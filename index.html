@@ -392,7 +392,6 @@
             margin: 0;
         }
     </style>
-    <script src="js/shared-filters.js"></script>
 </head>
 <body>
     <div class="header">
@@ -654,7 +653,7 @@
         // Dropdown functions
         function toggleDropdown(type) {
             const menu = document.getElementById(type + '-menu');
-            const button = document.querySelector('#' + type + '-dropdown .dropdown-button');
+            const button = document.querySelector(`#${type}-dropdown .dropdown-button`);
             
             // Close any other open dropdown
             if (openDropdown && openDropdown !== type) {
@@ -670,7 +669,7 @@
         
         function openDropdownMenu(type) {
             const menu = document.getElementById(type + '-menu');
-            const button = document.querySelector('#' + type + '-dropdown .dropdown-button');
+            const button = document.querySelector(`#${type}-dropdown .dropdown-button`);
             const rect = button.getBoundingClientRect();
             const footer = document.querySelector('.pagination');
             const footerRect = footer.getBoundingClientRect();
@@ -687,7 +686,7 @@
         
         function closeDropdown(type) {
             const menu = document.getElementById(type + '-menu');
-            const button = document.querySelector('#' + type + '-dropdown .dropdown-button');
+            const button = document.querySelector(`#${type}-dropdown .dropdown-button`);
             
             menu.style.display = 'none';
             button.classList.remove('active');
@@ -701,28 +700,27 @@
             const selected = selectedFilters[type];
             
             if (selected.length === 0) {
-                let defaultText = 'All Classes';
-                if (type === 'year') defaultText = 'All Years';
-                if (type === 'zone') defaultText = 'All Zones';
-                
+                const defaultText = type === 'class' ? 'All Classes' : 
+                                  type === 'year' ? 'All Years' : 'All Zones';
                 textElement.textContent = defaultText;
                 textElement.style.color = '#666';
             } else if (selected.length === 1) {
+                // Show the single selected option name
                 if (type === 'class' && propertyClassHierarchy[selected[0]]) {
-                    textElement.textContent = selected[0] + ' - ' + propertyClassHierarchy[selected[0]].name;
+                    textElement.textContent = `${selected[0]} - ${propertyClassHierarchy[selected[0]].name}`;
                 } else {
                     textElement.textContent = selected[0];
                 }
                 textElement.style.color = '#333';
             } else {
-                textElement.textContent = selected.length + ' selected';
+                textElement.textContent = `${selected.length} selected`;
                 textElement.style.color = '#333';
             }
         }
         
         function handleDropdownSelection(type, value, checked) {
             const menu = document.getElementById(type + '-menu');
-            const allCheckbox = document.getElementById(type + '-all');
+            const allCheckbox = document.getElementById(`${type}-all`);
             
             if (value === '') {
                 // "All" option selected
@@ -752,7 +750,7 @@
                                 selectedFilters[type].push(subclass);
                             }
                             // Check the subclass checkbox in the UI
-                            const subCheckbox = document.getElementById(type + '-' + subclass);
+                            const subCheckbox = document.getElementById(`${type}-${subclass}`);
                             if (subCheckbox) subCheckbox.checked = true;
                         });
                     } else {
@@ -775,7 +773,7 @@
                             
                             if (allSubclassesSelected && !selectedFilters[type].includes(parentClass)) {
                                 selectedFilters[type].push(parentClass);
-                                const parentCheckbox = document.getElementById(type + '-' + parentClass);
+                                const parentCheckbox = document.getElementById(`${type}-${parentClass}`);
                                 if (parentCheckbox) parentCheckbox.checked = true;
                             }
                         }
@@ -791,7 +789,7 @@
                         classInfo.subclasses.forEach(subclass => {
                             selectedFilters[type] = selectedFilters[type].filter(v => v !== subclass);
                             // Uncheck the subclass checkbox in the UI
-                            const subCheckbox = document.getElementById(type + '-' + subclass);
+                            const subCheckbox = document.getElementById(`${type}-${subclass}`);
                             if (subCheckbox) subCheckbox.checked = false;
                         });
                     } else {
@@ -803,7 +801,7 @@
                         
                         if (parentClass && selectedFilters[type].includes(parentClass)) {
                             selectedFilters[type] = selectedFilters[type].filter(v => v !== parentClass);
-                            const parentCheckbox = document.getElementById(type + '-' + parentClass);
+                            const parentCheckbox = document.getElementById(`${type}-${parentClass}`);
                             if (parentCheckbox) parentCheckbox.checked = false;
                         }
                     }
@@ -822,7 +820,7 @@
         
         // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
-            if (openDropdown && !e.target.closest('#' + openDropdown + '-dropdown')) {
+            if (openDropdown && !e.target.closest(`#${openDropdown}-dropdown`)) {
                 closeDropdown(openDropdown);
             }
         });
@@ -907,7 +905,7 @@
                     const option = document.createElement('div');
                     option.className = 'dropdown-option';
                     option.dataset.value = code;
-                    option.innerHTML = '<input type="checkbox" id="class-' + code + '"><label for="class-' + code + '">' + code + ' - ' + name + '</label>';
+                    option.innerHTML = `<input type="checkbox" id="class-${code}"><label for="class-${code}">${code} - ${name}</label>`;
                     classMenu.appendChild(option);
                     
                     // Add event listener
@@ -926,7 +924,7 @@
                             const option = document.createElement('div');
                             option.className = 'dropdown-option';
                             option.dataset.value = subcode;
-                            option.innerHTML = '<input type="checkbox" id="class-' + subcode + '"><label for="class-' + subcode + '" style="padding-left: 20px;">' + subcode + ' - ' + propertyClassHierarchy[subcode].name + '</label>';
+                            option.innerHTML = `<input type="checkbox" id="class-${subcode}"><label for="class-${subcode}" style="padding-left: 20px;">${subcode} - ${propertyClassHierarchy[subcode].name}</label>`;
                             classMenu.appendChild(option);
                             
                             // Add event listener
@@ -944,7 +942,7 @@
                 const option = document.createElement('div');
                 option.className = 'dropdown-option';
                 option.dataset.value = year;
-                option.innerHTML = '<input type="checkbox" id="year-' + year + '"><label for="year-' + year + '">' + year + '</label>';
+                option.innerHTML = `<input type="checkbox" id="year-${year}"><label for="year-${year}">${year}</label>`;
                 yearMenu.appendChild(option);
                 
                 // Add event listener
@@ -960,7 +958,7 @@
                 const option = document.createElement('div');
                 option.className = 'dropdown-option';
                 option.dataset.value = zone;
-                option.innerHTML = '<input type="checkbox" id="zone-' + zone + '"><label for="zone-' + zone + '">' + zone + '</label>';
+                option.innerHTML = `<input type="checkbox" id="zone-${zone}"><label for="zone-${zone}">${zone}</label>`;
                 zoneMenu.appendChild(option);
                 
                 // Add event listener
@@ -1030,30 +1028,31 @@
             pageData.forEach(parcel => {
                 const isSelected = selectedProperties.has(parcel.parcel_id);
                 const rowClass = comparisonMode ? (isSelected ? 'selected' : '') : '';
-                const clickHandler = comparisonMode ? 'onclick="handlePropertyClick(\'' + parcel.parcel_id + '\', event)"' : '';
+                const clickHandler = comparisonMode ? `onclick="handlePropertyClick('${parcel.parcel_id}', event)"` : '';
                 
-                tableHTML += 
-                    '<tr class="' + rowClass + '" ' + clickHandler + ' style="cursor: ' + (comparisonMode ? 'pointer' : 'default') + ';">' +
-                        '<td title="' + parcel.parcel_id + '">' + parcel.parcel_id + '</td>' +
-                        '<td title="' + parcel.owner_name + '">' + parcel.owner_name + '</td>' +
-                        '<td title="' + parcel.class_code + '">' + parcel.class_code + '</td>' +
-                        '<td title="' + parcel.zoning + '">' + parcel.zoning + '</td>' +
-                        '<td title="' + parcel.building_style + '">' + (parcel.building_style || '') + '</td>' +
-                        '<td title="' + parcel.building_grade + '">' + (parcel.building_grade || '') + '</td>' +
-                        '<td title="' + parcel.year_built + '">' + (parseInt(parcel.year_built) || '—') + '</td>' +
-                        '<td title="' + parcel.living_area_sqft + '">' + (formatNumber(parseNumber(parcel.living_area_sqft)) || '—') + '</td>' +
-                        '<td title="' + parcel.bedrooms + '">' + (parcel.bedrooms || '—') + '</td>' +
-                        '<td title="' + parcel.total_rooms + '">' + (parcel.total_rooms || '—') + '</td>' +
-                        '<td title="' + parcel.full_baths + '">' + (parcel.full_baths || '—') + '</td>' +
-                        '<td title="' + parcel.half_baths + '">' + (parcel.half_baths || '—') + '</td>' +
-                        '<td title="' + parcel.heating_type + '">' + (parcel.heating_type || '') + '</td>' +
-                        '<td title="' + parcel.heating_fuel + '">' + (parcel.heating_fuel || '') + '</td>' +
-                        '<td title="' + parcel.neighborhood + '">' + (parcel.neighborhood || '') + '</td>' +
-                        '<td title="' + parcel.lot_size_acres + '">' + (parcel.lot_size_acres || '') + '</td>' +
-                        '<td title="' + formatCurrency(parseNumber(parcel.land_value)) + '">' + formatCurrency(parseNumber(parcel.land_value)) + '</td>' +
-                        '<td title="' + formatCurrency(parseNumber(parcel.building_value)) + '">' + formatCurrency(parseNumber(parcel.building_value)) + '</td>' +
-                        '<td title="' + formatCurrency(parseNumber(parcel.total_value)) + '">' + formatCurrency(parseNumber(parcel.total_value)) + '</td>' +
-                    '</tr>';
+                tableHTML += `
+                    <tr class="${rowClass}" ${clickHandler} style="cursor: ${comparisonMode ? 'pointer' : 'default'};">
+                        <td title="${parcel.parcel_id}">${parcel.parcel_id}</td>
+                        <td title="${parcel.owner_name}">${parcel.owner_name}</td>
+                        <td title="${parcel.class_code}">${parcel.class_code}</td>
+                        <td title="${parcel.zoning}">${parcel.zoning}</td>
+                        <td title="${parcel.building_style}">${parcel.building_style}</td>
+                        <td title="${parcel.building_grade}">${parcel.building_grade}</td>
+                        <td title="${parcel.year_built}">${parseInt(parcel.year_built) || '—'}</td>
+                        <td title="${parcel.living_area_sqft}">${formatNumber(parseNumber(parcel.living_area_sqft)) || '—'}</td>
+                        <td title="${parcel.bedrooms}">${parcel.bedrooms || '—'}</td>
+                        <td title="${parcel.total_rooms}">${parcel.total_rooms || '—'}</td>
+                        <td title="${parcel.full_baths}">${parcel.full_baths || '—'}</td>
+                        <td title="${parcel.half_baths}">${parcel.half_baths || '—'}</td>
+                        <td title="${parcel.heating_type}">${parcel.heating_type}</td>
+                        <td title="${parcel.heating_fuel}">${parcel.heating_fuel}</td>
+                        <td title="${parcel.neighborhood}">${parcel.neighborhood}</td>
+                        <td title="${parcel.lot_size_acres}">${parcel.lot_size_acres}</td>
+                        <td title="${formatCurrency(parseNumber(parcel.land_value))}">${formatCurrency(parseNumber(parcel.land_value))}</td>
+                        <td title="${formatCurrency(parseNumber(parcel.building_value))}">${formatCurrency(parseNumber(parcel.building_value))}</td>
+                        <td title="${formatCurrency(parseNumber(parcel.total_value))}">${formatCurrency(parseNumber(parcel.total_value))}</td>
+                    </tr>
+                `;
             });
 
             tableBody.innerHTML = tableHTML;
@@ -1068,7 +1067,7 @@
             let paginationHTML = '';
             
             // Previous button
-            paginationHTML += '<button class="page-btn" onclick="changePage(' + (currentPage - 1) + ')" ' + (currentPage <= 1 ? 'disabled' : '') + '>&laquo; Prev</button>';
+            paginationHTML += `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''}>&laquo; Prev</button>`;
             
             // Page numbers
             let startPage = Math.max(1, currentPage - 2);
@@ -1084,18 +1083,19 @@
             
             for (let i = startPage; i <= endPage; i++) {
                 const activeClass = i === currentPage ? ' active' : '';
-                paginationHTML += '<button class="page-btn' + activeClass + '" onclick="changePage(' + i + ')">' + i + '</button>';
+                paginationHTML += `<button class="page-btn${activeClass}" onclick="changePage(${i})">${i}</button>`;
             }
             
             // Next button
-            paginationHTML += '<button class="page-btn" onclick="changePage(' + (currentPage + 1) + ')" ' + (currentPage >= totalPages ? 'disabled' : '') + '>Next &raquo;</button>';
+            paginationHTML += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''}>Next &raquo;</button>`;
             
             // Add function buttons inline with pagination
-            paginationHTML += 
-                '<span style="margin: 0 16px; color: #666;">Showing ' + (((currentPage - 1) * rowsPerPage) + 1) + '-' + Math.min(currentPage * rowsPerPage, filteredParcels.length) + ' of ' + formatNumber(filteredParcels.length) + ' properties</span>' +
-                '<button class="btn btn-success" onclick="exportFilteredData()" style="padding: 4px 8px; font-size: 0.8em; margin: 0 4px;">📊 Export</button>' +
-                '<button class="btn btn-warning" onclick="toggleAnalytics()" style="padding: 4px 8px; font-size: 0.8em; margin: 0 4px;">📈 Analytics</button>' +
-                '<button class="btn" onclick="toggleComparison()" style="padding: 4px 8px; font-size: 0.8em; margin: 0 4px;">⚖️ Compare</button>';
+            paginationHTML += `
+                <span style="margin: 0 16px; color: #666;">Showing ${((currentPage - 1) * rowsPerPage) + 1}-${Math.min(currentPage * rowsPerPage, filteredParcels.length)} of ${formatNumber(filteredParcels.length)} properties</span>
+                <button class="btn btn-success" onclick="exportFilteredData()" style="padding: 4px 8px; font-size: 0.8em; margin: 0 4px;">📊 Export</button>
+                <button class="btn btn-warning" onclick="toggleAnalytics()" style="padding: 4px 8px; font-size: 0.8em; margin: 0 4px;">📈 Analytics</button>
+                <button class="btn" onclick="toggleComparison()" style="padding: 4px 8px; font-size: 0.8em; margin: 0 4px;">⚖️ Compare</button>
+            `;
             
             paginationDiv.innerHTML = paginationHTML;
         }
@@ -1141,21 +1141,21 @@
             
             filteredParcels.forEach(parcel => {
                 const row = [
-                    '"' + parcel.parcel_id + '"',
-                    '"' + parcel.owner_name + '"',
-                    '"' + parcel.class_code + '"',
-                    '"' + parcel.zoning + '"',
-                    '"' + parcel.building_style + '"',
-                    '"' + parcel.building_grade + '"',
+                    `"${parcel.parcel_id}"`,
+                    `"${parcel.owner_name}"`,
+                    `"${parcel.class_code}"`,
+                    `"${parcel.zoning}"`,
+                    `"${parcel.building_style}"`,
+                    `"${parcel.building_grade}"`,
                     parseInt(parcel.year_built) || '',
                     parseNumber(parcel.living_area_sqft) || '',
                     parcel.bedrooms || '',
                     parcel.total_rooms || '',
                     parcel.full_baths || '',
                     parcel.half_baths || '',
-                    '"' + parcel.heating_type + '"',
-                    '"' + parcel.heating_fuel + '"',
-                    '"' + parcel.neighborhood + '"',
+                    `"${parcel.heating_type}"`,
+                    `"${parcel.heating_fuel}"`,
+                    `"${parcel.neighborhood}"`,
                     parcel.lot_size_acres || '',
                     parseNumber(parcel.land_value) || '',
                     parseNumber(parcel.building_value) || '',
@@ -1170,7 +1170,7 @@
             
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'lebanon_properties_' + new Date().toISOString().slice(0, 10) + '.csv';
+            a.download = `lebanon_properties_${new Date().toISOString().slice(0, 10)}.csv`;
             a.click();
             
             window.URL.revokeObjectURL(url);
