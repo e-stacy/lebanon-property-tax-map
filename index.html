@@ -71,8 +71,8 @@
             display: flex; 
             gap: 12px; 
             margin-bottom: 8px; 
-            align-items: flex-end;
-            flex-wrap: nowrap;
+            align-items: center;
+            flex-wrap: wrap;
         }
         .control-group {
             display: flex;
@@ -989,66 +989,6 @@
             content.innerHTML = compareHtml;
         }
         
-        // Enhanced search with suggestions
-        function setupSearchSuggestions() {
-            const searchInput = document.getElementById('search');
-            const dropdown = document.getElementById('suggestions-dropdown');
-            
-            // Build suggestions array
-            allSuggestions = [];
-            allParcels.forEach(parcel => {
-                if (parcel.owner_name) allSuggestions.push({ type: 'owner', value: parcel.owner_name });
-                if (parcel.parcel_id) allSuggestions.push({ type: 'parcel', value: parcel.parcel_id });
-            });
-            
-            // Remove duplicates
-            allSuggestions = allSuggestions.filter((item, index, self) => 
-                index === self.findIndex(t => t.value === item.value)
-            );
-            
-            searchInput.addEventListener('input', function() {
-                const query = this.value.toLowerCase();
-                
-                if (query.length < 2) {
-                    dropdown.style.display = 'none';
-                    return;
-                }
-                
-                const matches = allSuggestions
-                    .filter(item => item.value.toLowerCase().includes(query))
-                    .slice(0, 8);
-                
-                if (matches.length === 0) {
-                    dropdown.style.display = 'none';
-                    return;
-                }
-                
-                let suggestionHtml = '';
-                matches.forEach(match => {
-                    const icon = match.type === 'address' ? '🏠' : match.type === 'owner' ? '👤' : '📋';
-                    suggestionHtml += `
-                        <div class="suggestion-item" onclick="selectSuggestion('${match.value.replace(/'/g, "\\'")}')">${icon} ${match.value}</div>
-                    `;
-                });
-                
-                dropdown.innerHTML = suggestionHtml;
-                dropdown.style.display = 'block';
-            });
-            
-            // Hide dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
-                    dropdown.style.display = 'none';
-                }
-            });
-        }
-        
-        function selectSuggestion(value) {
-            document.getElementById('search').value = value;
-            document.getElementById('suggestions-dropdown').style.display = 'none';
-            currentPage = 1;
-            applyFilters();
-        }
         
         // Clear all filters
         function clearFilters() {
