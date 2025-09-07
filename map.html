@@ -25,11 +25,11 @@
             top: 10px;
             right: 10px;
             background: white;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.3);
             z-index: 1000;
-            min-width: 168px;
+            min-width: 150px;
             max-height: calc(100vh - 40px);
             overflow-y: auto;
         }
@@ -1352,18 +1352,28 @@
                 }
             }
             
-            // Calculate median value for filtered properties
+            // Calculate median value
             let medianValue = 0;
-            if (visibleCount > 0) {
-                const values = [];
-                for (const [id, prop] of propertyData) {
-                    if (passesFilters(prop)) {
-                        const value = parseFloat(prop.total_value) || 0;
-                        if (value > 0) values.push(value);
+            if (!hasFilters) {
+                // No filters - use city-wide median
+                const allValues = [...propertyData.values()]
+                    .map(p => parseFloat(p.total_value) || 0)
+                    .filter(v => v > 0)
+                    .sort((a, b) => a - b);
+                medianValue = allValues.length > 0 ? allValues[Math.floor(allValues.length / 2)] : 0;
+            } else {
+                // Filters applied - calculate filtered median
+                if (visibleCount > 0) {
+                    const values = [];
+                    for (const [id, prop] of propertyData) {
+                        if (passesFilters(prop)) {
+                            const value = parseFloat(prop.total_value) || 0;
+                            if (value > 0) values.push(value);
+                        }
                     }
+                    values.sort((a, b) => a - b);
+                    medianValue = values.length > 0 ? values[Math.floor(values.length / 2)] : 0;
                 }
-                values.sort((a, b) => a - b);
-                medianValue = values.length > 0 ? values[Math.floor(values.length / 2)] : 0;
             }
             const percentage = allPropertiesTotal > 0 ? (totalValue / allPropertiesTotal * 100) : 0;
             
@@ -1388,15 +1398,15 @@
             document.getElementById('median-value').textContent = formatLargeNumber(medianValue);
             
             // Calculate all percentages
-            const parcelPercentage = allPropertiesCount > 0 ? (visibleCount / allPropertiesCount * 100) : 0;
-            const valuePercentage = allPropertiesTotal > 0 ? (totalValue / allPropertiesTotal * 100) : 0;
+            const parcelPercentage = !hasFilters ? 100 : (allPropertiesCount > 0 ? (visibleCount / allPropertiesCount * 100) : 0);
+            const valuePercentage = !hasFilters ? 100 : (allPropertiesTotal > 0 ? (totalValue / allPropertiesTotal * 100) : 0);
             // Get all values for median calculation
             const allPropValues = [...propertyData.values()]
                 .map(p => parseFloat(p.total_value) || 0)
                 .filter(v => v > 0)
                 .sort((a, b) => a - b);
             const allMedianValue = allPropValues.length > 0 ? allPropValues[Math.floor(allPropValues.length / 2)] : 0;
-            const medianPercentage = allMedianValue > 0 ? (medianValue / allMedianValue * 100) : 0;
+            const medianPercentage = !hasFilters ? 100 : (allMedianValue > 0 ? (medianValue / allMedianValue * 100) : 0);
             
             document.getElementById('parcel-percentage').textContent = parcelPercentage.toFixed(1) + '%';
             document.getElementById('value-percentage').textContent = valuePercentage.toFixed(1) + '%';
