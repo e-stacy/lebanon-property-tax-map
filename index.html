@@ -1068,7 +1068,7 @@
             let paginationHTML = '';
             
             // Previous button
-            paginationHTML += `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''}>&laquo; Prev</button>`;
+            paginationHTML += '<button class="page-btn" onclick="changePage(' + (currentPage - 1) + ')" ' + (currentPage <= 1 ? 'disabled' : '') + '>&laquo; Prev</button>';
             
             // Page numbers
             let startPage = Math.max(1, currentPage - 2);
@@ -1084,19 +1084,18 @@
             
             for (let i = startPage; i <= endPage; i++) {
                 const activeClass = i === currentPage ? ' active' : '';
-                paginationHTML += `<button class="page-btn${activeClass}" onclick="changePage(${i})">${i}</button>`;
+                paginationHTML += '<button class="page-btn' + activeClass + '" onclick="changePage(' + i + ')">' + i + '</button>';
             }
             
             // Next button
-            paginationHTML += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''}>Next &raquo;</button>`;
+            paginationHTML += '<button class="page-btn" onclick="changePage(' + (currentPage + 1) + ')" ' + (currentPage >= totalPages ? 'disabled' : '') + '>Next &raquo;</button>';
             
             // Add function buttons inline with pagination
-            paginationHTML += `
-                <span style="margin: 0 16px; color: #666;">Showing ${((currentPage - 1) * rowsPerPage) + 1}-${Math.min(currentPage * rowsPerPage, filteredParcels.length)} of ${formatNumber(filteredParcels.length)} properties</span>
-                <button class="btn btn-success" onclick="exportFilteredData()" style="padding: 4px 8px; font-size: 0.8em; margin: 0 4px;">📊 Export</button>
-                <button class="btn btn-warning" onclick="toggleAnalytics()" style="padding: 4px 8px; font-size: 0.8em; margin: 0 4px;">📈 Analytics</button>
-                <button class="btn" onclick="toggleComparison()" style="padding: 4px 8px; font-size: 0.8em; margin: 0 4px;">⚖️ Compare</button>
-            `;
+            paginationHTML += 
+                '<span style="margin: 0 16px; color: #666;">Showing ' + (((currentPage - 1) * rowsPerPage) + 1) + '-' + Math.min(currentPage * rowsPerPage, filteredParcels.length) + ' of ' + formatNumber(filteredParcels.length) + ' properties</span>' +
+                '<button class="btn btn-success" onclick="exportFilteredData()" style="padding: 4px 8px; font-size: 0.8em; margin: 0 4px;">📊 Export</button>' +
+                '<button class="btn btn-warning" onclick="toggleAnalytics()" style="padding: 4px 8px; font-size: 0.8em; margin: 0 4px;">📈 Analytics</button>' +
+                '<button class="btn" onclick="toggleComparison()" style="padding: 4px 8px; font-size: 0.8em; margin: 0 4px;">⚖️ Compare</button>';
             
             paginationDiv.innerHTML = paginationHTML;
         }
@@ -1142,21 +1141,21 @@
             
             filteredParcels.forEach(parcel => {
                 const row = [
-                    `"${parcel.parcel_id}"`,
-                    `"${parcel.owner_name}"`,
-                    `"${parcel.class_code}"`,
-                    `"${parcel.zoning}"`,
-                    `"${parcel.building_style}"`,
-                    `"${parcel.building_grade}"`,
+                    '"' + parcel.parcel_id + '"',
+                    '"' + parcel.owner_name + '"',
+                    '"' + parcel.class_code + '"',
+                    '"' + parcel.zoning + '"',
+                    '"' + parcel.building_style + '"',
+                    '"' + parcel.building_grade + '"',
                     parseInt(parcel.year_built) || '',
                     parseNumber(parcel.living_area_sqft) || '',
                     parcel.bedrooms || '',
                     parcel.total_rooms || '',
                     parcel.full_baths || '',
                     parcel.half_baths || '',
-                    `"${parcel.heating_type}"`,
-                    `"${parcel.heating_fuel}"`,
-                    `"${parcel.neighborhood}"`,
+                    '"' + parcel.heating_type + '"',
+                    '"' + parcel.heating_fuel + '"',
+                    '"' + parcel.neighborhood + '"',
                     parcel.lot_size_acres || '',
                     parseNumber(parcel.land_value) || '',
                     parseNumber(parcel.building_value) || '',
@@ -1171,7 +1170,7 @@
             
             const a = document.createElement('a');
             a.href = url;
-            a.download = `lebanon_properties_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.download = 'lebanon_properties_' + new Date().toISOString().slice(0, 10) + '.csv';
             a.click();
             
             window.URL.revokeObjectURL(url);
