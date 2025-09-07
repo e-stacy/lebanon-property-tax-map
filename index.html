@@ -392,6 +392,7 @@
             margin: 0;
         }
     </style>
+    <script src="js/shared-filters.js"></script>
 </head>
 <body>
     <div class="header">
@@ -1031,29 +1032,28 @@
                 const rowClass = comparisonMode ? (isSelected ? 'selected' : '') : '';
                 const clickHandler = comparisonMode ? 'onclick="handlePropertyClick(\'' + parcel.parcel_id + '\', event)"' : '';
                 
-                tableHTML += `
-                    <tr class="${rowClass}" ${clickHandler} style="cursor: ${comparisonMode ? 'pointer' : 'default'};">
-                        <td title="${parcel.parcel_id}">${parcel.parcel_id}</td>
-                        <td title="${parcel.owner_name}">${parcel.owner_name}</td>
-                        <td title="${parcel.class_code}">${parcel.class_code}</td>
-                        <td title="${parcel.zoning}">${parcel.zoning}</td>
-                        <td title="${parcel.building_style}">${parcel.building_style}</td>
-                        <td title="${parcel.building_grade}">${parcel.building_grade}</td>
-                        <td title="${parcel.year_built}">${parseInt(parcel.year_built) || '—'}</td>
-                        <td title="${parcel.living_area_sqft}">${formatNumber(parseNumber(parcel.living_area_sqft)) || '—'}</td>
-                        <td title="${parcel.bedrooms}">${parcel.bedrooms || '—'}</td>
-                        <td title="${parcel.total_rooms}">${parcel.total_rooms || '—'}</td>
-                        <td title="${parcel.full_baths}">${parcel.full_baths || '—'}</td>
-                        <td title="${parcel.half_baths}">${parcel.half_baths || '—'}</td>
-                        <td title="${parcel.heating_type}">${parcel.heating_type}</td>
-                        <td title="${parcel.heating_fuel}">${parcel.heating_fuel}</td>
-                        <td title="${parcel.neighborhood}">${parcel.neighborhood}</td>
-                        <td title="${parcel.lot_size_acres}">${parcel.lot_size_acres}</td>
-                        <td title="${formatCurrency(parseNumber(parcel.land_value))}">${formatCurrency(parseNumber(parcel.land_value))}</td>
-                        <td title="${formatCurrency(parseNumber(parcel.building_value))}">${formatCurrency(parseNumber(parcel.building_value))}</td>
-                        <td title="${formatCurrency(parseNumber(parcel.total_value))}">${formatCurrency(parseNumber(parcel.total_value))}</td>
-                    </tr>
-                `;
+                tableHTML += 
+                    '<tr class="' + rowClass + '" ' + clickHandler + ' style="cursor: ' + (comparisonMode ? 'pointer' : 'default') + ';">' +
+                        '<td title="' + parcel.parcel_id + '">' + parcel.parcel_id + '</td>' +
+                        '<td title="' + parcel.owner_name + '">' + parcel.owner_name + '</td>' +
+                        '<td title="' + parcel.class_code + '">' + parcel.class_code + '</td>' +
+                        '<td title="' + parcel.zoning + '">' + parcel.zoning + '</td>' +
+                        '<td title="' + parcel.building_style + '">' + (parcel.building_style || '') + '</td>' +
+                        '<td title="' + parcel.building_grade + '">' + (parcel.building_grade || '') + '</td>' +
+                        '<td title="' + parcel.year_built + '">' + (parseInt(parcel.year_built) || '—') + '</td>' +
+                        '<td title="' + parcel.living_area_sqft + '">' + (formatNumber(parseNumber(parcel.living_area_sqft)) || '—') + '</td>' +
+                        '<td title="' + parcel.bedrooms + '">' + (parcel.bedrooms || '—') + '</td>' +
+                        '<td title="' + parcel.total_rooms + '">' + (parcel.total_rooms || '—') + '</td>' +
+                        '<td title="' + parcel.full_baths + '">' + (parcel.full_baths || '—') + '</td>' +
+                        '<td title="' + parcel.half_baths + '">' + (parcel.half_baths || '—') + '</td>' +
+                        '<td title="' + parcel.heating_type + '">' + (parcel.heating_type || '') + '</td>' +
+                        '<td title="' + parcel.heating_fuel + '">' + (parcel.heating_fuel || '') + '</td>' +
+                        '<td title="' + parcel.neighborhood + '">' + (parcel.neighborhood || '') + '</td>' +
+                        '<td title="' + parcel.lot_size_acres + '">' + (parcel.lot_size_acres || '') + '</td>' +
+                        '<td title="' + formatCurrency(parseNumber(parcel.land_value)) + '">' + formatCurrency(parseNumber(parcel.land_value)) + '</td>' +
+                        '<td title="' + formatCurrency(parseNumber(parcel.building_value)) + '">' + formatCurrency(parseNumber(parcel.building_value)) + '</td>' +
+                        '<td title="' + formatCurrency(parseNumber(parcel.total_value)) + '">' + formatCurrency(parseNumber(parcel.total_value)) + '</td>' +
+                    '</tr>';
             });
 
             tableBody.innerHTML = tableHTML;
