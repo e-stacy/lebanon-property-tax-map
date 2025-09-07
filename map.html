@@ -7,7 +7,7 @@
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="simple-checkbox-styles.css">
+    <link rel="stylesheet" href="working-checkbox-styles.css">
     
     <style>
         body { 
@@ -188,10 +188,7 @@
             </div>
             
             <div class="filter-group">
-                <label>Property Class Filter:</label>
-                <select id="class-filter">
-                    <option value="">All Classes</option>
-                </select>
+                <div id="class-filter"></div>
             </div>
             
             <div class="filter-group">
@@ -1567,31 +1564,20 @@
         document.addEventListener('DOMContentLoaded', initMap);
     </script>
     
-    <!-- Simple Checkbox Filter System -->
-    <script src="simple-checkbox-filters.js"></script>
+    <!-- Working Checkbox Filter System -->
+    <script src="working-checkbox-filters.js"></script>
     <script>
-        // Initialize checkboxes after data loads for map
-        const originalPopulateFilterss = populateFilters;
-        populateFilters = function() {
-            originalPopulateFilterss();
-            
-            // Get property class counts from loaded data
-            const propertyClasses = {};
-            propertyData.forEach(prop => {
-                const classCode = prop.class_code;
-                if (classCode) {
-                    propertyClasses[classCode] = (propertyClasses[classCode] || 0) + 1;
-                }
-            });
-            
-            // Initialize checkbox filters
-            initializeCheckboxFilters(propertyClasses);
-        };
+        // Initialize working filters after data loads for map
+        function initializeWorkingMapFilters() {
+            if (propertyData && propertyData.size > 0) {
+                workingFilters.createPropertyClassFilter('class-filter', propertyData);
+            }
+        }
         
-        // Update the existing applyFilters function to work with checkboxes
-        const originalApplyFilterss = applyFilters;
+        // Update the existing applyFilters function to work with working checkboxes
+        const originalMapApplyFilters = applyFilters;
         applyFilters = function() {
-            // Get selected property classes from checkboxes
+            // Get selected property classes from working checkboxes
             const selectedClasses = getSelectedValues('class-filter');
             
             // Apply filters to map layers
@@ -1607,7 +1593,7 @@
                 
                 if (prop) {
                     // Property class filter
-                    if (selectedClasses.length > 0 && selectedClasses[0] !== '') {
+                    if (selectedClasses.length > 0) {
                         if (!selectedClasses.includes(prop.class_code)) {
                             isVisible = false;
                         }
@@ -1658,6 +1644,18 @@
             
             document.getElementById('parcel-percentage').textContent = totalParcels > 0 ? ((visibleCount / totalParcels) * 100).toFixed(1) + '%' : '0%';
             document.getElementById('value-percentage').textContent = allTotalValue > 0 ? ((totalValue / allTotalValue) * 100).toFixed(1) + '%' : '0%';
+        };
+        
+        // Initialize filters after data loads
+        const originalMapUpdateStats = updateStats;
+        updateStats = function() {
+            originalMapUpdateStats();
+            if (propertyData && propertyData.size > 0 && !window.mapFiltersInitialized) {
+                setTimeout(() => {
+                    initializeWorkingMapFilters();
+                    window.mapFiltersInitialized = true;
+                }, 100);
+            }
         };
     </script>
     
