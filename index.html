@@ -94,22 +94,80 @@
             width: 100%;
             box-sizing: border-box;
         }
-        select[multiple] {
-            padding: 4px;
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+        }
+        .dropdown-button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
             background: white;
+            cursor: pointer;
+            font-size: 0.9em;
+            min-height: 20px;
+            transition: border-color 0.2s;
         }
-        select[multiple] option {
-            padding: 4px 8px;
-            margin: 1px 0;
-            border-radius: 3px;
+        .dropdown-button:hover {
+            border-color: #2196f3;
         }
-        select[multiple] option:hover {
-            background: #e3f2fd;
+        .dropdown-button.active {
+            border-color: #2196f3;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
         }
-        select[multiple] option:checked {
-            background: #2196f3;
-            color: white;
-            font-weight: 500;
+        .dropdown-text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #333;
+        }
+        .dropdown-arrow {
+            color: #666;
+            font-size: 0.8em;
+            transition: transform 0.2s;
+        }
+        .dropdown-button.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+        .dropdown-menu {
+            position: fixed;
+            background: white;
+            border: 2px solid #2196f3;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 10000;
+            display: none;
+            min-width: 200px;
+        }
+        .dropdown-option {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .dropdown-option:hover {
+            background: #f8f9fa;
+        }
+        .dropdown-option:last-child {
+            border-bottom: none;
+        }
+        .dropdown-option input[type="checkbox"] {
+            margin: 0 8px 0 0;
+            width: auto;
+        }
+        .dropdown-option label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin: 0;
         }
         input[type="search"] {
             min-width: 150px;
@@ -351,22 +409,49 @@
         <div class="control-row">
             <button class="btn" onclick="clearFilters()" style="margin-right: 15px; align-self: flex-end; margin-bottom: 6px;">🔄 Reset Filters</button>
             <div class="control-group">
-                <div class="control-label">Property Class <small style="color: #888;">(Ctrl+click for multiple)</small></div>
-                <select id="class-filter" multiple size="4" style="height: 80px; overflow-y: auto;">
-                    <option value="" style="font-style: italic; color: #666;">All Classes</option>
-                </select>
+                <div class="control-label">Property Class <small style="color: #888;">(Click for options)</small></div>
+                <div class="custom-dropdown" id="class-dropdown">
+                    <div class="dropdown-button" onclick="toggleDropdown('class')">
+                        <span class="dropdown-text" id="class-text">All Classes</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="dropdown-menu" id="class-menu">
+                        <div class="dropdown-option" data-value="">
+                            <input type="checkbox" id="class-all" checked>
+                            <label for="class-all">All Classes</label>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="control-group">
-                <div class="control-label">Year Built <small style="color: #888;">(Ctrl+click for multiple)</small></div>
-                <select id="year-built-filter" multiple size="4" style="height: 80px; overflow-y: auto;">
-                    <option value="" style="font-style: italic; color: #666;">All Years</option>
-                </select>
+                <div class="control-label">Year Built <small style="color: #888;">(Click for options)</small></div>
+                <div class="custom-dropdown" id="year-dropdown">
+                    <div class="dropdown-button" onclick="toggleDropdown('year')">
+                        <span class="dropdown-text" id="year-text">All Years</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="dropdown-menu" id="year-menu">
+                        <div class="dropdown-option" data-value="">
+                            <input type="checkbox" id="year-all" checked>
+                            <label for="year-all">All Years</label>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="control-group">
-                <div class="control-label">Zone <small style="color: #888;">(Ctrl+click for multiple)</small></div>
-                <select id="zoning-filter" multiple size="4" style="height: 80px; overflow-y: auto;">
-                    <option value="" style="font-style: italic; color: #666;">All Zones</option>
-                </select>
+                <div class="control-label">Zone <small style="color: #888;">(Click for options)</small></div>
+                <div class="custom-dropdown" id="zone-dropdown">
+                    <div class="dropdown-button" onclick="toggleDropdown('zone')">
+                        <span class="dropdown-text" id="zone-text">All Zones</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="dropdown-menu" id="zone-menu">
+                        <div class="dropdown-option" data-value="">
+                            <input type="checkbox" id="zone-all" checked>
+                            <label for="zone-all">All Zones</label>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="control-group">
                 <div class="control-label">Min Value ($)</div>
@@ -625,14 +710,14 @@
 
         // Populate filter dropdowns
         function populateFilters() {
-            const classFilter = document.getElementById('class-filter');
-            const yearFilter = document.getElementById('year-built-filter');
-            const zoneFilter = document.getElementById('zoning-filter');
+            const classMenu = document.getElementById('class-menu');
+            const yearMenu = document.getElementById('year-menu');
+            const zoneMenu = document.getElementById('zone-menu');
             
             // Clear existing options (keep "All" options)
-            classFilter.innerHTML = '<option value="">All Classes</option>';
-            yearFilter.innerHTML = '<option value="">All Years</option>';
-            zoneFilter.innerHTML = '<option value="">All Zones</option>';
+            classMenu.innerHTML = '<div class=\"dropdown-option\" data-value=\"\"><input type=\"checkbox\" id=\"class-all\" checked><label for=\"class-all\">All Classes</label></div>';
+            yearMenu.innerHTML = '<div class=\"dropdown-option\" data-value=\"\"><input type=\"checkbox\" id=\"year-all\" checked><label for=\"year-all\">All Years</label></div>';
+            zoneMenu.innerHTML = '<div class=\"dropdown-option\" data-value=\"\"><input type=\"checkbox\" id=\"zone-all\" checked><label for=\"zone-all\">All Zones</label></div>';
             
             // Populate property class filter with hierarchical structure
             const usedClasses = new Set(allParcels.map(p => p.class_code).filter(c => c));
@@ -646,57 +731,18 @@
                 
                 // Add primary class option
                 if (usedClasses.has(code)) {
-                    const option = document.createElement('option');
-                    option.value = code;
-                    option.textContent = `${code} - ${name}`;
-                    classFilter.appendChild(option);
-                }
-                
-                // Add subclass options (indented)
-                if (classInfo && classInfo.subclasses) {
-                    classInfo.subclasses
-                        .filter(sub => usedClasses.has(sub) && propertyClassHierarchy[sub])
-                        .sort()
-                        .forEach(subcode => {
-                            const option = document.createElement('option');
-                            option.value = subcode;
-                            option.textContent = `  ${subcode} - ${propertyClassHierarchy[subcode].name}`;
-                            classFilter.appendChild(option);
-                        });
-                }
-            });
-            
-            // Populate year built filter
-            const years = [...new Set(allParcels.map(p => p.year_built ? parseInt(p.year_built) : null).filter(y => y))].sort((a, b) => b - a);
-            years.forEach(year => {
-                const option = document.createElement('option');
-                option.value = year;
-                option.textContent = year;
-                yearFilter.appendChild(option);
-            });
-            
-            // Populate zoning filter
-            const zones = [...new Set(allParcels.map(p => p.zoning).filter(z => z))].sort();
-            zones.forEach(zone => {
-                const option = document.createElement('option');
-                option.value = zone;
-                option.textContent = zone;
-                zoneFilter.appendChild(option);
-            });
-        }
+                    const option = document.createElement('div');
+                    option.className = 'dropdown-option';\n                    option.dataset.value = code;\n                    option.innerHTML = `<input type=\"checkbox\" id=\"class-${code}\"><label for=\"class-${code}\">${code} - ${name}</label>`;\n                    classMenu.appendChild(option);\n                    \n                    // Add event listener\n                    const checkbox = option.querySelector('input');\n                    checkbox.addEventListener('change', (e) => {\n                        handleDropdownSelection('class', code, e.target.checked);\n                    });\n                }\n                \n                // Add subclass options (indented)\n                if (classInfo && classInfo.subclasses) {\n                    classInfo.subclasses\n                        .filter(sub => usedClasses.has(sub) && propertyClassHierarchy[sub])\n                        .sort()\n                        .forEach(subcode => {\n                            const option = document.createElement('div');\n                            option.className = 'dropdown-option';\n                            option.dataset.value = subcode;\n                            option.innerHTML = `<input type=\"checkbox\" id=\"class-${subcode}\"><label for=\"class-${subcode}\" style=\"padding-left: 20px;\">${subcode} - ${propertyClassHierarchy[subcode].name}</label>`;\n                            classMenu.appendChild(option);\n                            \n                            // Add event listener\n                            const checkbox = option.querySelector('input');\n                            checkbox.addEventListener('change', (e) => {\n                                handleDropdownSelection('class', subcode, e.target.checked);\n                            });\n                        });\n                }\n            });\n            \n            // Populate year built filter\n            const years = [...new Set(allParcels.map(p => p.year_built ? parseInt(p.year_built) : null).filter(y => y))].sort((a, b) => b - a);\n            years.forEach(year => {\n                const option = document.createElement('div');\n                option.className = 'dropdown-option';\n                option.dataset.value = year;\n                option.innerHTML = `<input type=\"checkbox\" id=\"year-${year}\"><label for=\"year-${year}\">${year}</label>`;\n                yearMenu.appendChild(option);\n                \n                // Add event listener\n                const checkbox = option.querySelector('input');\n                checkbox.addEventListener('change', (e) => {\n                    handleDropdownSelection('year', year.toString(), e.target.checked);\n                });\n            });\n            \n            // Populate zoning filter\n            const zones = [...new Set(allParcels.map(p => p.zoning).filter(z => z))].sort();\n            zones.forEach(zone => {\n                const option = document.createElement('div');\n                option.className = 'dropdown-option';\n                option.dataset.value = zone;\n                option.innerHTML = `<input type=\"checkbox\" id=\"zone-${zone}\"><label for=\"zone-${zone}\">${zone}</label>`;\n                zoneMenu.appendChild(option);\n                \n                // Add event listener\n                const checkbox = option.querySelector('input');\n                checkbox.addEventListener('change', (e) => {\n                    handleDropdownSelection('zone', zone, e.target.checked);\n                });\n            });\n        }
 
         // Apply filters
         function applyFilters() {
-            const classFilterElement = document.getElementById('class-filter');
-            const yearFilterElement = document.getElementById('year-built-filter');
-            const zoneFilterElement = document.getElementById('zoning-filter');
             const minValue = parseNumber(document.getElementById('min-value').value);
             const maxValue = parseNumber(document.getElementById('max-value').value);
 
-            // Get selected values from multi-select dropdowns
-            const selectedClasses = Array.from(classFilterElement.selectedOptions).map(opt => opt.value).filter(v => v);
-            const selectedYears = Array.from(yearFilterElement.selectedOptions).map(opt => opt.value).filter(v => v);
-            const selectedZones = Array.from(zoneFilterElement.selectedOptions).map(opt => opt.value).filter(v => v);
+            // Get selected values from custom dropdowns
+            const selectedClasses = selectedFilters.class;
+            const selectedYears = selectedFilters.year;
+            const selectedZones = selectedFilters.zone;
 
             filteredParcels = allParcels.filter(parcel => {
                 // Class filter with hierarchical support
@@ -1032,16 +1078,113 @@
         }
         
         
+        // Custom dropdown functionality
+        let openDropdown = null;
+        let selectedFilters = {
+            class: [],
+            year: [],
+            zone: []
+        };
+
+        function toggleDropdown(type) {
+            const menu = document.getElementById(type + '-menu');
+            const button = document.querySelector(`#${type}-dropdown .dropdown-button`);
+            
+            // Close any other open dropdown
+            if (openDropdown && openDropdown !== type) {
+                closeDropdown(openDropdown);
+            }
+            
+            if (menu.style.display === 'block') {
+                closeDropdown(type);
+            } else {
+                openDropdownMenu(type);
+            }
+        }
+        
+        function openDropdownMenu(type) {
+            const menu = document.getElementById(type + '-menu');
+            const button = document.querySelector(`#${type}-dropdown .dropdown-button`);
+            const rect = button.getBoundingClientRect();
+            const footer = document.querySelector('.pagination');
+            const footerRect = footer.getBoundingClientRect();
+            
+            // Position above footer
+            menu.style.bottom = (window.innerHeight - footerRect.top + 10) + 'px';
+            menu.style.left = rect.left + 'px';
+            menu.style.width = rect.width + 'px';
+            menu.style.display = 'block';
+            
+            button.classList.add('active');
+            openDropdown = type;
+        }
+        
+        function closeDropdown(type) {
+            const menu = document.getElementById(type + '-menu');
+            const button = document.querySelector(`#${type}-dropdown .dropdown-button`);
+            
+            menu.style.display = 'none';
+            button.classList.remove('active');
+            if (openDropdown === type) {
+                openDropdown = null;
+            }
+        }
+        
+        function updateDropdownText(type) {
+            const textElement = document.getElementById(type + '-text');
+            const selected = selectedFilters[type];
+            
+            if (selected.length === 0) {
+                const defaultText = type === 'class' ? 'All Classes' : 
+                                  type === 'year' ? 'All Years' : 'All Zones';
+                textElement.textContent = defaultText;
+                textElement.style.color = '#666';
+            } else if (selected.length === 1) {
+                textElement.textContent = selected[0];
+                textElement.style.color = '#333';
+            } else {
+                textElement.textContent = `${selected.length} selected`;
+                textElement.style.color = '#333';
+            }
+        }
+        
+        function handleDropdownSelection(type, value, checked) {
+            if (checked) {
+                if (!selectedFilters[type].includes(value)) {
+                    selectedFilters[type].push(value);
+                }
+            } else {
+                selectedFilters[type] = selectedFilters[type].filter(v => v !== value);
+            }
+            
+            updateDropdownText(type);
+            currentPage = 1;
+            applyFilters();
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (openDropdown && !e.target.closest(`#${openDropdown}-dropdown`)) {
+                closeDropdown(openDropdown);
+            }
+        });
+        
         // Clear all filters
         function clearFilters() {
-            // Clear multi-select dropdowns by deselecting all options
-            const classFilter = document.getElementById('class-filter');
-            const yearFilter = document.getElementById('year-built-filter');
-            const zoneFilter = document.getElementById('zoning-filter');
+            // Reset all dropdown selections
+            selectedFilters = { class: [], year: [], zone: [] };
             
-            Array.from(classFilter.options).forEach(option => option.selected = false);
-            Array.from(yearFilter.options).forEach(option => option.selected = false);
-            Array.from(zoneFilter.options).forEach(option => option.selected = false);
+            // Update dropdown texts
+            updateDropdownText('class');
+            updateDropdownText('year');
+            updateDropdownText('zone');
+            
+            // Clear checkboxes in all dropdown menus
+            ['class', 'year', 'zone'].forEach(type => {
+                const menu = document.getElementById(type + '-menu');
+                const checkboxes = menu.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(cb => cb.checked = false);
+            });
             
             document.getElementById('min-value').value = '';
             document.getElementById('max-value').value = '';
@@ -1050,9 +1193,6 @@
         }
         
         // Event listeners
-        document.getElementById('class-filter').addEventListener('change', () => { currentPage = 1; applyFilters(); });
-        document.getElementById('year-built-filter').addEventListener('change', () => { currentPage = 1; applyFilters(); });
-        document.getElementById('zoning-filter').addEventListener('change', () => { currentPage = 1; applyFilters(); });
         document.getElementById('min-value').addEventListener('input', () => { currentPage = 1; applyFilters(); });
         document.getElementById('max-value').addEventListener('input', () => { currentPage = 1; applyFilters(); });
 
