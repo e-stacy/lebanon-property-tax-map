@@ -97,83 +97,6 @@
             font-size: 0.9em;
         }
         
-        /* Custom Dropdown Styles */
-        .custom-dropdown {
-            position: relative;
-            width: 100%;
-        }
-        .dropdown-button {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 10px;
-            border: 2px solid #e1e5e9;
-            border-radius: 6px;
-            background: white;
-            cursor: pointer;
-            font-size: 0.9em;
-            min-height: 20px;
-            transition: border-color 0.2s;
-        }
-        .dropdown-button:hover {
-            border-color: #2196f3;
-        }
-        .dropdown-button.active {
-            border-color: #2196f3;
-            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
-        }
-        .dropdown-text {
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: #333;
-        }
-        .dropdown-arrow {
-            color: #666;
-            font-size: 0.8em;
-            transition: transform 0.2s;
-        }
-        .dropdown-button.active .dropdown-arrow {
-            transform: rotate(180deg);
-        }
-        .dropdown-menu {
-            position: fixed;
-            background: white;
-            border: 2px solid #2196f3;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            max-height: 300px;
-            overflow-y: auto;
-            z-index: 10000;
-            display: none;
-            min-width: 200px;
-        }
-        .dropdown-option {
-            display: flex;
-            align-items: center;
-            padding: 8px 12px;
-            border-bottom: 1px solid #f0f0f0;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .dropdown-option:hover {
-            background: #f8f9fa;
-        }
-        .dropdown-option:last-child {
-            border-bottom: none;
-        }
-        .dropdown-option input[type="checkbox"] {
-            margin: 0 8px 0 0;
-            width: auto;
-        }
-        .dropdown-option label {
-            flex: 1;
-            cursor: pointer;
-            font-size: 0.9em;
-            margin: 0;
-        }
-        
         input[type="checkbox"] {
             width: auto;
         }
@@ -264,19 +187,10 @@
             </div>
             
             <div class="filter-group">
-                <label>Property Class <small style="color: #888;">(Click for options)</small></label>
-                <div class="custom-dropdown" id="class-dropdown">
-                    <div class="dropdown-button" onclick="toggleDropdown('class')">
-                        <span class="dropdown-text" id="class-text">All Classes</span>
-                        <span class="dropdown-arrow">▼</span>
-                    </div>
-                    <div class="dropdown-menu" id="class-menu">
-                        <div class="dropdown-option" data-value="">
-                            <input type="checkbox" id="class-all" checked>
-                            <label for="class-all">All Classes</label>
-                        </div>
-                    </div>
-                </div>
+                <label>Property Class Filter:</label>
+                <select id="class-filter">
+                    <option value="">All Classes</option>
+                </select>
             </div>
             
             <div class="filter-group">
@@ -396,12 +310,6 @@
         let parcelData = [];
         let propertyData = new Map();
         let currentFilters = {};
-        
-        // Custom dropdown functionality
-        let openDropdown = null;
-        let selectedFilters = {
-            class: []
-        };
         
         // Color schemes for different visualization modes
         // Hierarchical property class structure for Lebanon, NH
@@ -627,23 +535,17 @@
                 .map(([code, info]) => ({ code, name: info.name }));
         }
         
-        function getClassesForFilter(selectedClasses) {
-            const result = [];
-            selectedClasses.forEach(selectedClass => {
-                const classInfo = propertyClassHierarchy[selectedClass];
-                if (!classInfo) {
-                    result.push(selectedClass);
-                    return;
-                }
-                
-                // If it's a primary class with subclasses, include all subclasses
-                if (classInfo.primary && classInfo.subclasses) {
-                    result.push(selectedClass, ...classInfo.subclasses);
-                } else {
-                    result.push(selectedClass);
-                }
-            });
-            return [...new Set(result)]; // Remove duplicates
+        function getClassesForFilter(selectedClass) {
+            const classInfo = propertyClassHierarchy[selectedClass];
+            if (!classInfo) return [selectedClass];
+            
+            // If it's a primary class with subclasses, include all subclasses
+            if (classInfo.primary && classInfo.subclasses) {
+                return [selectedClass, ...classInfo.subclasses];
+            }
+            
+            // If it's a subclass, just return itself
+            return [selectedClass];
         }
         
         // Generate colors for all actual Lebanon class codes
@@ -1094,13 +996,13 @@
         
         // Check if property passes current filters
         function passesFilters(property) {
-            const selectedClasses = selectedFilters.class;
+            const classFilter = document.getElementById('class-filter').value;
             const minValue = parseFloat(document.getElementById('min-value').value) || 0;
             const maxValue = parseFloat(document.getElementById('max-value').value) || Infinity;
             
-            // Hierarchical class filtering with multi-select support
-            if (selectedClasses.length > 0 && property?.class_code) {
-                const allowedClasses = getClassesForFilter(selectedClasses);
+            // Hierarchical class filtering
+            if (classFilter && property?.class_code) {
+                const allowedClasses = getClassesForFilter(classFilter);
                 if (!allowedClasses.includes(property.class_code)) {
                     return false;
                 }
@@ -1143,190 +1045,12 @@
             `;
         }
         
-        // Dropdown functions (shared with main page)
-        function toggleDropdown(type) {
-            const menu = document.getElementById(type + '-menu');
-            const button = document.querySelector(`#${type}-dropdown .dropdown-button`);
-            
-            // Close any other open dropdown
-            if (openDropdown && openDropdown !== type) {
-                closeDropdown(openDropdown);
-            }
-            
-            if (menu.style.display === 'block') {
-                closeDropdown(type);
-            } else {
-                openDropdownMenu(type);
-            }
-        }
-        
-        function openDropdownMenu(type) {
-            const menu = document.getElementById(type + '-menu');
-            const button = document.querySelector(`#${type}-dropdown .dropdown-button`);
-            const rect = button.getBoundingClientRect();
-            
-            // Position the dropdown
-            menu.style.top = (rect.bottom + 5) + 'px';
-            menu.style.left = rect.left + 'px';
-            menu.style.width = rect.width + 'px';
-            menu.style.display = 'block';
-            
-            button.classList.add('active');
-            openDropdown = type;
-        }
-        
-        function closeDropdown(type) {
-            const menu = document.getElementById(type + '-menu');
-            const button = document.querySelector(`#${type}-dropdown .dropdown-button`);
-            
-            menu.style.display = 'none';
-            button.classList.remove('active');
-            if (openDropdown === type) {
-                openDropdown = null;
-            }
-        }
-        
-        function updateDropdownText(type) {
-            const textElement = document.getElementById(type + '-text');
-            const selected = selectedFilters[type];
-            
-            if (selected.length === 0) {
-                textElement.textContent = 'All Classes';
-                textElement.style.color = '#666';
-            } else if (selected.length === 1) {
-                // Show the single selected option name
-                if (propertyClassHierarchy[selected[0]]) {
-                    textElement.textContent = `${selected[0]} - ${propertyClassHierarchy[selected[0]].name}`;
-                } else {
-                    textElement.textContent = selected[0];
-                }
-                textElement.style.color = '#333';
-            } else {
-                textElement.textContent = `${selected.length} selected`;
-                textElement.style.color = '#333';
-            }
-        }
-        
-        function handleDropdownSelection(type, value, checked) {
-            const menu = document.getElementById(type + '-menu');
-            const allCheckbox = document.getElementById(`${type}-all`);
-            
-            if (value === '') {
-                // "All" option selected
-                if (checked) {
-                    // Uncheck all other options and clear the array
-                    const otherCheckboxes = menu.querySelectorAll('input[type="checkbox"]:not(#' + type + '-all)');
-                    otherCheckboxes.forEach(cb => cb.checked = false);
-                    selectedFilters[type] = [];
-                } else {
-                    // "All" unchecked, keep current selections
-                }
-            } else {
-                // Specific option selected
-                if (checked) {
-                    // Uncheck "All" option first
-                    if (allCheckbox) allCheckbox.checked = false;
-                    
-                    // Check if this is a primary class with subclasses
-                    const classInfo = propertyClassHierarchy[value];
-                    if (classInfo && classInfo.primary && classInfo.subclasses) {
-                        // Primary class selected - add it and all its subclasses
-                        if (!selectedFilters[type].includes(value)) {
-                            selectedFilters[type].push(value);
-                        }
-                        classInfo.subclasses.forEach(subclass => {
-                            if (!selectedFilters[type].includes(subclass)) {
-                                selectedFilters[type].push(subclass);
-                            }
-                            // Check the subclass checkbox in the UI
-                            const subCheckbox = document.getElementById(`${type}-${subclass}`);
-                            if (subCheckbox) subCheckbox.checked = true;
-                        });
-                    } else {
-                        // Regular class or subclass selected
-                        if (!selectedFilters[type].includes(value)) {
-                            selectedFilters[type].push(value);
-                        }
-                        
-                        // If this is a subclass, check if all subclasses of its parent are now selected
-                        const parentClass = Object.keys(propertyClassHierarchy).find(key => {
-                            const info = propertyClassHierarchy[key];
-                            return info.subclasses && info.subclasses.includes(value);
-                        });
-                        
-                        if (parentClass) {
-                            const parentInfo = propertyClassHierarchy[parentClass];
-                            const allSubclassesSelected = parentInfo.subclasses.every(sub => 
-                                selectedFilters[type].includes(sub)
-                            );
-                            
-                            if (allSubclassesSelected && !selectedFilters[type].includes(parentClass)) {
-                                selectedFilters[type].push(parentClass);
-                                const parentCheckbox = document.getElementById(`${type}-${parentClass}`);
-                                if (parentCheckbox) parentCheckbox.checked = true;
-                            }
-                        }
-                    }
-                } else {
-                    // Remove from selection
-                    selectedFilters[type] = selectedFilters[type].filter(v => v !== value);
-                    
-                    // Check if this is a primary class being unchecked
-                    const classInfo = propertyClassHierarchy[value];
-                    if (classInfo && classInfo.primary && classInfo.subclasses) {
-                        // Primary class unchecked - remove all its subclasses
-                        classInfo.subclasses.forEach(subclass => {
-                            selectedFilters[type] = selectedFilters[type].filter(v => v !== subclass);
-                            // Uncheck the subclass checkbox in the UI
-                            const subCheckbox = document.getElementById(`${type}-${subclass}`);
-                            if (subCheckbox) subCheckbox.checked = false;
-                        });
-                    } else {
-                        // Subclass unchecked - uncheck its parent if it was checked
-                        const parentClass = Object.keys(propertyClassHierarchy).find(key => {
-                            const info = propertyClassHierarchy[key];
-                            return info.subclasses && info.subclasses.includes(value);
-                        });
-                        
-                        if (parentClass && selectedFilters[type].includes(parentClass)) {
-                            selectedFilters[type] = selectedFilters[type].filter(v => v !== parentClass);
-                            const parentCheckbox = document.getElementById(`${type}-${parentClass}`);
-                            if (parentCheckbox) parentCheckbox.checked = false;
-                        }
-                    }
-                    
-                    // If no selections left, check "All" option
-                    if (selectedFilters[type].length === 0 && allCheckbox) {
-                        allCheckbox.checked = true;
-                    }
-                }
-            }
-            
-            updateDropdownText(type);
-            applyFilters();
-        }
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            if (openDropdown && !e.target.closest(`#${openDropdown}-dropdown`)) {
-                closeDropdown(openDropdown);
-            }
-        });
-        
         // Populate hierarchical class filter dropdown
         function populateClassFilter(properties) {
-            const classMenu = document.getElementById('class-menu');
+            const classFilter = document.getElementById('class-filter');
             const usedClasses = new Set(properties.map(p => p?.class_code).filter(c => c && propertyClassHierarchy[c]));
             
-            // Clear existing options (keep "All" option)
-            classMenu.innerHTML = '<div class="dropdown-option" data-value=""><input type="checkbox" id="class-all" checked><label for="class-all">All Classes</label></div>';
-            
-            // Add event listener for "All" checkbox
-            document.getElementById('class-all').addEventListener('change', (e) => {
-                handleDropdownSelection('class', '', e.target.checked);
-            });
-            
-            // Get primary classes that are actually used
+            // Get primary classes that are actually used (either directly or have used subclasses)
             const primaryClassesToShow = getPrimaryClasses().filter(({code}) => {
                 const classInfo = propertyClassHierarchy[code];
                 
@@ -1349,36 +1073,24 @@
                 
                 // Add primary class option
                 if (usedClasses.has(code)) {
-                    const option = document.createElement('div');
-                    option.className = 'dropdown-option';
-                    option.dataset.value = code;
-                    option.innerHTML = `<input type="checkbox" id="class-${code}"><label for="class-${code}">${code} - ${name}</label>`;
-                    classMenu.appendChild(option);
-                    
-                    // Add event listener
-                    const checkbox = option.querySelector('input');
-                    checkbox.addEventListener('change', (e) => {
-                        handleDropdownSelection('class', code, e.target.checked);
-                    });
+                    const option = document.createElement('option');
+                    option.value = code;
+                    option.textContent = `${code} - ${name}`;
+                    classFilter.appendChild(option);
                 }
                 
                 // Add subclass options (indented)
                 if (classInfo.subclasses) {
                     classInfo.subclasses
-                        .filter(sub => usedClasses.has(sub) && propertyClassHierarchy[sub])
+                        .filter(sub => usedClasses.has(sub))
                         .sort()
-                        .forEach(subcode => {
-                            const option = document.createElement('div');
-                            option.className = 'dropdown-option';
-                            option.dataset.value = subcode;
-                            option.innerHTML = `<input type="checkbox" id="class-${subcode}"><label for="class-${subcode}" style="padding-left: 20px;">${subcode} - ${propertyClassHierarchy[subcode].name}</label>`;
-                            classMenu.appendChild(option);
-                            
-                            // Add event listener
-                            const checkbox = option.querySelector('input');
-                            checkbox.addEventListener('change', (e) => {
-                                handleDropdownSelection('class', subcode, e.target.checked);
-                            });
+                        .forEach(subCode => {
+                            const subInfo = propertyClassHierarchy[subCode];
+                            const option = document.createElement('option');
+                            option.value = subCode;
+                            option.textContent = `  - ${subCode} - ${subInfo.name}`;
+                            option.style.paddingLeft = '15px';
+                            classFilter.appendChild(option);
                         });
                 }
             });
@@ -1527,19 +1239,19 @@
             if (!shouldShowColorCoding()) {
                 html = '<div style="font-style: italic; color: #666; padding: 8px; background: #f8f9fa; border-radius: 4px;">Color Legend Overlay is disabled. Toggle to show color coding.</div>';
             } else if (colorBy === 'class') {
-                const selectedClasses = selectedFilters.class;
+                const classFilter = document.getElementById('class-filter').value;
                 
-                if (selectedClasses.length > 0) {
+                if (classFilter) {
                     // Show legend for selected class hierarchy
-                    selectedClasses.forEach(classFilter => {
-                        const classInfo = propertyClassHierarchy[classFilter];
-                        
-                        if (classInfo && classInfo.primary && classInfo.subclasses) {
-                            // Primary class selected - show it and its subclasses
-                            html += `<div class="color-legend" style="font-weight: bold; margin-bottom: 4px;">
-                                <div class="color-box" style="background-color: ${colorSchemes.class[classFilter]}"></div>
-                                ${classFilter} - ${classInfo.name}
-                            </div>`;
+                    const allowedClasses = getClassesForFilter(classFilter);
+                    const classInfo = propertyClassHierarchy[classFilter];
+                    
+                    if (classInfo && classInfo.primary && classInfo.subclasses) {
+                        // Primary class selected - show it and its subclasses
+                        html += `<div class="color-legend" style="font-weight: bold; margin-bottom: 4px;">
+                            <div class="color-box" style="background-color: ${colorSchemes.class[classFilter]}"></div>
+                            ${classFilter} - ${classInfo.name}
+                        </div>`;
                         
                         classInfo.subclasses
                             .filter(sub => allowedClasses.includes(sub) && colorSchemes.class[sub])
@@ -1551,13 +1263,11 @@
                                 </div>`;
                             });
                     } else {
-                            // Sub-class selected - show just that one
-                            html += `<div class="color-legend">
-                                <div class="color-box" style="background-color: ${colorSchemes.class[classFilter]}"></div>
-                                ${classFilter} - ${classInfo ? classInfo.name : 'Unknown'}
-                            </div>`;
-                        }
-                    });
+                        // Sub-class selected - show just that one
+                        html += `<div class="color-legend">
+                            <div class="color-box" style="background-color: ${colorSchemes.class[classFilter]}"></div>
+                            ${classFilter} - ${classInfo ? classInfo.name : 'Unknown'}
+                        </div>`;
                     }
                 } else {
                     // No filter - show primary classes only
@@ -1632,10 +1342,10 @@
             let totalValue = 0;
             
             // Check if any filters are applied
-            const selectedClasses = selectedFilters.class;
+            const classFilter = document.getElementById('class-filter').value;
             const minValue = document.getElementById('min-value').value;
             const maxValue = document.getElementById('max-value').value;
-            const hasFilters = selectedClasses.length > 0 || minValue || maxValue;
+            const hasFilters = classFilter || minValue || maxValue;
             
             if (!hasFilters) {
                 // No filters applied - show total statistics
@@ -1679,21 +1389,16 @@
             // Update filter description
             
             let filterDesc = 'All Properties';
-            if (selectedClasses.length > 0) {
-                if (selectedClasses.length === 1) {
-                    const code = selectedClasses[0];
-                    const description = classDescriptions[code] || code;
-                    filterDesc = `${code} - ${description}`;
-                } else {
-                    filterDesc = `${selectedClasses.length} Property Classes Selected`;
-                }
+            if (classFilter) {
+                const description = classDescriptions[classFilter] || classFilter;
+                filterDesc = `${classFilter} - ${description}`;
             }
             if (minValue || maxValue) {
                 const valueRange = minValue && maxValue ? 
                     `$${formatLargeNumber(minValue)} - $${formatLargeNumber(maxValue)}` :
                     minValue ? `≥ $${formatLargeNumber(minValue)}` :
                     `≤ $${formatLargeNumber(maxValue)}`;
-                filterDesc += selectedClasses.length > 0 ? `, ${valueRange}` : valueRange;
+                filterDesc += classFilter ? `, ${valueRange}` : valueRange;
             }
             
             document.getElementById('filter-description').textContent = filterDesc;
@@ -1724,20 +1429,7 @@
         
         // Clear filters
         function clearFilters() {
-            // Reset dropdown selections
-            selectedFilters = { class: [] };
-            
-            // Update dropdown text
-            updateDropdownText('class');
-            
-            // Reset all checkboxes
-            const menu = document.getElementById('class-menu');
-            const checkboxes = menu.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(cb => cb.checked = false);
-            // Check the "All" option
-            const allCheckbox = document.getElementById('class-all');
-            if (allCheckbox) allCheckbox.checked = true;
-            
+            document.getElementById('class-filter').value = '';
             document.getElementById('min-value').value = '';
             document.getElementById('max-value').value = '';
             updateParcelLayer();
