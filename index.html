@@ -1,70 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lebanon Property Tax Database</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body { 
-            font-family: system-ui, Arial, sans-serif; 
             margin: 0; 
-            padding: 20px; 
-            background: #f8f9fa;
+            padding: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f7fa;
         }
         .header {
-            background: white;
-            padding: 12px 15px;
-            border-radius: 6px;
-            margin-bottom: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .header-left h1 { 
-            margin: 0; 
-            color: #2c3e50;
-            font-size: 1.4em;
-            font-weight: 500;
+        .header-left h1 {
+            margin: 0;
+            font-size: 1.6em;
+            font-weight: 600;
         }
-        .subtitle { 
-            color: #666; 
+        .header-left p {
+            margin: 4px 0 0 0;
             font-size: 0.85em;
-            margin-top: 2px;
+            opacity: 0.9;
         }
-        .header-right {
-            flex-shrink: 0;
+        .header-right .btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
         }
-        .stats-grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 8px; 
-            margin-bottom: 12px;
+        .header-right .btn:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
         }
-        .stat-card { 
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin: 20px;
+        }
+        .stat-card {
             background: white;
-            border-radius: 6px; 
-            padding: 8px 10px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            min-width: 0;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .stat-number { 
-            font-size: 1.1em; 
-            font-weight: bold; 
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
             color: #2c3e50;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
         }
-        .stat-label { 
-            color: #666; 
-            font-size: 0.75em;
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.85em;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
         }
         .controls {
             background: white;
             padding: 20px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin: 0 20px 20px 20px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .control-row { 
@@ -93,81 +101,6 @@
             font-size: 0.9em;
             width: 100%;
             box-sizing: border-box;
-        }
-        .custom-dropdown {
-            position: relative;
-            width: 100%;
-        }
-        .dropdown-button {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 10px;
-            border: 2px solid #e1e5e9;
-            border-radius: 6px;
-            background: white;
-            cursor: pointer;
-            font-size: 0.9em;
-            min-height: 20px;
-            transition: border-color 0.2s;
-        }
-        .dropdown-button:hover {
-            border-color: #2196f3;
-        }
-        .dropdown-button.active {
-            border-color: #2196f3;
-            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
-        }
-        .dropdown-text {
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: #333;
-        }
-        .dropdown-arrow {
-            color: #666;
-            font-size: 0.8em;
-            transition: transform 0.2s;
-        }
-        .dropdown-button.active .dropdown-arrow {
-            transform: rotate(180deg);
-        }
-        .dropdown-menu {
-            position: fixed;
-            background: white;
-            border: 2px solid #2196f3;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            max-height: 300px;
-            overflow-y: auto;
-            z-index: 10000;
-            display: none;
-            min-width: 200px;
-        }
-        .dropdown-option {
-            display: flex;
-            align-items: center;
-            padding: 8px 12px;
-            border-bottom: 1px solid #f0f0f0;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .dropdown-option:hover {
-            background: #f8f9fa;
-        }
-        .dropdown-option:last-child {
-            border-bottom: none;
-        }
-        .dropdown-option input[type="checkbox"] {
-            margin: 0 8px 0 0;
-            width: auto;
-        }
-        .dropdown-option label {
-            flex: 1;
-            cursor: pointer;
-            font-size: 0.9em;
-            margin: 0;
         }
         input[type="search"] {
             min-width: 150px;
@@ -259,38 +192,21 @@
         tbody tr:hover {
             background: #f8f9fa;
         }
-        .currency {
-            text-align: right;
-            font-family: 'Monaco', 'Menlo', monospace;
-        }
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
         .no-results {
             text-align: center;
-            padding: 40px;
             color: #999;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
+            font-style: italic;
+            padding: 40px;
         }
         .btn {
             background: #3498db;
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            padding: 10px 16px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 0.9em;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+            transition: background 0.2s;
         }
         .btn:hover {
             background: #2980b9;
@@ -299,29 +215,22 @@
             background: #27ae60;
         }
         .btn-success:hover {
-            background: #219a52;
+            background: #229954;
         }
         .btn-warning {
             background: #f39c12;
         }
         .btn-warning:hover {
-            background: #d68910;
+            background: #e67e22;
+        }
+        .action-buttons {
+            margin-top: 12px;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
         .analytics-panel {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: none;
-        }
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 16px;
-            margin-top: 16px;
-        }
-        .analytics-card {
             background: #f8f9fa;
             padding: 16px;
             border-radius: 6px;
@@ -333,30 +242,40 @@
             padding: 20px;
             margin-bottom: 20px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: none;
+            border-left: 4px solid #2c3e50;
         }
         .compare-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-top: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
         .compare-property {
             background: #f8f9fa;
             padding: 16px;
             border-radius: 6px;
-            border: 1px solid #e1e5e9;
         }
-        .property-select {
-            cursor: pointer;
-            transition: all 0.2s;
+        .compare-property div {
+            margin: 4px 0;
+            font-size: 0.9em;
         }
-        .property-select:hover {
-            background: #e3f2fd !important;
+        .compare-property strong {
+            color: #2c3e50;
         }
-        .property-select.selected {
-            background: #bbdefb !important;
-            border-left: 4px solid #2196f3;
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin: 16px 0;
+        }
+        .analytics-card {
+            background: white;
+            padding: 16px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .analytics-card h4 {
+            margin: 0 0 8px 0;
+            color: #2c3e50;
         }
         @media (max-width: 768px) {
             .stats-grid {
@@ -373,34 +292,111 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+        /* Custom Dropdown Styles */
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+        }
+        .dropdown-button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.9em;
+            min-height: 20px;
+            transition: border-color 0.2s;
+        }
+        .dropdown-button:hover {
+            border-color: #2196f3;
+        }
+        .dropdown-button.active {
+            border-color: #2196f3;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+        }
+        .dropdown-text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #333;
+        }
+        .dropdown-arrow {
+            color: #666;
+            font-size: 0.8em;
+            transition: transform 0.2s;
+        }
+        .dropdown-button.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+        .dropdown-menu {
+            position: fixed;
+            background: white;
+            border: 2px solid #2196f3;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 10000;
+            display: none;
+            min-width: 200px;
+        }
+        .dropdown-option {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .dropdown-option:hover {
+            background: #f8f9fa;
+        }
+        .dropdown-option:last-child {
+            border-bottom: none;
+        }
+        .dropdown-option input[type="checkbox"] {
+            margin: 0 8px 0 0;
+            width: auto;
+        }
+        .dropdown-option label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="header-left">
             <h1>Lebanon Property Tax Database</h1>
-            <div class="subtitle">Comprehensive property assessment data for the City of Lebanon, NH</div>
+            <p>Comprehensive property assessment data for the City of Lebanon, NH</p>
         </div>
         <div class="header-right">
-            <a href="map.html" style="background: #27ae60; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 0.9em;">🗺️ View Map</a>
+            <a href="map.html" class="btn">🗺️ View Map</a>
         </div>
     </div>
 
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-number" id="total-parcels">—</div>
+            <div class="stat-value" id="total-parcels">0</div>
             <div class="stat-label">Total Parcels</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number" id="total-value">—</div>
+            <div class="stat-value" id="total-value">$0</div>
             <div class="stat-label">Total Assessed Value</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number" id="median-value">—</div>
+            <div class="stat-value" id="median-value">$0</div>
             <div class="stat-label">Median Property Value</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number" id="property-classes">—</div>
+            <div class="stat-value" id="property-classes">0</div>
             <div class="stat-label">Property Classes</div>
         </div>
     </div>
@@ -468,132 +464,67 @@
         </div>
     </div>
 
-    <div id="filter-stats" class="filter-stats"></div>
-    
-    <div id="analytics-panel" class="analytics-panel">
-        <h3 style="margin: 0 0 16px 0; color: #2c3e50;">📈 Property Analytics</h3>
-        <div class="analytics-grid">
-            <div class="analytics-card">
-                <h4 style="margin: 0 0 8px 0;">Value Distribution</h4>
-                <div id="value-distribution"></div>
-            </div>
-            <div class="analytics-card">
-                <h4 style="margin: 0 0 8px 0;">Property Classes</h4>
-                <div id="class-breakdown"></div>
-            </div>
-            <div class="analytics-card">
-                <h4 style="margin: 0 0 8px 0;">Size Analysis</h4>
-                <div id="size-analysis"></div>
-            </div>
-            <div class="analytics-card">
-                <h4 style="margin: 0 0 8px 0;">Market Insights</h4>
-                <div id="market-insights"></div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="compare-panel" class="compare-panel">
-        <h3 style="margin: 0 0 16px 0; color: #2c3e50;">⚖️ Property Comparison</h3>
-        <div id="comparison-content">
-            <p style="color: #666;">Select properties from the table below to compare them side by side.</p>
-        </div>
+    <div id="compare-panel" class="compare-panel" style="margin: 0 20px 20px 20px; display: none;">
+        <h3 style="margin: 0 0 16px 0; color: #2c3e50;">Property Comparison</h3>
+        <div id="comparison-content"></div>
     </div>
 
-    <div class="table-container">
+    <div class="table-container" style="margin: 0 20px;">
         <table>
             <thead>
-                <tr>
-                    <th>Parcel ID</th>
-                    <th>Owner</th>
-                    <th>Class</th>
-                    <th title="Zoning district">Zone</th>
-                    <th title="Architectural style">Style</th>
-                    <th title="Construction quality grade">Grade</th>
-                    <th>Year Built</th>
-                    <th>Living Area (sqft)</th>
-                    <th>Bedrooms</th>
-                    <th title="Total rooms including bedrooms">Total Rooms</th>
-                    <th title="Full bathrooms">Bathrooms</th>
-                    <th title="Half bathrooms/powder rooms">Half Baths</th>
-                    <th title="Primary heating system type">Heat Type</th>
-                    <th title="Heating fuel source">Fuel</th>
-                    <th title="Land neighborhood code">Neighborhood</th>
-                    <th>Lot Size (acres)</th>
-                    <th class="currency">Land Value</th>
-                    <th class="currency">Building Value</th>
-                    <th class="currency">Total Value</th>
+                <tr id="table-headers">
+                    <th style="width: 80px;">Parcel ID</th>
+                    <th style="width: 200px;">Owner</th>
+                    <th style="width: 70px;">Class</th>
+                    <th style="width: 80px;">Zone</th>
+                    <th style="width: 90px;">Style</th>
+                    <th style="width: 80px;">Grade</th>
+                    <th style="width: 80px;">Year Built</th>
+                    <th style="width: 90px;">Living Area (sqft)</th>
+                    <th style="width: 80px;">Bedrooms</th>
+                    <th style="width: 80px;">Total Rooms</th>
+                    <th style="width: 80px;">Full Baths</th>
+                    <th style="width: 80px;">Half Baths</th>
+                    <th style="width: 90px;">Heat Type</th>
+                    <th style="width: 80px;">Fuel</th>
+                    <th style="width: 90px;">Neighborhood</th>
+                    <th style="width: 90px;">Lot Size (acres)</th>
+                    <th style="width: 110px;">Land Value</th>
+                    <th style="width: 110px;">Building Value</th>
+                    <th style="width: 110px;">Total Value</th>
                 </tr>
             </thead>
             <tbody id="parcels-table">
-                <tr>
-                    <td colspan="19" class="loading">Loading property data...</td>
-                </tr>
+                <tr><td colspan="19" class="no-results">Loading...</td></tr>
             </tbody>
         </table>
     </div>
 
-    <div id="pagination" class="pagination"></div>
+    <div id="analytics-panel" class="analytics-panel" style="margin: 0 20px 20px 20px; display: none;">
+        <h3 style="margin: 0 0 16px 0;">Data Analytics</h3>
+        <div id="analytics-content"></div>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
 
     <script>
         let allParcels = [];
         let filteredParcels = [];
-
-        // Utility functions
-        const formatCurrency = (value) => {
-            const num = parseFloat(value) || 0;
-            return num.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
-        };
-
-        const formatNumber = (value) => {
-            const num = parseFloat(value) || 0;
-            return num.toLocaleString();
-        };
-
-        const parseNumber = (value) => {
-            return parseFloat(String(value).replace(/[^0-9.-]/g, '')) || 0;
-        };
-
-        // Load data
-        async function loadParcels() {
-            try {
-                const response = await fetch('data/parcels.csv');
-                const text = await response.text();
-                console.log('Raw CSV length:', text.length);
-                
-                // Parse CSV properly handling quoted fields
-                const lines = text.trim().split('\n');
-                const headers = parseCSVLine(lines[0]);
-                console.log('Headers:', headers);
-                
-                allParcels = lines.slice(1).map(line => {
-                    const values = parseCSVLine(line);
-                    const parcel = {};
-                    headers.forEach((header, index) => {
-                        parcel[header] = values[index] || '';
-                    });
-                    return parcel;
-                }).filter(p => p.parcel_id && p.parcel_id.trim());
-
-                console.log(`Loaded ${allParcels.length} parcels`);
-                if (allParcels.length > 0) {
-                    console.log('First parcel:', allParcels[0]);
-                }
-                updateStats();
-                populateFilters();
-                applyFilters();
-                
-                // Initialize column resizing after table is rendered
-                setTimeout(initializeColumnResizing, 100);
-            } catch (error) {
-                console.error('Error loading data:', error);
-                document.getElementById('parcels-table').innerHTML = '<tr><td colspan="19" class="no-results">Error loading data</td></tr>';
-            }
-        }
+        let currentPage = 1;
+        const rowsPerPage = 200;
 
         // Enhanced features variables
         let selectedProperties = new Set();
         let comparisonMode = false;
         
+        // Custom dropdown functionality
+        let openDropdown = null;
+        let selectedFilters = {
+            class: [],
+            year: [],
+            zone: []
+        };
+
         // Parse CSV line handling quoted fields properly
         function parseCSVLine(line) {
             const result = [];
@@ -693,399 +624,7 @@
             return [...new Set(result)]; // Remove duplicates
         }
 
-        // Update statistics
-        function updateStats() {
-            const totalParcels = allParcels.length;
-            const totalValue = allParcels.reduce((sum, p) => sum + parseNumber(p.total_value), 0);
-            const values = allParcels.map(p => parseNumber(p.total_value)).filter(v => v > 0).sort((a, b) => a - b);
-            const medianValue = values.length > 0 ? values[Math.floor(values.length / 2)] : 0;
-            // Count only valid property class codes
-            const validClasses = new Set(allParcels.map(p => p.class_code).filter(c => lebanonClassCodes.includes(c)));
-
-            document.getElementById('total-parcels').textContent = formatNumber(totalParcels);
-            document.getElementById('total-value').textContent = formatCurrency(totalValue);
-            document.getElementById('median-value').textContent = formatCurrency(medianValue);
-            document.getElementById('property-classes').textContent = formatNumber(validClasses.size);
-        }
-
-        // Populate filter dropdowns
-        function populateFilters() {
-            const classMenu = document.getElementById('class-menu');
-            const yearMenu = document.getElementById('year-menu');
-            const zoneMenu = document.getElementById('zone-menu');
-            
-            // Clear existing options (keep "All" options)
-            classMenu.innerHTML = '<div class=\"dropdown-option\" data-value=\"\"><input type=\"checkbox\" id=\"class-all\" checked><label for=\"class-all\">All Classes</label></div>';
-            yearMenu.innerHTML = '<div class=\"dropdown-option\" data-value=\"\"><input type=\"checkbox\" id=\"year-all\" checked><label for=\"year-all\">All Years</label></div>';
-            zoneMenu.innerHTML = '<div class=\"dropdown-option\" data-value=\"\"><input type=\"checkbox\" id=\"zone-all\" checked><label for=\"zone-all\">All Zones</label></div>';
-            
-            // Populate property class filter with hierarchical structure
-            const usedClasses = new Set(allParcels.map(p => p.class_code).filter(c => c));
-            const primaryClasses = getPrimaryClasses().filter(({code}) => usedClasses.has(code));
-            
-            // Sort by class code for consistent ordering
-            primaryClasses.sort((a, b) => a.code.localeCompare(b.code));
-            
-            primaryClasses.forEach(({code, name}) => {
-                const classInfo = propertyClassHierarchy[code];
-                
-                // Add primary class option
-                if (usedClasses.has(code)) {
-                    const option = document.createElement('div');
-                    option.className = 'dropdown-option';\n                    option.dataset.value = code;\n                    option.innerHTML = `<input type=\"checkbox\" id=\"class-${code}\"><label for=\"class-${code}\">${code} - ${name}</label>`;\n                    classMenu.appendChild(option);\n                    \n                    // Add event listener\n                    const checkbox = option.querySelector('input');\n                    checkbox.addEventListener('change', (e) => {\n                        handleDropdownSelection('class', code, e.target.checked);\n                    });\n                }\n                \n                // Add subclass options (indented)\n                if (classInfo && classInfo.subclasses) {\n                    classInfo.subclasses\n                        .filter(sub => usedClasses.has(sub) && propertyClassHierarchy[sub])\n                        .sort()\n                        .forEach(subcode => {\n                            const option = document.createElement('div');\n                            option.className = 'dropdown-option';\n                            option.dataset.value = subcode;\n                            option.innerHTML = `<input type=\"checkbox\" id=\"class-${subcode}\"><label for=\"class-${subcode}\" style=\"padding-left: 20px;\">${subcode} - ${propertyClassHierarchy[subcode].name}</label>`;\n                            classMenu.appendChild(option);\n                            \n                            // Add event listener\n                            const checkbox = option.querySelector('input');\n                            checkbox.addEventListener('change', (e) => {\n                                handleDropdownSelection('class', subcode, e.target.checked);\n                            });\n                        });\n                }\n            });\n            \n            // Populate year built filter\n            const years = [...new Set(allParcels.map(p => p.year_built ? parseInt(p.year_built) : null).filter(y => y))].sort((a, b) => b - a);\n            years.forEach(year => {\n                const option = document.createElement('div');\n                option.className = 'dropdown-option';\n                option.dataset.value = year;\n                option.innerHTML = `<input type=\"checkbox\" id=\"year-${year}\"><label for=\"year-${year}\">${year}</label>`;\n                yearMenu.appendChild(option);\n                \n                // Add event listener\n                const checkbox = option.querySelector('input');\n                checkbox.addEventListener('change', (e) => {\n                    handleDropdownSelection('year', year.toString(), e.target.checked);\n                });\n            });\n            \n            // Populate zoning filter\n            const zones = [...new Set(allParcels.map(p => p.zoning).filter(z => z))].sort();\n            zones.forEach(zone => {\n                const option = document.createElement('div');\n                option.className = 'dropdown-option';\n                option.dataset.value = zone;\n                option.innerHTML = `<input type=\"checkbox\" id=\"zone-${zone}\"><label for=\"zone-${zone}\">${zone}</label>`;\n                zoneMenu.appendChild(option);\n                \n                // Add event listener\n                const checkbox = option.querySelector('input');\n                checkbox.addEventListener('change', (e) => {\n                    handleDropdownSelection('zone', zone, e.target.checked);\n                });\n            });\n        }
-
-        // Apply filters
-        function applyFilters() {
-            const minValue = parseNumber(document.getElementById('min-value').value);
-            const maxValue = parseNumber(document.getElementById('max-value').value);
-
-            // Get selected values from custom dropdowns
-            const selectedClasses = selectedFilters.class;
-            const selectedYears = selectedFilters.year;
-            const selectedZones = selectedFilters.zone;
-
-            filteredParcels = allParcels.filter(parcel => {
-                // Class filter with hierarchical support
-                if (selectedClasses.length > 0) {
-                    const allowedClasses = getClassesForFilter(selectedClasses);
-                    if (!allowedClasses.includes(parcel.class_code)) {
-                        return false;
-                    }
-                }
-                
-                // Year built filter (multiple selection)
-                if (selectedYears.length > 0 && !selectedYears.includes(String(parseInt(parcel.year_built) || ''))) {
-                    return false;
-                }
-                
-                // Zoning filter (multiple selection)
-                if (selectedZones.length > 0 && !selectedZones.includes(parcel.zoning)) {
-                    return false;
-                }
-
-                // Value filters
-                const value = parseNumber(parcel.total_value);
-                if (minValue > 0 && value < minValue) return false;
-                if (maxValue > 0 && value > maxValue) return false;
-
-                return true;
-            });
-
-            renderTable();
-            updateFilterStats();
-            document.getElementById('filtered-count').textContent = formatNumber(filteredParcels.length);
-        }
-
-        // Handle property selection for comparison
-        function handlePropertyClick(parcelId, event) {
-            if (!comparisonMode) return;
-            
-            event.stopPropagation();
-            
-            if (selectedProperties.has(parcelId)) {
-                selectedProperties.delete(parcelId);
-                event.currentTarget.classList.remove('selected');
-            } else {
-                if (selectedProperties.size < 4) { // Limit to 4 properties
-                    selectedProperties.add(parcelId);
-                    event.currentTarget.classList.add('selected');
-                }
-            }
-            
-            updateSelectedCount();
-            updateComparisonPanel();
-        }
-        
-        // Render table
-        function renderTable() {
-            const tbody = document.getElementById('parcels-table');
-            
-            if (filteredParcels.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="19" class="no-results">No properties match your criteria</td></tr>';
-                return;
-            }
-
-            const startIndex = (currentPage - 1) * rowsPerPage;
-            const endIndex = startIndex + rowsPerPage;
-            const rows = filteredParcels.slice(startIndex, endIndex).map(parcel => {
-                const isSelected = selectedProperties.has(parcel.parcel_id);
-                return `
-                <tr class="${comparisonMode ? 'property-select' : ''} ${isSelected ? 'selected' : ''}" 
-                    onclick="handlePropertyClick('${parcel.parcel_id}', event)" 
-                    style="${comparisonMode ? 'cursor: pointer;' : ''}">
-                    <td>${parcel.parcel_id || ''}</td>
-                    <td>${parcel.owner_name || ''}</td>
-                    <td>${parcel.class_code || ''}</td>
-                    <td>${parcel.zoning || '—'}</td>
-                    <td>${parcel.building_style || '—'}</td>
-                    <td>${parcel.building_grade || '—'}</td>
-                    <td>${parcel.year_built ? parseInt(parcel.year_built) : '—'}</td>
-                    <td>${formatNumber(parcel.living_area_sqft) || '—'}</td>
-                    <td>${parcel.bedrooms || '—'}</td>
-                    <td>${parcel.total_rooms || '—'}</td>
-                    <td>${parcel.full_baths || '—'}</td>
-                    <td>${parcel.half_baths || '—'}</td>
-                    <td>${parcel.heating_type || '—'}</td>
-                    <td>${parcel.heating_fuel || '—'}</td>
-                    <td>${parcel.neighborhood || '—'}</td>
-                    <td>${parcel.lot_size_acres || ''}</td>
-                    <td class="currency">${formatCurrency(parcel.land_value)}</td>
-                    <td class="currency">${formatCurrency(parcel.building_value)}</td>
-                    <td class="currency">${formatCurrency(parcel.total_value)}</td>
-                </tr>
-            `;}).join('');
-
-            tbody.innerHTML = rows;
-            
-            updatePagination();
-        }
-
-        // Pagination variables
-        let currentPage = 1;
-        const rowsPerPage = 200; /* Optimize for better performance */
-        
-        // Update pagination controls
-        function updatePagination() {
-            const totalPages = Math.ceil(filteredParcels.length / rowsPerPage);
-            const paginationDiv = document.getElementById('pagination');
-            
-            if (totalPages <= 1) {
-                paginationDiv.innerHTML = '';
-                return;
-            }
-            
-            let paginationHTML = '';
-            
-            // Previous button
-            paginationHTML += `<button class="page-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>&laquo; Prev</button>`;
-            
-            // Page numbers
-            for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
-                paginationHTML += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
-            }
-            
-            // Next button
-            paginationHTML += `<button class="page-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next &raquo;</button>`;
-            
-            // Page info
-            const startIndex = (currentPage - 1) * rowsPerPage + 1;
-            const endIndex = Math.min(currentPage * rowsPerPage, filteredParcels.length);
-            // Add function buttons inline with pagination
-            paginationHTML += `
-                <span style="margin: 0 16px; color: #666;">Showing ${startIndex}-${endIndex} of ${formatNumber(filteredParcels.length)} properties</span>
-                <button class="btn btn-success" onclick="exportFilteredData()" style="padding: 4px 8px; font-size: 0.8em; margin: 0 4px;">📊 Export</button>
-                <button class="btn btn-warning" onclick="toggleAnalytics()" style="padding: 4px 8px; font-size: 0.8em; margin: 0 4px;">📈 Analytics</button>
-                <button class="btn" onclick="toggleComparison()" style="padding: 4px 8px; font-size: 0.8em; margin: 0 4px;">⚖️ Compare</button>
-            `;
-            
-            paginationDiv.innerHTML = paginationHTML;
-        }
-        
-        // Go to page function
-        function goToPage(page) {
-            const totalPages = Math.ceil(filteredParcels.length / rowsPerPage);
-            if (page < 1 || page > totalPages) return;
-            
-            currentPage = page;
-            renderTable();
-        }
-        
-        // Add filter statistics
-        function updateFilterStats() {
-            const statsDiv = document.getElementById('filter-stats');
-            if (!filteredParcels.length || filteredParcels.length === allParcels.length) {
-                statsDiv.style.display = 'none';
-                return;
-            }
-            
-            const totalValue = filteredParcels.reduce((sum, p) => sum + (parseNumber(p.total_value) || 0), 0);
-            const allTotalValue = allParcels.reduce((sum, p) => sum + (parseNumber(p.total_value) || 0), 0);
-            
-            const parcelPercent = ((filteredParcels.length / allParcels.length) * 100).toFixed(1);
-            const valuePercent = allTotalValue > 0 ? ((totalValue / allTotalValue) * 100).toFixed(1) : '0.0';
-            
-            statsDiv.innerHTML = `
-                <strong>Filtered Results:</strong> ${parcelPercent}% of parcels (${formatNumber(filteredParcels.length)} of ${formatNumber(allParcels.length)}) 
-                representing ${valuePercent}% of total city value ($${formatLargeNumber(totalValue)} of $${formatLargeNumber(allTotalValue)})
-            `;
-            statsDiv.style.display = 'block';
-        }
-        
-        // Export filtered data as CSV
-        function exportFilteredData() {
-            const headers = ['parcel_id', 'owner_name', 'class_code', 'zoning', 'building_style', 'building_grade', 'year_built', 'living_area_sqft', 'bedrooms', 'total_rooms', 'full_baths', 'half_baths', 'heating_type', 'heating_fuel', 'neighborhood', 'lot_size_acres', 'land_value', 'building_value', 'total_value'];
-            let csvContent = headers.join(',') + '\n';
-            
-            filteredParcels.forEach(parcel => {
-                const row = headers.map(header => {
-                    let value = parcel[header] || '';
-                    // Escape values containing commas or quotes
-                    if (value.includes(',') || value.includes('"')) {
-                        value = '"' + value.replace(/"/g, '""') + '"';
-                    }
-                    return value;
-                });
-                csvContent += row.join(',') + '\n';
-            });
-            
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `lebanon-property-data-${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        }
-        
-        // Toggle analytics panel
-        function toggleAnalytics() {
-            const panel = document.getElementById('analytics-panel');
-            const isVisible = panel.style.display === 'block';
-            panel.style.display = isVisible ? 'none' : 'block';
-            
-            if (!isVisible) {
-                updateAnalytics();
-            }
-        }
-        
-        // Update analytics with current data
-        function updateAnalytics() {
-            // Value distribution
-            const valueRanges = [
-                { label: 'Under $200K', min: 0, max: 200000 },
-                { label: '$200K - $500K', min: 200000, max: 500000 },
-                { label: '$500K - $1M', min: 500000, max: 1000000 },
-                { label: 'Over $1M', min: 1000000, max: Infinity }
-            ];
-            
-            let valueDistHtml = '';
-            valueRanges.forEach(range => {
-                const count = filteredParcels.filter(p => {
-                    const val = parseNumber(p.total_value);
-                    return val >= range.min && val < range.max;
-                }).length;
-                const percent = filteredParcels.length ? ((count / filteredParcels.length) * 100).toFixed(1) : 0;
-                valueDistHtml += `<div>${range.label}: ${count} (${percent}%)</div>`;
-            });
-            document.getElementById('value-distribution').innerHTML = valueDistHtml;
-            
-            // Property classes
-            const classCounts = {};
-            filteredParcels.forEach(p => {
-                const cls = p.class_code || 'Unknown';
-                classCounts[cls] = (classCounts[cls] || 0) + 1;
-            });
-            
-            let classHtml = '';
-            Object.entries(classCounts)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5)
-                .forEach(([cls, count]) => {
-                    const percent = ((count / filteredParcels.length) * 100).toFixed(1);
-                    classHtml += `<div>Class ${cls}: ${count} (${percent}%)</div>`;
-                });
-            document.getElementById('class-breakdown').innerHTML = classHtml;
-            
-            // Size analysis
-            const avgAcres = filteredParcels.reduce((sum, p) => sum + parseFloat(p.lot_size_acres || 0), 0) / filteredParcels.length;
-            const avgValue = filteredParcels.reduce((sum, p) => sum + parseNumber(p.total_value), 0) / filteredParcels.length;
-            const avgValuePerAcre = avgAcres > 0 ? avgValue / avgAcres : 0;
-            
-            const sizeHtml = `
-                <div>Avg Lot Size: ${avgAcres.toFixed(2)} acres</div>
-                <div>Avg Value: ${formatCurrency(avgValue)}</div>
-                <div>Value/Acre: ${formatCurrency(avgValuePerAcre)}</div>
-            `;
-            document.getElementById('size-analysis').innerHTML = sizeHtml;
-            
-            // Market insights
-            const medianValue = getMedianValue(filteredParcels);
-            const highValue = Math.max(...filteredParcels.map(p => parseNumber(p.total_value)));
-            const lowValue = Math.min(...filteredParcels.map(p => parseNumber(p.total_value)).filter(v => v > 0));
-            
-            const insightsHtml = `
-                <div>Median: ${formatCurrency(medianValue)}</div>
-                <div>Highest: ${formatCurrency(highValue)}</div>
-                <div>Lowest: ${formatCurrency(lowValue)}</div>
-            `;
-            document.getElementById('market-insights').innerHTML = insightsHtml;
-        }
-        
-        function getMedianValue(parcels) {
-            const values = parcels.map(p => parseNumber(p.total_value)).filter(v => v > 0).sort((a, b) => a - b);
-            return values.length > 0 ? values[Math.floor(values.length / 2)] : 0;
-        }
-        
-        // Toggle comparison mode
-        function toggleComparison() {
-            comparisonMode = !comparisonMode;
-            const countEl = document.getElementById('comparison-count');
-            countEl.style.display = comparisonMode ? 'inline' : 'none';
-            
-            if (!comparisonMode) {
-                selectedProperties.clear();
-                document.getElementById('compare-panel').style.display = 'none';
-                updateSelectedCount();
-                // Remove selection styling
-                document.querySelectorAll('.property-select').forEach(row => {
-                    row.classList.remove('selected');
-                });
-            } else {
-                updateComparisonPanel();
-            }
-        }
-        
-        function updateSelectedCount() {
-            document.getElementById('selected-count').textContent = selectedProperties.size;
-        }
-        
-        function updateComparisonPanel() {
-            const panel = document.getElementById('compare-panel');
-            const content = document.getElementById('comparison-content');
-            
-            if (selectedProperties.size === 0) {
-                content.innerHTML = '<p style="color: #666;">Select properties from the table below to compare them side by side.</p>';
-                panel.style.display = 'none';
-                return;
-            }
-            
-            panel.style.display = 'block';
-            
-            let compareHtml = '<div class="compare-grid">';
-            selectedProperties.forEach(parcelId => {
-                const property = allParcels.find(p => p.parcel_id === parcelId);
-                if (property) {
-                    compareHtml += `
-                        <div class="compare-property">
-                            <h4 style="margin: 0 0 8px 0; color: #2c3e50;">${property.owner_name} (${property.parcel_id})</h4>
-                            <div><strong>Class:</strong> ${property.class_code}</div>
-                            <div><strong>Year Built:</strong> ${property.year_built || '—'}</div>
-                            <div><strong>Living Area:</strong> ${formatNumber(property.living_area_sqft) || '—'} sqft</div>
-                            <div><strong>Bedrooms:</strong> ${property.bedrooms || '—'}</div>
-                            <div><strong>Lot Size:</strong> ${property.lot_size_acres} acres</div>
-                            <div><strong>Land Value:</strong> ${formatCurrency(property.land_value)}</div>
-                            <div><strong>Building Value:</strong> ${formatCurrency(property.building_value)}</div>
-                            <div><strong>Total Value:</strong> ${formatCurrency(property.total_value)}</div>
-                        </div>
-                    `;
-                }
-            });
-            compareHtml += '</div>';
-            
-            content.innerHTML = compareHtml;
-        }
-        
-        
-        // Custom dropdown functionality
-        let openDropdown = null;
-        let selectedFilters = {
-            class: [],
-            year: [],
-            zone: []
-        };
-
+        // Dropdown functions
         function toggleDropdown(type) {
             const menu = document.getElementById(type + '-menu');
             const button = document.querySelector(`#${type}-dropdown .dropdown-button`);
@@ -1168,7 +707,271 @@
                 closeDropdown(openDropdown);
             }
         });
-        
+
+        // Utility functions
+        function parseNumber(str) {
+            if (!str) return 0;
+            return parseFloat(str.toString().replace(/[,$]/g, '')) || 0;
+        }
+
+        function formatNumber(num) {
+            return new Intl.NumberFormat().format(num);
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function formatLargeNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(0) + 'K';
+            }
+            return num.toString();
+        }
+
+        // Update statistics
+        function updateStats() {
+            const totalParcels = allParcels.length;
+            const totalValue = allParcels.reduce((sum, p) => sum + parseNumber(p.total_value), 0);
+            const values = allParcels.map(p => parseNumber(p.total_value)).filter(v => v > 0).sort((a, b) => a - b);
+            const medianValue = values.length > 0 ? values[Math.floor(values.length / 2)] : 0;
+            // Count only valid property class codes
+            const validClasses = new Set(allParcels.map(p => p.class_code).filter(c => lebanonClassCodes.includes(c)));
+
+            document.getElementById('total-parcels').textContent = formatNumber(totalParcels);
+            document.getElementById('total-value').textContent = formatCurrency(totalValue);
+            document.getElementById('median-value').textContent = formatCurrency(medianValue);
+            document.getElementById('property-classes').textContent = formatNumber(validClasses.size);
+        }
+
+        // Populate filter dropdowns
+        function populateFilters() {
+            const classMenu = document.getElementById('class-menu');
+            const yearMenu = document.getElementById('year-menu');
+            const zoneMenu = document.getElementById('zone-menu');
+            
+            // Clear existing options (keep "All" options)
+            classMenu.innerHTML = '<div class="dropdown-option" data-value=""><input type="checkbox" id="class-all" checked><label for="class-all">All Classes</label></div>';
+            yearMenu.innerHTML = '<div class="dropdown-option" data-value=""><input type="checkbox" id="year-all" checked><label for="year-all">All Years</label></div>';
+            zoneMenu.innerHTML = '<div class="dropdown-option" data-value=""><input type="checkbox" id="zone-all" checked><label for="zone-all">All Zones</label></div>';
+            
+            // Populate property class filter with hierarchical structure
+            const usedClasses = new Set(allParcels.map(p => p.class_code).filter(c => c));
+            const primaryClasses = getPrimaryClasses().filter(({code}) => usedClasses.has(code));
+            
+            // Sort by class code for consistent ordering
+            primaryClasses.sort((a, b) => a.code.localeCompare(b.code));
+            
+            primaryClasses.forEach(({code, name}) => {
+                const classInfo = propertyClassHierarchy[code];
+                
+                // Add primary class option
+                if (usedClasses.has(code)) {
+                    const option = document.createElement('div');
+                    option.className = 'dropdown-option';
+                    option.dataset.value = code;
+                    option.innerHTML = `<input type="checkbox" id="class-${code}"><label for="class-${code}">${code} - ${name}</label>`;
+                    classMenu.appendChild(option);
+                    
+                    // Add event listener
+                    const checkbox = option.querySelector('input');
+                    checkbox.addEventListener('change', (e) => {
+                        handleDropdownSelection('class', code, e.target.checked);
+                    });
+                }
+                
+                // Add subclass options (indented)
+                if (classInfo && classInfo.subclasses) {
+                    classInfo.subclasses
+                        .filter(sub => usedClasses.has(sub) && propertyClassHierarchy[sub])
+                        .sort()
+                        .forEach(subcode => {
+                            const option = document.createElement('div');
+                            option.className = 'dropdown-option';
+                            option.dataset.value = subcode;
+                            option.innerHTML = `<input type="checkbox" id="class-${subcode}"><label for="class-${subcode}" style="padding-left: 20px;">${subcode} - ${propertyClassHierarchy[subcode].name}</label>`;
+                            classMenu.appendChild(option);
+                            
+                            // Add event listener
+                            const checkbox = option.querySelector('input');
+                            checkbox.addEventListener('change', (e) => {
+                                handleDropdownSelection('class', subcode, e.target.checked);
+                            });
+                        });
+                }
+            });
+            
+            // Populate year built filter
+            const years = [...new Set(allParcels.map(p => p.year_built ? parseInt(p.year_built) : null).filter(y => y))].sort((a, b) => b - a);
+            years.forEach(year => {
+                const option = document.createElement('div');
+                option.className = 'dropdown-option';
+                option.dataset.value = year;
+                option.innerHTML = `<input type="checkbox" id="year-${year}"><label for="year-${year}">${year}</label>`;
+                yearMenu.appendChild(option);
+                
+                // Add event listener
+                const checkbox = option.querySelector('input');
+                checkbox.addEventListener('change', (e) => {
+                    handleDropdownSelection('year', year.toString(), e.target.checked);
+                });
+            });
+            
+            // Populate zoning filter
+            const zones = [...new Set(allParcels.map(p => p.zoning).filter(z => z))].sort();
+            zones.forEach(zone => {
+                const option = document.createElement('div');
+                option.className = 'dropdown-option';
+                option.dataset.value = zone;
+                option.innerHTML = `<input type="checkbox" id="zone-${zone}"><label for="zone-${zone}">${zone}</label>`;
+                zoneMenu.appendChild(option);
+                
+                // Add event listener
+                const checkbox = option.querySelector('input');
+                checkbox.addEventListener('change', (e) => {
+                    handleDropdownSelection('zone', zone, e.target.checked);
+                });
+            });
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const minValue = parseNumber(document.getElementById('min-value').value);
+            const maxValue = parseNumber(document.getElementById('max-value').value);
+
+            // Get selected values from custom dropdowns
+            const selectedClasses = selectedFilters.class;
+            const selectedYears = selectedFilters.year;
+            const selectedZones = selectedFilters.zone;
+
+            filteredParcels = allParcels.filter(parcel => {
+                // Class filter with hierarchical support
+                if (selectedClasses.length > 0) {
+                    const allowedClasses = getClassesForFilter(selectedClasses);
+                    if (!allowedClasses.includes(parcel.class_code)) {
+                        return false;
+                    }
+                }
+                
+                // Year built filter (multiple selection)
+                if (selectedYears.length > 0 && !selectedYears.includes(String(parseInt(parcel.year_built) || ''))) {
+                    return false;
+                }
+                
+                // Zoning filter (multiple selection)
+                if (selectedZones.length > 0 && !selectedZones.includes(parcel.zoning)) {
+                    return false;
+                }
+
+                // Value filters
+                const value = parseNumber(parcel.total_value);
+                if (minValue > 0 && value < minValue) return false;
+                if (maxValue > 0 && value > maxValue) return false;
+
+                return true;
+            });
+
+            renderTable();
+            updateFilterStats();
+            document.getElementById('filtered-count').textContent = formatNumber(filteredParcels.length);
+        }
+
+        // Render table
+        function renderTable() {
+            const tableBody = document.getElementById('parcels-table');
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const pageData = filteredParcels.slice(startIndex, endIndex);
+
+            if (pageData.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="19" class="no-results">No properties match your filters</td></tr>';
+                renderPagination();
+                return;
+            }
+
+            let tableHTML = '';
+            pageData.forEach(parcel => {
+                const isSelected = selectedProperties.has(parcel.parcel_id);
+                const rowClass = comparisonMode ? (isSelected ? 'selected' : '') : '';
+                const clickHandler = comparisonMode ? `onclick="handlePropertyClick('${parcel.parcel_id}', event)"` : '';
+                
+                tableHTML += `
+                    <tr class="${rowClass}" ${clickHandler} style="cursor: ${comparisonMode ? 'pointer' : 'default'};">
+                        <td title="${parcel.parcel_id}">${parcel.parcel_id}</td>
+                        <td title="${parcel.owner_name}">${parcel.owner_name}</td>
+                        <td title="${parcel.class_code}">${parcel.class_code}</td>
+                        <td title="${parcel.zoning}">${parcel.zoning}</td>
+                        <td title="${parcel.building_style}">${parcel.building_style}</td>
+                        <td title="${parcel.building_grade}">${parcel.building_grade}</td>
+                        <td title="${parcel.year_built}">${parseInt(parcel.year_built) || '—'}</td>
+                        <td title="${parcel.living_area_sqft}">${formatNumber(parseNumber(parcel.living_area_sqft)) || '—'}</td>
+                        <td title="${parcel.bedrooms}">${parcel.bedrooms || '—'}</td>
+                        <td title="${parcel.total_rooms}">${parcel.total_rooms || '—'}</td>
+                        <td title="${parcel.full_baths}">${parcel.full_baths || '—'}</td>
+                        <td title="${parcel.half_baths}">${parcel.half_baths || '—'}</td>
+                        <td title="${parcel.heating_type}">${parcel.heating_type}</td>
+                        <td title="${parcel.heating_fuel}">${parcel.heating_fuel}</td>
+                        <td title="${parcel.neighborhood}">${parcel.neighborhood}</td>
+                        <td title="${parcel.lot_size_acres}">${parcel.lot_size_acres}</td>
+                        <td title="${formatCurrency(parseNumber(parcel.land_value))}">${formatCurrency(parseNumber(parcel.land_value))}</td>
+                        <td title="${formatCurrency(parseNumber(parcel.building_value))}">${formatCurrency(parseNumber(parcel.building_value))}</td>
+                        <td title="${formatCurrency(parseNumber(parcel.total_value))}">${formatCurrency(parseNumber(parcel.total_value))}</td>
+                    </tr>
+                `;
+            });
+
+            tableBody.innerHTML = tableHTML;
+            renderPagination();
+        }
+
+        // Render pagination
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredParcels.length / rowsPerPage);
+            const paginationDiv = document.getElementById('pagination');
+
+            let paginationHTML = '';
+            
+            // Previous button
+            paginationHTML += `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''}>&laquo; Prev</button>`;
+            
+            // Page numbers
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, currentPage + 2);
+            
+            if (endPage - startPage < 4) {
+                if (startPage === 1) {
+                    endPage = Math.min(totalPages, startPage + 4);
+                } else if (endPage === totalPages) {
+                    startPage = Math.max(1, endPage - 4);
+                }
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const activeClass = i === currentPage ? ' active' : '';
+                paginationHTML += `<button class="page-btn${activeClass}" onclick="changePage(${i})">${i}</button>`;
+            }
+            
+            // Next button
+            paginationHTML += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''}>Next &raquo;</button>`;
+            
+            // Add function buttons inline with pagination
+            paginationHTML += `
+                <span style="margin: 0 16px; color: #666;">Showing ${((currentPage - 1) * rowsPerPage) + 1}-${Math.min(currentPage * rowsPerPage, filteredParcels.length)} of ${formatNumber(filteredParcels.length)} properties</span>
+                <button class="btn btn-success" onclick="exportFilteredData()" style="padding: 4px 8px; font-size: 0.8em; margin: 0 4px;">📊 Export</button>
+                <button class="btn btn-warning" onclick="toggleAnalytics()" style="padding: 4px 8px; font-size: 0.8em; margin: 0 4px;">📈 Analytics</button>
+                <button class="btn" onclick="toggleComparison()" style="padding: 4px 8px; font-size: 0.8em; margin: 0 4px;">⚖️ Compare</button>
+            `;
+            
+            paginationDiv.innerHTML = paginationHTML;
+        }
+
         // Clear all filters
         function clearFilters() {
             // Reset all dropdown selections
@@ -1191,10 +994,206 @@
             currentPage = 1;
             applyFilters();
         }
-        
-        // Event listeners
-        document.getElementById('min-value').addEventListener('input', () => { currentPage = 1; applyFilters(); });
-        document.getElementById('max-value').addEventListener('input', () => { currentPage = 1; applyFilters(); });
+
+        // Other functions...
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredParcels.length / rowsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderTable();
+            }
+        }
+
+        function exportFilteredData() {
+            const headers = ['Parcel ID', 'Owner', 'Class', 'Zone', 'Style', 'Grade', 'Year Built', 'Living Area', 'Bedrooms', 'Total Rooms', 'Full Baths', 'Half Baths', 'Heat Type', 'Fuel', 'Neighborhood', 'Lot Size', 'Land Value', 'Building Value', 'Total Value'];
+            const rows = [headers.join(',')];
+            
+            filteredParcels.forEach(parcel => {
+                const row = [
+                    `"${parcel.parcel_id}"`,
+                    `"${parcel.owner_name}"`,
+                    `"${parcel.class_code}"`,
+                    `"${parcel.zoning}"`,
+                    `"${parcel.building_style}"`,
+                    `"${parcel.building_grade}"`,
+                    parseInt(parcel.year_built) || '',
+                    parseNumber(parcel.living_area_sqft) || '',
+                    parcel.bedrooms || '',
+                    parcel.total_rooms || '',
+                    parcel.full_baths || '',
+                    parcel.half_baths || '',
+                    `"${parcel.heating_type}"`,
+                    `"${parcel.heating_fuel}"`,
+                    `"${parcel.neighborhood}"`,
+                    parcel.lot_size_acres || '',
+                    parseNumber(parcel.land_value) || '',
+                    parseNumber(parcel.building_value) || '',
+                    parseNumber(parcel.total_value) || ''
+                ];
+                rows.push(row.join(','));
+            });
+            
+            const csvContent = rows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `lebanon_properties_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            
+            window.URL.revokeObjectURL(url);
+        }
+
+        function toggleAnalytics() {
+            const panel = document.getElementById('analytics-panel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            
+            if (panel.style.display === 'block') {
+                generateAnalytics();
+            }
+        }
+
+        function generateAnalytics() {
+            const content = document.getElementById('analytics-content');
+            
+            // Calculate analytics
+            const totalProperties = filteredParcels.length;
+            const totalValue = filteredParcels.reduce((sum, p) => sum + parseNumber(p.total_value), 0);
+            const avgValue = totalValue / totalProperties || 0;
+            
+            const classBreakdown = {};
+            const yearBreakdown = {};
+            
+            filteredParcels.forEach(p => {
+                classBreakdown[p.class_code] = (classBreakdown[p.class_code] || 0) + 1;
+                const year = parseInt(p.year_built);
+                if (year) {
+                    const decade = Math.floor(year / 10) * 10;
+                    yearBreakdown[decade] = (yearBreakdown[decade] || 0) + 1;
+                }
+            });
+            
+            let analyticsHTML = `
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h4>Summary Statistics</h4>
+                        <div>Total Properties: ${formatNumber(totalProperties)}</div>
+                        <div>Total Value: ${formatCurrency(totalValue)}</div>
+                        <div>Average Value: ${formatCurrency(avgValue)}</div>
+                    </div>
+                    <div class="analytics-card">
+                        <h4>Top Property Classes</h4>
+            `;
+            
+            Object.entries(classBreakdown)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5)
+                .forEach(([cls, count]) => {
+                    analyticsHTML += `<div>${cls}: ${count} properties</div>`;
+                });
+            
+            analyticsHTML += `
+                    </div>
+                    <div class="analytics-card">
+                        <h4>Construction by Decade</h4>
+            `;
+            
+            Object.entries(yearBreakdown)
+                .sort((a, b) => b[0] - a[0])
+                .slice(0, 5)
+                .forEach(([decade, count]) => {
+                    analyticsHTML += `<div>${decade}s: ${count} properties</div>`;
+                });
+            
+            analyticsHTML += '</div></div>';
+            content.innerHTML = analyticsHTML;
+        }
+
+        function toggleComparison() {
+            comparisonMode = !comparisonMode;
+            const button = event.target;
+            const countDisplay = document.getElementById('comparison-count');
+            
+            if (comparisonMode) {
+                button.textContent = '❌ Exit Compare';
+                button.style.background = '#e74c3c';
+                countDisplay.style.display = 'inline';
+                alert('Comparison mode enabled. Click on properties to compare them side by side (max 4).');
+            } else {
+                button.textContent = '⚖️ Compare';
+                button.style.background = '#3498db';
+                selectedProperties.clear();
+                countDisplay.style.display = 'none';
+                document.getElementById('compare-panel').style.display = 'none';
+            }
+            
+            renderTable();
+        }
+
+        function handlePropertyClick(parcelId, event) {
+            if (!comparisonMode) return;
+            
+            event.stopPropagation();
+            
+            if (selectedProperties.has(parcelId)) {
+                selectedProperties.delete(parcelId);
+                event.currentTarget.classList.remove('selected');
+            } else {
+                if (selectedProperties.size < 4) {
+                    selectedProperties.add(parcelId);
+                    event.currentTarget.classList.add('selected');
+                } else {
+                    alert('Maximum 4 properties can be compared at once.');
+                }
+            }
+            
+            updateComparisonCount();
+            generateComparison();
+        }
+
+        function updateComparisonCount() {
+            document.getElementById('selected-count').textContent = selectedProperties.size;
+        }
+
+        function updateFilterStats() {
+            // Optional: Add filter statistics display
+        }
+
+        function generateComparison() {
+            const panel = document.getElementById('compare-panel');
+            const content = document.getElementById('comparison-content');
+            
+            if (selectedProperties.size === 0) {
+                panel.style.display = 'none';
+                return;
+            }
+            
+            panel.style.display = 'block';
+            
+            let compareHtml = '<div class="compare-grid">';
+            selectedProperties.forEach(parcelId => {
+                const property = allParcels.find(p => p.parcel_id === parcelId);
+                if (property) {
+                    compareHtml += `
+                        <div class="compare-property">
+                            <h4 style="margin: 0 0 8px 0; color: #2c3e50;">${property.owner_name} (${property.parcel_id})</h4>
+                            <div><strong>Class:</strong> ${property.class_code}</div>
+                            <div><strong>Year Built:</strong> ${property.year_built || '—'}</div>
+                            <div><strong>Living Area:</strong> ${formatNumber(property.living_area_sqft) || '—'} sqft</div>
+                            <div><strong>Bedrooms:</strong> ${property.bedrooms || '—'}</div>
+                            <div><strong>Lot Size:</strong> ${property.lot_size_acres} acres</div>
+                            <div><strong>Land Value:</strong> ${formatCurrency(property.land_value)}</div>
+                            <div><strong>Building Value:</strong> ${formatCurrency(property.building_value)}</div>
+                            <div><strong>Total Value:</strong> ${formatCurrency(property.total_value)}</div>
+                        </div>
+                    `;
+                }
+            });
+            compareHtml += '</div>';
+            
+            content.innerHTML = compareHtml;
+        }
 
         // Column resizing functionality
         let isResizing = false;
@@ -1252,9 +1251,10 @@
             });
         }
 
-        // Initialize
-        loadParcels();
-        
+        // Event listeners
+        document.getElementById('min-value').addEventListener('input', () => { currentPage = 1; applyFilters(); });
+        document.getElementById('max-value').addEventListener('input', () => { currentPage = 1; applyFilters(); });
+
         // Load data function
         async function loadParcels() {
             try {
@@ -1291,6 +1291,9 @@
                 document.getElementById('parcels-table').innerHTML = '<tr><td colspan="19" class="no-results">Error loading data</td></tr>';
             }
         }
+
+        // Initialize
+        loadParcels();
     </script>
 </body>
 </html>
