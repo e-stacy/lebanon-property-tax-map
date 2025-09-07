@@ -764,6 +764,15 @@
                     
                     console.log('Parcel boundaries added to map successfully');
                     
+                    // Store parcel data for later processing
+                    parcelData = geojsonData.features;
+                    
+                    // Remove the basic layer and add properly colored parcels
+                    map.removeLayer(parcelsLayer);
+                    
+                    // Add parcels with proper coloring
+                    updateParcelLayer();
+                    
                 } else {
                     throw new Error('No features found in GeoJSON data');
                 }
