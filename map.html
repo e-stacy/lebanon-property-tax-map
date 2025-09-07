@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Lebanon Property Tax Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: system-ui, Arial, sans-serif;
+        }
+        
+        #map { 
+            height: 100vh; 
+            width: 100%; 
+        }
+        
+        .map-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+            min-width: 280px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+        
+        .control-section {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+        
+        .control-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .control-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        
+        .filter-group {
+            margin-bottom: 10px;
+        }
+        
+        .stats {
+            font-size: 0.9em;
+        }
+        
+        .color-legend {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 0.85em;
+        }
+        
+        .color-box {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            border: 1px solid #ccc;
+            flex-shrink: 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        .color-legend {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 0.85em;
+        }
+        
+        .color-box {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            border: 1px solid #999;
+            border-radius: 2px;
+        }
+        
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .stats {
+            font-size: 0.85em;
+            color: #666;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        
+        .leaflet-popup-content {
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        
+        .popup-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .popup-row {
+            margin-bottom: 3px;
+        }
+        
+        .popup-label {
+            font-weight: bold;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <div class="map-controls">
+        <div class="control-section">
+            <div class="control-title">Property Filters</div>
+            
+            <div class="filter-group">
+                <label>Color Parcels By:</label>
+                <select id="color-by">
+                    <option value="class">Property Class</option>
+                    <option value="value">Total Value</option>
+                    <option value="density">Value per Acre</option>
+                    <option value="year">Year Built</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Property Class Filter:</label>
+                <select id="class-filter">
+                    <option value="">All Classes</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Min Value ($):</label>
+                <input type="number" id="min-value" placeholder="0">
+            </div>
+            
+            <div class="filter-group">
+                <label>Max Value ($):</label>
+                <input type="number" id="max-value" placeholder="Any">
+            </div>
+            
+            <div class="filter-group">
+                <button class="btn" onclick="applyFilters()">Apply Filters</button>
+                <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <div class="control-title">Map Layers</div>
+            <table style="width: 100%; border-collapse: collapse; margin: 0; padding: 0;">
+                <tr>
+                    <td style="width: 20px; padding: 2px 0; margin: 0; text-align: left;">
+                        <input type="checkbox" id="show-parcels" checked style="margin: 0; padding: 0;">
+                    </td>
+                    <td style="padding: 2px 0 2px 5px; margin: 0; text-align: left;">
+                        <label for="show-parcels" style="margin: 0; padding: 0; cursor: pointer;">Parcel Boundaries</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 20px; padding: 2px 0; margin: 0; text-align: left;">
+                        <input type="checkbox" id="show-labels" style="margin: 0; padding: 0;">
+                    </td>
+                    <td style="padding: 2px 0 2px 5px; margin: 0; text-align: left;">
+                        <label for="show-labels" style="margin: 0; padding: 0; cursor: pointer;">Map-Block-Lot</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 20px; padding: 2px 0; margin: 0; text-align: left;">
+                        <input type="checkbox" id="show-values" style="margin: 0; padding: 0;">
+                    </td>
+                    <td style="padding: 2px 0 2px 5px; margin: 0; text-align: left;">
+                        <label for="show-values" style="margin: 0; padding: 0; cursor: pointer;">Assessed Value</label>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="control-section">
+            <div class="control-title">Color Legend</div>
+            <div id="legend-content">
+                <!-- Legend will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <div class="control-title">Lebanon Total Value</div>
+            <div class="stats">
+                <div>All Parcels: <span id="total-parcels">5,698</span></div>
+                <div>Total Value: $<span id="all-total-value">4.1B</span></div>
+                <div>Avg Value: $<span id="all-avg-value">720K</span></div>
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <div class="control-title">Current View: <span id="filter-description">All Properties</span></div>
+            <table class="stats-table" style="width: 100%; font-size: 0.85em;">
+                <thead>
+                    <tr style="background: #f0f0f0; font-weight: bold;">
+                        <td style="padding: 4px; border-bottom: 1px solid #ddd;">Metric</td>
+                        <td style="padding: 4px; border-bottom: 1px solid #ddd; text-align: right;">Value</td>
+                        <td style="padding: 4px; border-bottom: 1px solid #ddd; text-align: right;">% of Total</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 2px 4px;">Parcels</td>
+                        <td style="padding: 2px 4px; text-align: right;"><span id="visible-count">0</span></td>
+                        <td style="padding: 2px 4px; text-align: right;"><span id="parcel-percentage">0%</span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 2px 4px;">Total Value</td>
+                        <td style="padding: 2px 4px; text-align: right;">$<span id="total-value">0</span></td>
+                        <td style="padding: 2px 4px; text-align: right;"><span id="value-percentage">0%</span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 2px 4px;">Avg Value</td>
+                        <td style="padding: 2px 4px; text-align: right;">$<span id="avg-value">0</span></td>
+                        <td style="padding: 2px 4px; text-align: right;"><span id="avg-percentage">0%</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="control-section">
+            <div class="filter-group">
+                <button class="btn" onclick="window.location.href='index.html'">← Back to Data View</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // Global variables
+        let map;
+        let parcelsLayer;
+        let parcelData = [];
+        let propertyData = new Map();
+        let currentFilters = {};
+        
+        // Color schemes for different visualization modes
+        const colorSchemes = {
+            class: {
+                '1010': '#e74c3c', // Residential - Red
+                '1020': '#e67e22', // Mobile Home - Orange  
+                '1030': '#f39c12', // Condo - Yellow
+                '1040': '#27ae60', // Apartment - Green
+                '1300': '#f1c40f', // Vacant Land - Bright Yellow
+                '1320': '#e8c547', // Small Parcels - Light Yellow
+                '2010': '#3498db', // Commercial - Blue
+                '2020': '#9b59b6', // Industrial - Purple
+                '3010': '#34495e', // Utilities - Dark Gray
+                '3020': '#95a5a6', // Other - Light Gray
+                '3520': '#2980b9', // Commercial (alt) - Dark Blue
+                '9030': '#7f8c8d', // Municipal - Gray
+                '9090': '#bdc3c7', // Association - Light Gray
+                'default': '#95a5a6'
+            },
+            value: {
+                ranges: [
+                    { min: 0, max: 100000, color: '#2ecc71' },
+                    { min: 100000, max: 250000, color: '#f1c40f' },
+                    { min: 250000, max: 500000, color: '#e67e22' },
+                    { min: 500000, max: 1000000, color: '#e74c3c' },
+                    { min: 1000000, max: Infinity, color: '#8e44ad' }
+                ]
+            },
+            density: {
+                ranges: [
+                    { min: 0, max: 50000, color: '#2ecc71' },
+                    { min: 50000, max: 100000, color: '#f1c40f' },
+                    { min: 100000, max: 200000, color: '#e67e22' },
+                    { min: 200000, max: 500000, color: '#e74c3c' },
+                    { min: 500000, max: Infinity, color: '#8e44ad' }
+                ]
+            },
+            year: {
+                ranges: [
+                    { min: 0, max: 1950, color: '#8e44ad' },
+                    { min: 1950, max: 1970, color: '#e74c3c' },
+                    { min: 1970, max: 1990, color: '#e67e22' },
+                    { min: 1990, max: 2010, color: '#f1c40f' },
+                    { min: 2010, max: Infinity, color: '#2ecc71' }
+                ]
+            }
+        };
+        
+        // Initialize map
+        function initMap() {
+            // Center on Lebanon, NH
+            map = L.map('map').setView([43.6424, -72.2517], 13);
+            
+            // Add OpenStreetMap tiles
+            // Use OpenStreetMap tiles with good contrast
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 20
+            }).addTo(map);
+            
+            // Update labels when map zoom changes
+            map.on('zoomend', function() {
+                const showMBL = document.getElementById('show-labels').checked;
+                const showValue = document.getElementById('show-values').checked;
+                
+                if (showMBL || showValue) {
+                    toggleMapLabels();
+                }
+            });
+
+            // Load data
+            loadPropertyData().then(() => {
+                // Make sure legend appears initially
+                updateLegend();
+            });
+        }
+        
+        // Load property data
+        async function loadPropertyData() {
+            try {
+                console.log('Loading property data...');
+                
+                // Load property database
+                const response = await fetch('data/parcels.csv');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const text = await response.text();
+                console.log('Raw CSV text length:', text.length);
+                console.log('First 200 chars:', text.substring(0, 200));
+                
+                const lines = text.trim().split('\n');
+                console.log('Number of lines:', lines.length);
+                
+                if (lines.length < 2) {
+                    throw new Error('CSV file appears to be empty or malformed');
+                }
+                
+                const headers = parseCSVLine(lines[0]);
+                console.log('Headers found:', headers);
+                
+                const properties = lines.slice(1).map((line, index) => {
+                    try {
+                        const values = parseCSVLine(line);
+                        const property = {};
+                        headers.forEach((header, index) => {
+                            property[header] = values[index] || '';
+                        });
+                        return property;
+                    } catch (err) {
+                        console.warn(`Error parsing line ${index + 2}:`, err);
+                        return null;
+                    }
+                }).filter(p => p && p.parcel_id && p.parcel_id.trim());
+                
+                // Index properties by parcel ID for quick lookup
+                properties.forEach(prop => {
+                    propertyData.set(prop.parcel_id, prop);
+                });
+                
+                console.log(`Successfully loaded ${properties.length} properties`);
+                if (properties.length > 0) {
+                    console.log('Sample property:', properties[0]);
+                }
+                
+                // Populate class filter
+                populateClassFilter(properties);
+                
+                // Load spatial data
+                loadActualSpatialData(properties);
+                
+            } catch (error) {
+                console.error('Error loading property data:', error);
+                alert('Error loading property data: ' + error.message);
+            }
+        }
+        
+        // Parse CSV line (same function as in main app)
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim());
+            return result;
+        }
+        
+        // Load actual spatial data
+        async function loadActualSpatialData(properties) {
+            try {
+                console.log('Loading parcel boundaries...');
+                
+                const response = await fetch('spatial/parcels_wgs84.geojson');
+                if (!response.ok) {
+                    throw new Error(`Failed to load spatial data: ${response.status}`);
+                }
+                
+                const geojsonText = await response.text();
+                console.log('GeoJSON loaded, size:', geojsonText.length);
+                
+                const geojsonData = JSON.parse(geojsonText);
+                console.log('Parsed GeoJSON, features:', geojsonData.features?.length || 0);
+                
+                if (geojsonData.features && geojsonData.features.length > 0) {
+                    parcelData = geojsonData.features;
+                    console.log(`Successfully loaded ${parcelData.length} parcel boundaries`);
+                    
+                    // Add parcels directly to map with prominent boundaries
+                    parcelsLayer = L.geoJSON(geojsonData, {
+                        style: {
+                            color: '#000000',
+                            weight: 3,
+                            fillColor: '#87CEEB',
+                            fillOpacity: 0.1,
+                            opacity: 1.0
+                        },
+                        onEachFeature: function(feature, layer) {
+                            const mapLot = feature.properties.MAP_LOT;
+                            
+                            // Simple popup with spatial data
+                            const popupContent = `
+                                <div class="popup-title">Parcel ${mapLot}</div>
+                                <div class="popup-row"><span class="popup-label">GIS ID:</span> ${feature.properties.GIS_ID || 'Unknown'}</div>
+                                <div class="popup-row"><span class="popup-label">Acres:</span> ${(feature.properties.CALC_ACRES || 0).toFixed(2)}</div>
+                            `;
+                            
+                            layer.bindPopup(popupContent);
+                            
+                            layer.on('mouseover', function() {
+                                this.setStyle({ weight: 4, color: '#000' });
+                            });
+                            
+                            layer.on('mouseout', function() {
+                                this.setStyle({ weight: 2, color: '#333' });
+                            });
+                        }
+                    }).addTo(map);
+                    
+                    console.log('Parcel boundaries added to map successfully');
+                    
+                } else {
+                    throw new Error('No features found in GeoJSON data');
+                }
+                
+            } catch (error) {
+                console.error('Error loading spatial data:', error);
+                console.log('Creating fallback visualization...');
+                createTestParcels(properties);
+            }
+        }
+        
+        // Create test parcels to verify property data quality
+        function createTestParcels(properties) {
+            const features = [];
+            
+            // Create a more organized grid to test data quality
+            const centerLat = 43.6424;
+            const centerLng = -72.2517;
+            const testCount = Math.min(100, properties.length); // Test first 100 properties
+            const gridSize = Math.ceil(Math.sqrt(testCount));
+            const spacing = 0.003;
+            
+            console.log(`Creating ${testCount} test parcels to verify data quality`);
+            
+            properties.slice(0, testCount).forEach((prop, index) => {
+                const row = Math.floor(index / gridSize);
+                const col = index % gridSize;
+                
+                const baseLat = centerLat - (gridSize * spacing / 2) + (row * spacing);
+                const baseLng = centerLng - (gridSize * spacing / 2) + (col * spacing);
+                
+                // Size based on property value for testing
+                const value = parseFloat(prop.total_value) || 0;
+                let size = 0.002;
+                if (value > 500000) size = 0.003;
+                if (value > 1000000) size = 0.004;
+                
+                const feature = {
+                    type: 'Feature',
+                    properties: { parcel_id: prop.parcel_id },
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [[
+                            [baseLng, baseLat],
+                            [baseLng + size, baseLat],
+                            [baseLng + size, baseLat + size],
+                            [baseLng, baseLat + size],
+                            [baseLng, baseLat]
+                        ]]
+                    }
+                };
+                features.push(feature);
+            });
+            
+            parcelData = features;
+            console.log(`Created ${features.length} test parcels for data verification`);
+            
+            // Add parcels to map
+            updateParcelLayer();
+            
+            return true; // Make function properly async
+        }
+        
+        // Update parcel layer based on current filters and styling
+        function updateParcelLayer() {
+            if (parcelsLayer) {
+                map.removeLayer(parcelsLayer);
+            }
+            
+            // Also remove existing labels when updating parcels
+            if (combinedLabelsLayer) {
+                map.removeLayer(combinedLabelsLayer);
+                combinedLabelsLayer = null;
+            }
+            
+            const colorBy = document.getElementById('color-by').value;
+            
+            parcelsLayer = L.geoJSON(parcelData, {
+                filter: function(feature) {
+                    // Only show parcels that pass the filters
+                    const mapLot = feature.properties.MAP_LOT;
+                    let prop = null;
+                    
+                    // Direct match with parcel_id
+                    prop = propertyData.get(mapLot);
+                    
+                    // If no property data found, show the parcel
+                    if (!prop) return true;
+                    
+                    // Only show parcels that pass current filters
+                    return passesFilters(prop);
+                },
+                style: function(feature) {
+                    const mapLot = feature.properties.MAP_LOT;
+                    let prop = null;
+                    
+                    // Direct match with parcel_id
+                    prop = propertyData.get(mapLot);
+                    
+                    const color = getParcelColor(prop, colorBy);
+                    
+                    return {
+                        color: '#000000',
+                        weight: 3,
+                        fillColor: color,
+                        fillOpacity: 0.3,
+                        opacity: 1.0
+                    };
+                },
+                onEachFeature: function(feature, layer) {
+                    // Try to link spatial data to property data
+                    const mapLot = feature.properties.MAP_LOT;
+                    let prop = null;
+                    
+                    // Direct match with parcel_id
+                    prop = propertyData.get(mapLot);
+                    
+                    // Strategy 3: Try map-block match (e.g., "107-6" matches map 107, block 6)
+                    if (!prop && mapLot.includes('-')) {
+                        const parts = mapLot.split('-');
+                        if (parts.length >= 2) {
+                            const mapNum = parts[0];
+                            const blockNum = parts[1];
+                            
+                            for (const [id, property] of propertyData) {
+                                if (property.map_number === mapNum && property.block_number === blockNum) {
+                                    prop = property;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Create popup content
+                    let popupContent;
+                    if (prop) {
+                        popupContent = createPopupContent(prop);
+                    } else {
+                        popupContent = `
+                            <div class="popup-title">Parcel ${mapLot}</div>
+                            <div class="popup-row"><span class="popup-label">GIS ID:</span> ${feature.properties.GIS_ID || 'Unknown'}</div>
+                            <div class="popup-row"><span class="popup-label">Acres:</span> ${(feature.properties.CALC_ACRES || 0).toFixed(2)}</div>
+                            <div class="popup-row"><span class="popup-label">Status:</span> No property data match found</div>
+                        `;
+                    }
+                    
+                    layer.bindPopup(popupContent);
+                    
+                    // Add hover effects
+                    layer.on('mouseover', function() {
+                        this.setStyle({ weight: 4, color: '#000' });
+                    });
+                    
+                    layer.on('mouseout', function() {
+                        this.setStyle({ weight: 2, color: '#333' });
+                    });
+                }
+            }).addTo(map);
+            
+            updateLegend();
+            updateStats();
+            
+            // Re-apply labels if checkboxes are checked
+            const showMBL = document.getElementById('show-labels').checked;
+            const showValue = document.getElementById('show-values').checked;
+            if (showMBL || showValue) {
+                addCombinedLabels(showMBL, showValue);
+            }
+        }
+        
+        // Get color for parcel based on visualization mode
+        function getParcelColor(property, colorBy) {
+            switch (colorBy) {
+                case 'class':
+                    return colorSchemes.class[property?.class_code] || colorSchemes.class.default;
+                    
+                case 'value':
+                    const value = parseFloat(property.total_value) || 0;
+                    for (const range of colorSchemes.value.ranges) {
+                        if (value >= range.min && value < range.max) {
+                            return range.color;
+                        }
+                    }
+                    return '#bdc3c7';
+                    
+                case 'density':
+                    const totalValue = parseFloat(property.total_value) || 0;
+                    const acres = parseFloat(property.lot_size_acres) || 1;
+                    const density = totalValue / acres;
+                    for (const range of colorSchemes.density.ranges) {
+                        if (density >= range.min && density < range.max) {
+                            return range.color;
+                        }
+                    }
+                    return '#bdc3c7';
+                    
+                case 'year':
+                    const year = parseInt(property.year_built) || 0;
+                    for (const range of colorSchemes.year.ranges) {
+                        if (year >= range.min && year < range.max) {
+                            return range.color;
+                        }
+                    }
+                    return '#bdc3c7';
+                    
+                default:
+                    return '#3498db';
+            }
+        }
+        
+        // Check if property passes current filters
+        function passesFilters(property) {
+            const classFilter = document.getElementById('class-filter').value;
+            const minValue = parseFloat(document.getElementById('min-value').value) || 0;
+            const maxValue = parseFloat(document.getElementById('max-value').value) || Infinity;
+            
+            if (classFilter && property?.class_code !== classFilter) {
+                return false;
+            }
+            
+            const value = parseFloat(property.total_value) || 0;
+            if (value < minValue || value > maxValue) {
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Create popup content for parcel
+        function createPopupContent(property) {
+            return `
+                <div class="popup-title">${property.situs_address || 'No Address'}</div>
+                <div class="popup-row"><span class="popup-label">Parcel:</span> ${property.parcel_id}</div>
+                <div class="popup-row"><span class="popup-label">Owner:</span> ${property.owner_name || 'Unknown'}</div>
+                <div class="popup-row"><span class="popup-label">Class:</span> ${property?.class_code || 'Unknown'}</div>
+                <div class="popup-row"><span class="popup-label">Lot Size:</span> ${property.lot_size_acres || '0'} acres</div>
+                <div class="popup-row"><span class="popup-label">Total Value:</span> $${formatNumber(property.total_value || 0)}</div>
+                <div class="popup-row"><span class="popup-label">Land Value:</span> $${formatNumber(property.land_value || 0)}</div>
+                <div class="popup-row"><span class="popup-label">Building Value:</span> $${formatNumber(property.building_value || 0)}</div>
+                ${property.year_built ? `<div class="popup-row"><span class="popup-label">Year Built:</span> ${property.year_built}</div>` : ''}
+                ${property.building_gla ? `<div class="popup-row"><span class="popup-label">Building Area:</span> ${formatNumber(property.building_gla)} sq ft</div>` : ''}
+            `;
+        }
+        
+        // Populate class filter dropdown
+        function populateClassFilter(properties) {
+            const classFilter = document.getElementById('class-filter');
+            const classes = [...new Set(properties.map(p => p?.class_code).filter(c => c))].sort();
+            
+            classes.forEach(cls => {
+                const option = document.createElement('option');
+                option.value = cls;
+                const description = classDescriptions[cls] || 'Unknown';
+                option.textContent = `${cls} - ${description}`;
+                classFilter.appendChild(option);
+            });
+        }
+        
+        // Class code descriptions
+        const classDescriptions = {
+            '1010': 'Residential',
+            '1020': 'Mobile Home',
+            '1030': 'Condominium',
+            '1040': 'Apartment',
+            '1300': 'Vacant Land',
+            '1320': 'Small Parcel',
+            '2010': 'Commercial',
+            '2020': 'Industrial',
+            '3010': 'Utilities',
+            '3020': 'Other',
+            '3520': 'Commercial Alt',
+            '9030': 'Municipal',
+            '9090': 'Association'
+        };
+
+        // Update legend based on current color scheme
+        function updateLegend() {
+            const colorBy = document.getElementById('color-by').value;
+            const legendContent = document.getElementById('legend-content');
+            
+            let html = '';
+            
+            if (colorBy === 'class') {
+                for (const [classCode, color] of Object.entries(colorSchemes.class)) {
+                    if (classCode !== 'default') {
+                        const description = classDescriptions[classCode] || 'Unknown';
+                        html += `<div class="color-legend">
+                            <div class="color-box" style="background-color: ${color}"></div>
+                            ${classCode} - ${description}
+                        </div>`;
+                    }
+                }
+            } else if (colorBy === 'value') {
+                colorSchemes.value.ranges.forEach(range => {
+                    const label = range.max === Infinity ? 
+                        `$${formatNumber(range.min)}+` : 
+                        `$${formatNumber(range.min)} - $${formatNumber(range.max)}`;
+                    html += `<div class="color-legend">
+                        <div class="color-box" style="background-color: ${range.color}"></div>
+                        ${label}
+                    </div>`;
+                });
+            }
+            // Add other legend types as needed
+            
+            legendContent.innerHTML = html;
+        }
+        
+        // Calculate total value for all properties (once)
+        let allPropertiesTotal = 0;
+        let allPropertiesCount = 0;
+        
+        function calculateTotalValue() {
+            if (allPropertiesTotal > 0) return; // Already calculated
+            
+            for (const [id, prop] of propertyData) {
+                allPropertiesTotal += parseFloat(prop.total_value) || 0;
+                allPropertiesCount++;
+            }
+            
+            // Update total value section
+            document.getElementById('total-parcels').textContent = formatNumber(allPropertiesCount);
+            document.getElementById('all-total-value').textContent = '$' + formatLargeNumber(allPropertiesTotal);
+            document.getElementById('all-avg-value').textContent = '$' + formatLargeNumber(allPropertiesTotal / allPropertiesCount);
+        }
+
+        // Format large numbers with K, M, B suffixes
+        function formatLargeNumber(num) {
+            if (num >= 1000000000) return (num / 1000000000).toFixed(1) + 'B';
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(0) + 'K';
+            return formatNumber(num);
+        }
+
+        // Update statistics
+        function updateStats() {
+            calculateTotalValue();
+            
+            // Calculate stats based on current filters, not just visible parcels
+            let visibleCount = 0;
+            let totalValue = 0;
+            
+            // Check if any filters are applied
+            const classFilter = document.getElementById('class-filter').value;
+            const minValue = document.getElementById('min-value').value;
+            const maxValue = document.getElementById('max-value').value;
+            const hasFilters = classFilter || minValue || maxValue;
+            
+            if (!hasFilters) {
+                // No filters applied - show total statistics
+                visibleCount = propertyData.size;
+                totalValue = allPropertiesTotal; // Use pre-calculated city total
+            } else {
+                // Filters applied - calculate filtered statistics
+                for (const [id, prop] of propertyData) {
+                    if (passesFilters(prop)) {
+                        visibleCount++;
+                        totalValue += parseFloat(prop.total_value) || 0;
+                    }
+                }
+            }
+            
+            const avgValue = visibleCount > 0 ? totalValue / visibleCount : 0;
+            const percentage = allPropertiesTotal > 0 ? (totalValue / allPropertiesTotal * 100) : 0;
+            
+            // Update filter description
+            
+            let filterDesc = 'All Properties';
+            if (classFilter) {
+                const description = classDescriptions[classFilter] || classFilter;
+                filterDesc = `${classFilter} - ${description}`;
+            }
+            if (minValue || maxValue) {
+                const valueRange = minValue && maxValue ? 
+                    `$${formatLargeNumber(minValue)} - $${formatLargeNumber(maxValue)}` :
+                    minValue ? `≥ $${formatLargeNumber(minValue)}` :
+                    `≤ $${formatLargeNumber(maxValue)}`;
+                filterDesc += classFilter ? `, ${valueRange}` : valueRange;
+            }
+            
+            document.getElementById('filter-description').textContent = filterDesc;
+            document.getElementById('visible-count').textContent = formatNumber(visibleCount);
+            document.getElementById('total-value').textContent = formatLargeNumber(totalValue);
+            document.getElementById('avg-value').textContent = formatLargeNumber(avgValue);
+            
+            // Calculate all percentages
+            const parcelPercentage = allPropertiesCount > 0 ? (visibleCount / allPropertiesCount * 100) : 0;
+            const valuePercentage = allPropertiesTotal > 0 ? (totalValue / allPropertiesTotal * 100) : 0;
+            const allAvgValue = allPropertiesCount > 0 ? allPropertiesTotal / allPropertiesCount : 0;
+            const avgPercentage = allAvgValue > 0 ? (avgValue / allAvgValue * 100) : 0;
+            
+            document.getElementById('parcel-percentage').textContent = parcelPercentage.toFixed(1) + '%';
+            document.getElementById('value-percentage').textContent = valuePercentage.toFixed(1) + '%';
+            document.getElementById('avg-percentage').textContent = avgPercentage.toFixed(1) + '%';
+        }
+        
+        // Apply filters
+        function applyFilters() {
+            updateParcelLayer();
+        }
+        
+        // Clear filters
+        function clearFilters() {
+            document.getElementById('class-filter').value = '';
+            document.getElementById('min-value').value = '';
+            document.getElementById('max-value').value = '';
+            updateParcelLayer();
+        }
+        
+        // Format number with commas
+        function formatNumber(num) {
+            return parseFloat(num).toLocaleString();
+        }
+        
+        // Toggle parcel boundaries visibility
+        function toggleParcels() {
+            const checkbox = document.getElementById('show-parcels');
+            if (checkbox.checked) {
+                if (parcelsLayer) {
+                    map.addLayer(parcelsLayer);
+                }
+            } else {
+                if (parcelsLayer) {
+                    map.removeLayer(parcelsLayer);
+                }
+            }
+        }
+        
+        // Global variable for combined labels
+        let combinedLabelsLayer;
+        
+        // Toggle combined labels based on checkboxes
+        function toggleMapLabels() {
+            const showMBL = document.getElementById('show-labels').checked;
+            const showValue = document.getElementById('show-values').checked;
+            
+            // Remove existing labels
+            if (combinedLabelsLayer) {
+                map.removeLayer(combinedLabelsLayer);
+                combinedLabelsLayer = null;
+            }
+            
+            // Add new labels if either checkbox is checked
+            if (showMBL || showValue) {
+                addCombinedLabels(showMBL, showValue);
+            }
+        }
+        
+        // Add combined labels to map
+        function addCombinedLabels(showMBL, showValue) {
+            if (!parcelsLayer) return;
+            
+            const labels = [];
+            const currentZoom = map.getZoom();
+            console.log(`Adding combined labels at zoom level: ${currentZoom}, MBL: ${showMBL}, Values: ${showValue}`);
+            
+            // Determine minimum zoom level needed (lower thresholds for better testing)
+            const minZoomForMBL = 14;
+            const minZoomForValue = 15;
+            const canShowMBL = showMBL && currentZoom >= minZoomForMBL;
+            const canShowValue = showValue && currentZoom >= minZoomForValue;
+            
+            if (!canShowMBL && !canShowValue) {
+                console.log('Zoom level too low for any labels');
+                return;
+            }
+            
+            parcelsLayer.eachLayer(layer => {
+                const bounds = layer.getBounds();
+                const center = bounds.getCenter();
+                const mapLot = layer.feature.properties.MAP_LOT;
+                
+                if (!mapLot) return;
+                
+                let labelContent = '';
+                let showThisLabel = false;
+                
+                // Add Map-Block-Lot if requested and zoom allows
+                if (canShowMBL) {
+                    // Get property data for complete identifier
+                    let prop = propertyData.get(mapLot);
+                    // Use the parcel_id which contains the complete map-block-lot identifier
+                    const fullId = prop?.parcel_id || mapLot;
+                    // console.log(`Label for ${mapLot}: found prop with parcel_id = ${prop?.parcel_id}, using ${fullId}`);
+                    labelContent = fullId;
+                    showThisLabel = true;
+                }
+                
+                // Add assessed value if requested and zoom allows
+                if (canShowValue) {
+                    // Find property data
+                    let prop = propertyData.get(mapLot);
+                    
+                    if (prop) {
+                        const value = formatLargeNumber(parseFloat(prop.total_value) || 0);
+                        if (labelContent) {
+                            // Both MBL and value - MBL on top, value on bottom
+                            // Keep the complete parcel_id, not just mapLot
+                            const fullId = prop?.parcel_id || mapLot;
+                            labelContent = `${fullId}<br/>$${value}`;
+                        } else {
+                            // Only value
+                            labelContent = `$${value}`;
+                        }
+                        showThisLabel = true;
+                    }
+                }
+                
+                if (showThisLabel && labelContent) {
+                    const label = L.marker(center, {
+                        icon: L.divIcon({
+                            className: 'combined-label',
+                            html: `<div style="background: rgba(255,255,255,0.95); padding: 3px 8px; border: 1px solid #333; border-radius: 4px; font-size: 11px; font-weight: bold; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3); line-height: 1.2; min-width: 60px; white-space: nowrap;">${labelContent}</div>`,
+                            iconSize: [null, null],
+                            iconAnchor: [null, null]
+                        })
+                    });
+                    labels.push(label);
+                }
+            });
+            
+            console.log(`Created ${labels.length} combined labels`);
+            if (labels.length > 0) {
+                combinedLabelsLayer = L.layerGroup(labels).addTo(map);
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('color-by').addEventListener('change', updateParcelLayer);
+        
+        // Add checkbox event listeners
+        document.getElementById('show-parcels').addEventListener('change', toggleParcels);
+        document.getElementById('show-labels').addEventListener('change', toggleMapLabels);
+        document.getElementById('show-values').addEventListener('change', toggleMapLabels);
+        
+        // Initialize map when page loads
+        document.addEventListener('DOMContentLoaded', initMap);
+    </script>
+</body>
+</html>
