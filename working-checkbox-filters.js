@@ -192,7 +192,7 @@ function updateWorkingFilter(containerId) {
     
     console.log('updateWorkingFilter called for:', containerId);
     
-    if (allCheckbox.checked) {
+    if (allCheckbox && allCheckbox.checked) {
         // If "All" is checked, uncheck others
         otherCheckboxes.forEach(cb => cb.checked = false);
         dropdownText.textContent = 'All Classes';
@@ -202,9 +202,16 @@ function updateWorkingFilter(containerId) {
         
         if (checkedOthers.length === 0) {
             // If none are checked, check "All"
-            allCheckbox.checked = true;
-            dropdownText.textContent = 'All Classes';
+            if (allCheckbox) {
+                allCheckbox.checked = true;
+                dropdownText.textContent = 'All Classes';
+            }
         } else {
+            // Uncheck "All" if others are checked
+            if (allCheckbox) {
+                allCheckbox.checked = false;
+            }
+            
             // Update text to show selection
             if (checkedOthers.length === 1) {
                 const selectedText = checkedOthers[0].nextElementSibling.textContent;
@@ -217,9 +224,16 @@ function updateWorkingFilter(containerId) {
         }
     }
     
-    // Trigger filter application
-    if (typeof applyFilters === 'function') {
-        applyFilters();
+    // Apply filters for the specific page
+    if (containerId === 'class-filter') {
+        // Get selected classes using the working filter system
+        const selectedClasses = workingFilters.getSelectedClasses(containerId);
+        console.log('Selected classes:', selectedClasses);
+        
+        // Call the appropriate filter function based on which page we're on
+        if (typeof applyFilters === 'function') {
+            applyFilters();
+        }
     }
 }
 
