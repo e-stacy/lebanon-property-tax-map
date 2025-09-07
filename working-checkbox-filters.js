@@ -196,36 +196,33 @@ function updateWorkingFilter(containerId) {
     
     console.log('updateWorkingFilter called for:', containerId);
     
-    if (allCheckbox && allCheckbox.checked) {
-        // If "All" is checked, uncheck others
-        otherCheckboxes.forEach(cb => cb.checked = false);
-        dropdownText.textContent = 'All Classes';
-    } else {
-        // Check if any others are checked
-        const checkedOthers = Array.from(otherCheckboxes).filter(cb => cb.checked);
-        
-        if (checkedOthers.length === 0) {
-            // If none are checked, check "All"
-            if (allCheckbox) {
-                allCheckbox.checked = true;
-                dropdownText.textContent = 'All Classes';
-            }
-        } else {
-            // Uncheck "All" if others are checked
-            if (allCheckbox) {
-                allCheckbox.checked = false;
-            }
-            
-            // Update text to show selection
-            if (checkedOthers.length === 1) {
-                const selectedText = checkedOthers[0].nextElementSibling.textContent;
-                dropdownText.textContent = selectedText.length > 30 
-                    ? selectedText.substring(0, 27) + '...' 
-                    : selectedText;
-            } else {
-                dropdownText.textContent = `${checkedOthers.length} classes selected`;
-            }
+    // Check how many specific checkboxes are checked
+    const checkedOthers = Array.from(otherCheckboxes).filter(cb => cb.checked);
+    console.log('DEBUG: Found', checkedOthers.length, 'specific checkboxes checked');
+    
+    if (checkedOthers.length > 0) {
+        // If any specific boxes are checked, uncheck "All"
+        if (allCheckbox) {
+            allCheckbox.checked = false;
+            console.log('DEBUG: Unchecked All checkbox');
         }
+        
+        // Update text to show selection
+        if (checkedOthers.length === 1) {
+            const selectedText = checkedOthers[0].nextElementSibling.textContent;
+            dropdownText.textContent = selectedText.length > 30 
+                ? selectedText.substring(0, 27) + '...' 
+                : selectedText;
+        } else {
+            dropdownText.textContent = `${checkedOthers.length} classes selected`;
+        }
+    } else {
+        // If no specific boxes are checked, check "All"
+        if (allCheckbox) {
+            allCheckbox.checked = true;
+            console.log('DEBUG: Checked All checkbox');
+        }
+        dropdownText.textContent = 'All Classes';
     }
     
     // Apply filters for the specific page
