@@ -127,10 +127,12 @@ class WorkingCheckboxFilters {
         primaryClasses.forEach(({ code, count, info }) => {
             // Add primary class
             html += `
-                <label class="checkbox-item primary-class">
-                    <input type="checkbox" value="${code}" onchange="updateWorkingFilter('${containerId}')">
-                    <span>${code} - ${info.name} (${count})</span>
-                </label>
+                <div class="checkbox-item primary-class">
+                    <label>
+                        <input type="checkbox" value="${code}" onchange="updateWorkingFilter('${containerId}')">
+                        <span>${code} - ${info.name} (${count})</span>
+                    </label>
+                </div>
             `;
             
             // Add subclasses if they exist in data
@@ -140,10 +142,12 @@ class WorkingCheckboxFilters {
                         const subInfo = PROPERTY_CLASS_HIERARCHY[subcode];
                         const subCount = classCounts[subcode];
                         html += `
-                            <label class="checkbox-item sub-class">
-                                <input type="checkbox" value="${subcode}" onchange="updateWorkingFilter('${containerId}')">
-                                <span>${subcode} - ${subInfo.name} (${subCount})</span>
-                            </label>
+                            <div class="checkbox-item sub-class">
+                                <label>
+                                    <input type="checkbox" value="${subcode}" onchange="updateWorkingFilter('${containerId}')">
+                                    <span>${subcode} - ${subInfo.name} (${subCount})</span>
+                                </label>
+                            </div>
                         `;
                     }
                 });

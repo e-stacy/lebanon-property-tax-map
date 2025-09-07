@@ -67,16 +67,26 @@
 }
 
 .checkbox-item {
+    display: block;
+    padding: 0;
+    border-bottom: 1px solid #f0f0f0;
+    margin: 0;
+    font-size: 0.85em;
+    position: relative;
+}
+
+.checkbox-item label {
     display: flex;
     align-items: center;
     padding: 8px 12px;
-    border-bottom: 1px solid #f0f0f0;
     cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
     margin: 0;
-    font-size: 0.85em;
 }
 
-.checkbox-item:hover {
+.checkbox-item:hover,
+.checkbox-item label:hover {
     background-color: #f8f9fa;
 }
 
@@ -87,42 +97,51 @@
 .checkbox-item input[type="checkbox"] {
     margin: 0 8px 0 0;
     flex-shrink: 0;
+    pointer-events: auto;
+    cursor: pointer;
 }
 
 .checkbox-item span {
     flex-grow: 1;
     line-height: 1.3;
+    text-align: left;
+    pointer-events: none;
 }
 
 /* Special styling for "All Classes" option */
-.checkbox-item:first-child {
+.checkbox-item:first-child label {
     background-color: #f8f9fa;
     font-weight: 600;
     border-bottom: 2px solid #e9ecef;
 }
 
-.checkbox-item:first-child:hover {
+.checkbox-item:first-child:hover label,
+.checkbox-item:first-child label:hover {
     background-color: #e9ecef;
 }
 
 /* Hierarchical styling */
-.checkbox-item.primary-class {
+.checkbox-item.primary-class label {
     font-weight: 600;
     background-color: #f9f9f9;
+    padding-left: 12px;
 }
 
-.checkbox-item.sub-class {
-    padding-left: 32px;
+.checkbox-item.sub-class label {
     font-size: 0.8em;
     background-color: #fdfdfd;
-    border-left: 3px solid #e9ecef;
+    padding-left: 40px;
+    border-left: 3px solid #dee2e6;
+    margin-left: 0;
 }
 
-.checkbox-item.sub-class:hover {
+.checkbox-item.sub-class:hover label,
+.checkbox-item.sub-class label:hover {
     background-color: #f0f8ff;
 }
 
-.checkbox-item.primary-class:hover {
+.checkbox-item.primary-class:hover label,
+.checkbox-item.primary-class label:hover {
     background-color: #f0f0f0;
 }
 
