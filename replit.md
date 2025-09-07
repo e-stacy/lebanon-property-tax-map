@@ -13,11 +13,14 @@ This is a property tax database and data explorer for Lebanon, New Hampshire. Th
 - Fixed color overlay system and statistics display on page load
 - Repository structure organized and ready for GitHub deployment
 
-**🔄 NEXT STEPS - GitHub Repository Update**
-- GitHub Personal Access Token created with Contents (read/write) and Workflows permissions
-- Repository structure ready for deployment: enhanced index.html, map.html, expanded data/parcels.csv
-- city_data moved to data/city_data/ for version history preservation
-- Awaiting token activation after app restart to push changes to https://github.com/e-stacy/lebanon-property-tax-map.git
+**🔄 NEXT STEPS - GitHub Pages Activation**
+- ✅ Enhanced files successfully deployed to GitHub repository
+- ✅ GitHub Personal Access Token updated with Pages (read/write) permissions  
+- ⏳ IMMEDIATE NEXT STEP: Enable GitHub Pages via API with enhanced token
+- Repository ready at: https://github.com/e-stacy/lebanon-property-tax-map.git
+- Target site URL: https://e-stacy.github.io/lebanon-property-tax-map/
+
+**STATUS NOTE**: Repository contains enhanced Lebanon Property Tax Database with NHDRA integration (5,622 properties, 25 columns). All files deployed, only GitHub Pages activation remaining.
 
 ## User Preferences
 
