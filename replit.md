@@ -4,6 +4,21 @@
 
 This is a property tax database and data explorer for Lebanon, New Hampshire. The project provides a comprehensive system for processing, normalizing, and visualizing property assessment data from the city. It includes normalized CSV datasets for parcels, buildings, land, sales, and NHDRA data, along with a web-based data explorer interface that displays property information in both tabular and map formats. The system follows a "Clerk mode" approach that prioritizes evidence-based processing and maintains clear data provenance throughout the transformation pipeline.
 
+## Current Status (September 2025)
+
+**✅ COMPLETED - Enhanced Database Integration**
+- Successfully integrated comprehensive NHDRA data from city_data into main parcels dataset
+- Expanded from 12 to 25 columns with detailed property information
+- Enhanced website interfaces (index.html and map.html) to display new data
+- Fixed color overlay system and statistics display on page load
+- Repository structure organized and ready for GitHub deployment
+
+**🔄 NEXT STEPS - GitHub Repository Update**
+- GitHub Personal Access Token created with Contents (read/write) and Workflows permissions
+- Repository structure ready for deployment: enhanced index.html, map.html, expanded data/parcels.csv
+- city_data moved to data/city_data/ for version history preservation
+- Awaiting token activation after app restart to push changes to https://github.com/e-stacy/lebanon-property-tax-map.git
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
