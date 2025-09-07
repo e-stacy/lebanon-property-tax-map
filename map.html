@@ -1465,19 +1465,19 @@
             if (!shouldShowColorCoding()) {
                 html = '<div style="font-style: italic; color: #666; padding: 8px; background: #f8f9fa; border-radius: 4px;">Color Legend Overlay is disabled. Toggle to show color coding.</div>';
             } else if (colorBy === 'class') {
-                const classFilter = document.getElementById('class-filter').value;
+                const selectedClasses = selectedFilters.class;
                 
-                if (classFilter) {
+                if (selectedClasses.length > 0) {
                     // Show legend for selected class hierarchy
-                    const allowedClasses = getClassesForFilter(classFilter);
-                    const classInfo = propertyClassHierarchy[classFilter];
-                    
-                    if (classInfo && classInfo.primary && classInfo.subclasses) {
-                        // Primary class selected - show it and its subclasses
-                        html += `<div class="color-legend" style="font-weight: bold; margin-bottom: 4px;">
-                            <div class="color-box" style="background-color: ${colorSchemes.class[classFilter]}"></div>
-                            ${classFilter} - ${classInfo.name}
-                        </div>`;
+                    selectedClasses.forEach(classFilter => {
+                        const classInfo = propertyClassHierarchy[classFilter];
+                        
+                        if (classInfo && classInfo.primary && classInfo.subclasses) {
+                            // Primary class selected - show it and its subclasses
+                            html += `<div class="color-legend" style="font-weight: bold; margin-bottom: 4px;">
+                                <div class="color-box" style="background-color: ${colorSchemes.class[classFilter]}"></div>
+                                ${classFilter} - ${classInfo.name}
+                            </div>`;
                         
                         classInfo.subclasses
                             .filter(sub => allowedClasses.includes(sub) && colorSchemes.class[sub])
@@ -1489,11 +1489,13 @@
                                 </div>`;
                             });
                     } else {
-                        // Sub-class selected - show just that one
-                        html += `<div class="color-legend">
-                            <div class="color-box" style="background-color: ${colorSchemes.class[classFilter]}"></div>
-                            ${classFilter} - ${classInfo ? classInfo.name : 'Unknown'}
-                        </div>`;
+                            // Sub-class selected - show just that one
+                            html += `<div class="color-legend">
+                                <div class="color-box" style="background-color: ${colorSchemes.class[classFilter]}"></div>
+                                ${classFilter} - ${classInfo ? classInfo.name : 'Unknown'}
+                            </div>`;
+                        }
+                    });
                     }
                 } else {
                     // No filter - show primary classes only
@@ -1568,10 +1570,10 @@
             let totalValue = 0;
             
             // Check if any filters are applied
-            const classFilter = document.getElementById('class-filter').value;
+            const selectedClasses = selectedFilters.class;
             const minValue = document.getElementById('min-value').value;
             const maxValue = document.getElementById('max-value').value;
-            const hasFilters = classFilter || minValue || maxValue;
+            const hasFilters = selectedClasses.length > 0 || minValue || maxValue;
             
             if (!hasFilters) {
                 // No filters applied - show total statistics
