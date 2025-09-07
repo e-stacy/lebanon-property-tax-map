@@ -312,8 +312,241 @@
         let currentFilters = {};
         
         // Color schemes for different visualization modes
-        // Define actual property class codes used in Lebanon, NH
-        const lebanonClassCodes = ['013R','0310','0430','1010','1012','101A','101C','101T','1020','102C','102V','1030','103V','1040','1050','1060','1090','1100','1110','111C','1120','112C','1210','1300','1310','1320','3000','3010','3040','3050','3110','3160','316C','3230','323I','3240','3250','325I','325R','325V','3260','3300','3310','3320','3330','333V','3340','3350','3370','3380','3400','340I','340R','3410','3420','3520','3530','3540','354C','3550','3740','3800','3880','3900','3910','3920','4000','400C','4010','401V','4020','402C','4040','4100','410V','4270','4300','430V','4310','433C','4400','4410','4420','4440','4500','450I','6000','6001','6111','6120','6121','6200','6201','6210','6211','6220','6221','6230','6231','9000','900I','9010','901C','901I','9030','903C','903I','903R','9040','9050','905I','905R','905V','9060','906R','9080','908R','9090','9130','913C','9150','9200','9550','9700','9730','9740','9780'];
+        // Hierarchical property class structure for Lebanon, NH
+        const propertyClassHierarchy = {
+            '1010': {
+                name: 'Residential Single Family',
+                primary: true,
+                subclasses: ['1012', '101A', '101C', '101T']
+            },
+            '1012': { name: 'Residential Multi-Unit', parent: '1010' },
+            '101A': { name: 'Residential Accessory', parent: '1010' },
+            '101C': { name: 'Residential Commercial', parent: '1010' },
+            '101T': { name: 'Residential Temp', parent: '1010' },
+            
+            '1020': {
+                name: 'Manufactured Housing',
+                primary: true,
+                subclasses: ['102C', '102V']
+            },
+            '102C': { name: 'Manufactured Commercial', parent: '1020' },
+            '102V': { name: 'Manufactured Village', parent: '1020' },
+            
+            '1030': {
+                name: 'Condominium',
+                primary: true,
+                subclasses: ['103V']
+            },
+            '103V': { name: 'Condo Village', parent: '1030' },
+            
+            '1040': { name: 'Multi-Family 2-4 Units', primary: true },
+            '1050': { name: 'Multi-Family 5+ Units', primary: true },
+            '1060': { name: 'Multi-Family Other', primary: true },
+            '1090': { name: 'Residential Other', primary: true },
+            '1100': { name: 'Dormitory', primary: true },
+            
+            '1110': {
+                name: 'Hotel/Motel',
+                primary: true,
+                subclasses: ['111C']
+            },
+            '111C': { name: 'Hotel Commercial', parent: '1110' },
+            
+            '1120': {
+                name: 'Resort',
+                primary: true,
+                subclasses: ['112C']
+            },
+            '112C': { name: 'Resort Commercial', parent: '1120' },
+            
+            '1210': { name: 'Camp', primary: true },
+            '1300': { name: 'Vacant Residential Land', primary: true },
+            '1310': { name: 'Vacant Commercial Land', primary: true },
+            '1320': { name: 'Vacant Industrial Land', primary: true },
+            
+            '3000': { name: 'Agricultural', primary: true },
+            '3010': { name: 'Agricultural Productive', primary: true },
+            '3040': { name: 'Agricultural Other', primary: true },
+            '3050': { name: 'Forest', primary: true },
+            '3110': { name: 'Vacant Rural', primary: true },
+            
+            '3160': {
+                name: 'Conservation/Preservation',
+                primary: true,
+                subclasses: ['316C']
+            },
+            '316C': { name: 'Conservation Commercial', parent: '3160' },
+            
+            '3230': {
+                name: 'Wetlands',
+                primary: true,
+                subclasses: ['323I']
+            },
+            '323I': { name: 'Wetlands Industrial', parent: '3230' },
+            
+            '3240': { name: 'Floodplain', primary: true },
+            
+            '3250': {
+                name: 'Current Use',
+                primary: true,
+                subclasses: ['325I', '325R', '325V']
+            },
+            '325I': { name: 'Current Use Industrial', parent: '3250' },
+            '325R': { name: 'Current Use Recreational', parent: '3250' },
+            '325V': { name: 'Current Use Village', parent: '3250' },
+            
+            '3260': { name: 'Open Space', primary: true },
+            '3300': { name: 'Waste Disposal', primary: true },
+            
+            '3330': {
+                name: 'Mining/Extraction',
+                primary: true,
+                subclasses: ['333V']
+            },
+            '333V': { name: 'Mining Village', parent: '3330' },
+            
+            '3400': {
+                name: 'Transportation',
+                primary: true,
+                subclasses: ['340I', '340R']
+            },
+            '340I': { name: 'Transportation Industrial', parent: '3400' },
+            '340R': { name: 'Transportation Recreational', parent: '3400' },
+            
+            '3410': { name: 'Utilities', primary: true },
+            '3420': { name: 'Other Utilities', primary: true },
+            '3900': { name: 'Commercial Land', primary: true },
+            
+            '4000': {
+                name: 'Commercial/Industrial',
+                primary: true,
+                subclasses: ['400C']
+            },
+            '400C': { name: 'Commercial Mix', parent: '4000' },
+            
+            '4010': {
+                name: 'Office Building',
+                primary: true,
+                subclasses: ['401V']
+            },
+            '401V': { name: 'Office Village', parent: '4010' },
+            
+            '4020': {
+                name: 'Bank',
+                primary: true,
+                subclasses: ['402C']
+            },
+            '402C': { name: 'Bank Commercial', parent: '4020' },
+            
+            '4040': { name: 'Professional Service', primary: true },
+            
+            '4100': {
+                name: 'Retail Trade',
+                primary: true,
+                subclasses: ['410V']
+            },
+            '410V': { name: 'Retail Village', parent: '4100' },
+            
+            '4300': {
+                name: 'Warehouse',
+                primary: true,
+                subclasses: ['430V']
+            },
+            '430V': { name: 'Warehouse Village', parent: '4300' },
+            
+            '4310': {
+                name: 'Storage',
+                primary: true,
+                subclasses: ['433C']
+            },
+            '433C': { name: 'Storage Commercial', parent: '4310' },
+            
+            '4400': { name: 'Light Manufacturing', primary: true },
+            '4410': { name: 'Heavy Manufacturing', primary: true },
+            '4500': { name: 'Research/Development', primary: true },
+            
+            '6000': { name: 'Exempt Charitable', primary: true },
+            '6001': { name: 'Exempt Educational', primary: true },
+            '6111': { name: 'Exempt Religious', primary: true },
+            '6220': { name: 'Government School', primary: true },
+            '6231': { name: 'Government Other', primary: true },
+            
+            '9010': {
+                name: 'School District',
+                primary: true,
+                subclasses: ['901C', '901I']
+            },
+            '901C': { name: 'School Commercial', parent: '9010' },
+            '901I': { name: 'School Industrial', parent: '9010' },
+            
+            '9030': {
+                name: 'Water/Sewer Department',
+                primary: true,
+                subclasses: ['903C', '903I', '903R']
+            },
+            '903C': { name: 'Water/Sewer Commercial', parent: '9030' },
+            '903I': { name: 'Water/Sewer Industrial', parent: '9030' },
+            '903R': { name: 'Water/Sewer Recreational', parent: '9030' },
+            
+            '9050': {
+                name: 'Fire Department',
+                primary: true,
+                subclasses: ['905I', '905R', '905V']
+            },
+            '905I': { name: 'Fire Industrial', parent: '9050' },
+            '905R': { name: 'Fire Recreational', parent: '9050' },
+            '905V': { name: 'Fire Village', parent: '9050' },
+            
+            '9060': {
+                name: 'Highway Department',
+                primary: true,
+                subclasses: ['906R']
+            },
+            '906R': { name: 'Highway Recreational', parent: '9060' },
+            
+            '9080': {
+                name: 'Other Municipal',
+                primary: true,
+                subclasses: ['908R']
+            },
+            '908R': { name: 'Municipal Recreational', parent: '9080' },
+            
+            '9090': { name: 'Municipal Association', primary: true },
+            
+            '9130': {
+                name: 'Electric Department',
+                primary: true,
+                subclasses: ['913C']
+            },
+            '913C': { name: 'Electric Commercial', parent: '9130' },
+            
+            '9150': { name: 'Airport', primary: true },
+            '9200': { name: 'Hospital', primary: true },
+            '9550': { name: 'Authority/Commission', primary: true }
+        };
+        
+        // Get all Lebanon class codes from hierarchy
+        const lebanonClassCodes = Object.keys(propertyClassHierarchy);
+        
+        // Helper functions for hierarchy
+        function getPrimaryClasses() {
+            return Object.entries(propertyClassHierarchy)
+                .filter(([code, info]) => info.primary)
+                .map(([code, info]) => ({ code, name: info.name }));
+        }
+        
+        function getClassesForFilter(selectedClass) {
+            const classInfo = propertyClassHierarchy[selectedClass];
+            if (!classInfo) return [selectedClass];
+            
+            // If it's a primary class with subclasses, include all subclasses
+            if (classInfo.primary && classInfo.subclasses) {
+                return [selectedClass, ...classInfo.subclasses];
+            }
+            
+            // If it's a subclass, just return itself
+            return [selectedClass];
+        }
         
         // Generate colors for all actual Lebanon class codes
         function generateClassColors() {
