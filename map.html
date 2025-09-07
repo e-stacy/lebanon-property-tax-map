@@ -1573,7 +1573,7 @@
             console.log('Map applyFilters called');
             
             // Get selected property classes
-            const selectedClasses = getSelectedValues('class-filter');
+            const selectedClasses = workingFilters.getSelectedClasses('class-filter');
             console.log('Selected classes:', selectedClasses);
             
             // Apply filters to map layers
