@@ -1390,7 +1390,12 @@
             // Calculate all percentages
             const parcelPercentage = allPropertiesCount > 0 ? (visibleCount / allPropertiesCount * 100) : 0;
             const valuePercentage = allPropertiesTotal > 0 ? (totalValue / allPropertiesTotal * 100) : 0;
-            const allMedianValue = allValues.length > 0 ? allValues[Math.floor(allValues.length / 2)] : 0;
+            // Get all values for median calculation
+            const allPropValues = [...propertyData.values()]
+                .map(p => parseFloat(p.total_value) || 0)
+                .filter(v => v > 0)
+                .sort((a, b) => a - b);
+            const allMedianValue = allPropValues.length > 0 ? allPropValues[Math.floor(allPropValues.length / 2)] : 0;
             const medianPercentage = allMedianValue > 0 ? (medianValue / allMedianValue * 100) : 0;
             
             document.getElementById('parcel-percentage').textContent = parcelPercentage.toFixed(1) + '%';
