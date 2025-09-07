@@ -386,9 +386,11 @@
             <thead>
                 <tr>
                     <th>Parcel ID</th>
-                    <th>Address</th>
                     <th>Owner</th>
                     <th>Class</th>
+                    <th>Year Built</th>
+                    <th>Living Area (sqft)</th>
+                    <th>Bedrooms</th>
                     <th>Lot Size (acres)</th>
                     <th class="currency">Land Value</th>
                     <th class="currency">Building Value</th>
@@ -397,7 +399,7 @@
             </thead>
             <tbody id="parcels-table">
                 <tr>
-                    <td colspan="8" class="loading">Loading property data...</td>
+                    <td colspan="10" class="loading">Loading property data...</td>
                 </tr>
             </tbody>
         </table>
@@ -525,7 +527,7 @@
 
             filteredParcels = allParcels.filter(parcel => {
                 // Search filter
-                if (searchTerm && !['parcel_id', 'situs_address', 'owner_name']
+                if (searchTerm && !['parcel_id', 'owner_name']
                     .some(field => (parcel[field] || '').toLowerCase().includes(searchTerm))) {
                     return false;
                 }
@@ -573,7 +575,7 @@
             const tbody = document.getElementById('parcels-table');
             
             if (filteredParcels.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="no-results">No properties match your criteria</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" class="no-results">No properties match your criteria</td></tr>';
                 return;
             }
 
@@ -586,9 +588,11 @@
                     onclick="handlePropertyClick('${parcel.parcel_id}', event)" 
                     style="${comparisonMode ? 'cursor: pointer;' : ''}">
                     <td>${parcel.parcel_id || ''}</td>
-                    <td>${parcel.situs_address || ''}</td>
                     <td>${parcel.owner_name || ''}</td>
                     <td>${parcel.class_code || ''}</td>
+                    <td>${parcel.year_built || '—'}</td>
+                    <td>${formatNumber(parcel.living_area_sqft) || '—'}</td>
+                    <td>${parcel.bedrooms || '—'}</td>
                     <td>${parcel.lot_size_acres || ''}</td>
                     <td class="currency">${formatCurrency(parcel.land_value)}</td>
                     <td class="currency">${formatCurrency(parcel.building_value)}</td>
@@ -668,7 +672,7 @@
         
         // Export filtered data as CSV
         function exportFilteredData() {
-            const headers = ['parcel_id', 'situs_address', 'owner_name', 'class_code', 'lot_size_acres', 'land_value', 'building_value', 'total_value'];
+            const headers = ['parcel_id', 'owner_name', 'class_code', 'year_built', 'living_area_sqft', 'bedrooms', 'lot_size_acres', 'land_value', 'building_value', 'total_value'];
             let csvContent = headers.join(',') + '\n';
             
             filteredParcels.forEach(parcel => {
