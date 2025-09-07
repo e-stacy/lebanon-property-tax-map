@@ -91,18 +91,27 @@
         .table-container {
             background: white;
             border-radius: 8px;
-            overflow-x: auto;
+            overflow: auto;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 80px; /* Space for fixed pagination */
+            max-height: calc(100vh - 600px); /* Fixed height for vertical scrolling */
+            border: 1px solid #e1e5e9;
         }
         .pagination {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 2px solid #e1e5e9;
+            padding: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 8px;
-            padding: 16px;
-            background: white;
-            border-radius: 8px;
-            margin-top: 12px;
+            flex-wrap: wrap;
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+            z-index: 1000;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .page-btn {
@@ -388,9 +397,18 @@
                     <th>Parcel ID</th>
                     <th>Owner</th>
                     <th>Class</th>
+                    <th title="Zoning district">Zone</th>
+                    <th title="Architectural style">Style</th>
+                    <th title="Construction quality grade">Grade</th>
                     <th>Year Built</th>
                     <th>Living Area (sqft)</th>
                     <th>Bedrooms</th>
+                    <th title="Total rooms including bedrooms">Total Rooms</th>
+                    <th title="Full bathrooms">Bathrooms</th>
+                    <th title="Half bathrooms/powder rooms">Half Baths</th>
+                    <th title="Primary heating system type">Heat Type</th>
+                    <th title="Heating fuel source">Fuel</th>
+                    <th title="Land neighborhood code">Neighborhood</th>
                     <th>Lot Size (acres)</th>
                     <th class="currency">Land Value</th>
                     <th class="currency">Building Value</th>
@@ -399,7 +417,7 @@
             </thead>
             <tbody id="parcels-table">
                 <tr>
-                    <td colspan="10" class="loading">Loading property data...</td>
+                    <td colspan="19" class="loading">Loading property data...</td>
                 </tr>
             </tbody>
         </table>
