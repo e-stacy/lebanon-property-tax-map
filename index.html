@@ -653,7 +653,7 @@
         // Dropdown functions
         function toggleDropdown(type) {
             const menu = document.getElementById(type + '-menu');
-            const button = document.querySelector(`#${type}-dropdown .dropdown-button`);
+            const button = document.querySelector('#' + type + '-dropdown .dropdown-button');
             
             // Close any other open dropdown
             if (openDropdown && openDropdown !== type) {
@@ -669,7 +669,7 @@
         
         function openDropdownMenu(type) {
             const menu = document.getElementById(type + '-menu');
-            const button = document.querySelector(`#${type}-dropdown .dropdown-button`);
+            const button = document.querySelector('#' + type + '-dropdown .dropdown-button');
             const rect = button.getBoundingClientRect();
             const footer = document.querySelector('.pagination');
             const footerRect = footer.getBoundingClientRect();
@@ -686,7 +686,7 @@
         
         function closeDropdown(type) {
             const menu = document.getElementById(type + '-menu');
-            const button = document.querySelector(`#${type}-dropdown .dropdown-button`);
+            const button = document.querySelector('#' + type + '-dropdown .dropdown-button');
             
             menu.style.display = 'none';
             button.classList.remove('active');
@@ -906,7 +906,7 @@
                     const option = document.createElement('div');
                     option.className = 'dropdown-option';
                     option.dataset.value = code;
-                    option.innerHTML = `<input type="checkbox" id="class-${code}"><label for="class-${code}">${code} - ${name}</label>`;
+                    option.innerHTML = '<input type="checkbox" id="class-' + code + '"><label for="class-' + code + '">' + code + ' - ' + name + '</label>';
                     classMenu.appendChild(option);
                     
                     // Add event listener
@@ -925,7 +925,7 @@
                             const option = document.createElement('div');
                             option.className = 'dropdown-option';
                             option.dataset.value = subcode;
-                            option.innerHTML = `<input type="checkbox" id="class-${subcode}"><label for="class-${subcode}" style="padding-left: 20px;">${subcode} - ${propertyClassHierarchy[subcode].name}</label>`;
+                            option.innerHTML = '<input type="checkbox" id="class-' + subcode + '"><label for="class-' + subcode + '" style="padding-left: 20px;">' + subcode + ' - ' + propertyClassHierarchy[subcode].name + '</label>';
                             classMenu.appendChild(option);
                             
                             // Add event listener
@@ -943,7 +943,7 @@
                 const option = document.createElement('div');
                 option.className = 'dropdown-option';
                 option.dataset.value = year;
-                option.innerHTML = `<input type="checkbox" id="year-${year}"><label for="year-${year}">${year}</label>`;
+                option.innerHTML = '<input type="checkbox" id="year-' + year + '"><label for="year-' + year + '">' + year + '</label>';
                 yearMenu.appendChild(option);
                 
                 // Add event listener
@@ -959,7 +959,7 @@
                 const option = document.createElement('div');
                 option.className = 'dropdown-option';
                 option.dataset.value = zone;
-                option.innerHTML = `<input type="checkbox" id="zone-${zone}"><label for="zone-${zone}">${zone}</label>`;
+                option.innerHTML = '<input type="checkbox" id="zone-' + zone + '"><label for="zone-' + zone + '">' + zone + '</label>';
                 zoneMenu.appendChild(option);
                 
                 // Add event listener
@@ -1029,7 +1029,7 @@
             pageData.forEach(parcel => {
                 const isSelected = selectedProperties.has(parcel.parcel_id);
                 const rowClass = comparisonMode ? (isSelected ? 'selected' : '') : '';
-                const clickHandler = comparisonMode ? `onclick="handlePropertyClick('${parcel.parcel_id}', event)"` : '';
+                const clickHandler = comparisonMode ? 'onclick="handlePropertyClick(\'' + parcel.parcel_id + '\', event)"' : '';
                 
                 tableHTML += `
                     <tr class="${rowClass}" ${clickHandler} style="cursor: ${comparisonMode ? 'pointer' : 'default'};">
