@@ -224,6 +224,14 @@
                         <label for="show-values" style="margin: 0; padding: 0; cursor: pointer;">Assessed Value</label>
                     </td>
                 </tr>
+                <tr>
+                    <td style="width: 20px; padding: 2px 0; margin: 0; text-align: left;">
+                        <input type="checkbox" id="transparent-colors" checked style="margin: 0; padding: 0;">
+                    </td>
+                    <td style="padding: 2px 0 2px 5px; margin: 0; text-align: left;">
+                        <label for="transparent-colors" style="margin: 0; padding: 0; cursor: pointer;">Transparent Colors</label>
+                    </td>
+                </tr>
             </table>
         </div>
         
@@ -476,7 +484,7 @@
                             color: '#000000',
                             weight: 3,
                             fillColor: '#87CEEB',
-                            fillOpacity: 0.1,
+                            fillOpacity: getDefaultOpacity(),
                             opacity: 1.0
                         },
                         onEachFeature: function(feature, layer) {
@@ -608,7 +616,7 @@
                         color: '#000000',
                         weight: 3,
                         fillColor: color,
-                        fillOpacity: 0.3,
+                        fillOpacity: getColorOpacity(),
                         opacity: 1.0
                     };
                 },
@@ -729,6 +737,17 @@
             }
             
             return true;
+        }
+        
+        // Get opacity values based on transparency setting
+        function getDefaultOpacity() {
+            const transparent = document.getElementById('transparent-colors').checked;
+            return transparent ? 0.05 : 0.1;  // Very low for uncolored parcels to see building footprints
+        }
+        
+        function getColorOpacity() {
+            const transparent = document.getElementById('transparent-colors').checked;
+            return transparent ? 0.15 : 0.3;  // Transparent enough to see building footprints clearly
         }
         
         // Create popup content for parcel
@@ -1037,6 +1056,7 @@
         document.getElementById('show-parcels').addEventListener('change', toggleParcels);
         document.getElementById('show-labels').addEventListener('change', toggleMapLabels);
         document.getElementById('show-values').addEventListener('change', toggleMapLabels);
+        document.getElementById('transparent-colors').addEventListener('change', updateParcelLayer);
         
         // Initialize map when page loads
         document.addEventListener('DOMContentLoaded', initMap);
