@@ -1,34 +1,40 @@
-/* Working Checkbox Filter Styles */
-.working-checkbox-filter {
-    margin-bottom: 10px;
-    position: relative;
+/* Working Checkbox Filter Styles - High Specificity for Index Page */
+.working-checkbox-filter,
+.controls .working-checkbox-filter,
+body .working-checkbox-filter {
+    margin-bottom: 10px !important;
+    position: relative !important;
 }
 
-.filter-label {
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #2c3e50;
-    font-size: 0.9em;
+.filter-label,
+.working-checkbox-filter .filter-label {
+    font-weight: bold !important;
+    margin-bottom: 5px !important;
+    color: #2c3e50 !important;
+    font-size: 0.9em !important;
 }
 
-.checkbox-dropdown {
-    position: relative;
-    display: inline-block;
-    min-width: 200px;
+.checkbox-dropdown,
+.working-checkbox-filter .checkbox-dropdown {
+    position: relative !important;
+    display: inline-block !important;
+    min-width: 200px !important;
 }
 
-.dropdown-button {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 8px 12px;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    box-sizing: border-box;
-    font-size: 0.9em;
+.dropdown-button,
+.working-checkbox-filter .dropdown-button,
+.checkbox-dropdown .dropdown-button {
+    background: white !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+    padding: 8px 12px !important;
+    cursor: pointer !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    font-size: 0.9em !important;
 }
 
 .dropdown-button:hover {
@@ -51,39 +57,45 @@
     transition: transform 0.2s;
 }
 
-.checkbox-list {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #ddd;
-    border-top: none;
-    border-radius: 0 0 4px 4px;
-    max-height: 300px;
-    overflow-y: auto;
-    z-index: 1000;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+.checkbox-list,
+.working-checkbox-filter .checkbox-list,
+.checkbox-dropdown .checkbox-list {
+    display: none !important;
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: white !important;
+    border: 1px solid #ddd !important;
+    border-top: none !important;
+    border-radius: 0 0 4px 4px !important;
+    max-height: 300px !important;
+    overflow-y: auto !important;
+    z-index: 1000 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
 }
 
-.checkbox-item {
-    display: block;
-    padding: 0;
-    border-bottom: 1px solid #f0f0f0;
-    margin: 0;
-    font-size: 0.85em;
-    position: relative;
+.checkbox-item,
+.working-checkbox-filter .checkbox-item,
+.checkbox-list .checkbox-item {
+    display: block !important;
+    padding: 0 !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    margin: 0 !important;
+    font-size: 0.85em !important;
+    position: relative !important;
 }
 
-.checkbox-item label {
-    display: flex;
-    align-items: center;
-    padding: 8px 12px;
-    cursor: pointer;
-    width: 100%;
-    box-sizing: border-box;
-    margin: 0;
+.checkbox-item label,
+.working-checkbox-filter .checkbox-item label,
+.checkbox-list .checkbox-item label {
+    display: flex !important;
+    align-items: center !important;
+    padding: 8px 12px !important;
+    cursor: pointer !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
 }
 
 .checkbox-item:hover,
