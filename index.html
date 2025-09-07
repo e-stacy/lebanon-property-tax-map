@@ -485,18 +485,22 @@
             return result;
         }
 
+        // Define actual property class codes used in Lebanon, NH
+        const lebanonClassCodes = ['013R','0310','0430','1010','1012','101A','101C','101T','1020','102C','102V','1030','103V','1040','1050','1060','1090','1100','1110','111C','1120','112C','1210','1300','1310','1320','3000','3010','3040','3050','3110','3160','316C','3230','323I','3240','3250','325I','325R','325V','3260','3300','3310','3320','3330','333V','3340','3350','3370','3380','3400','340I','340R','3410','3420','3520','3530','3540','354C','3550','3740','3800','3880','3900','3910','3920','4000','400C','4010','401V','4020','402C','4040','4100','410V','4270','4300','430V','4310','433C','4400','4410','4420','4440','4500','450I','6000','6001','6111','6120','6121','6200','6201','6210','6211','6220','6221','6230','6231','9000','900I','9010','901C','901I','9030','903C','903I','903R','9040','9050','905I','905R','905V','9060','906R','9080','908R','9090','9130','913C','9150','9200','9550','9700','9730','9740','9780'];
+
         // Update statistics
         function updateStats() {
             const totalParcels = allParcels.length;
             const totalValue = allParcels.reduce((sum, p) => sum + parseNumber(p.total_value), 0);
             const values = allParcels.map(p => parseNumber(p.total_value)).filter(v => v > 0).sort((a, b) => a - b);
             const medianValue = values.length > 0 ? values[Math.floor(values.length / 2)] : 0;
-            const uniqueClasses = new Set(allParcels.map(p => p.class_code).filter(c => c)).size;
+            // Count only valid property class codes
+            const validClasses = new Set(allParcels.map(p => p.class_code).filter(c => lebanonClassCodes.includes(c)));
 
             document.getElementById('total-parcels').textContent = formatNumber(totalParcels);
             document.getElementById('total-value').textContent = formatCurrency(totalValue);
             document.getElementById('median-value').textContent = formatCurrency(medianValue);
-            document.getElementById('property-classes').textContent = formatNumber(uniqueClasses);
+            document.getElementById('property-classes').textContent = formatNumber(validClasses.size);
         }
 
         // Populate filter dropdowns
