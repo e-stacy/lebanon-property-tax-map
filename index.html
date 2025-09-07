@@ -320,7 +320,7 @@
     <div class="controls">
         <div class="control-row">
             <div class="search-suggestions">
-                <input id="search" type="search" placeholder="Search by address, owner, or parcel ID...">
+                <input id="search" type="search" placeholder="Search by owner name or parcel ID...">
                 <div id="suggestions-dropdown" class="suggestions-dropdown"></div>
             </div>
             <label>
@@ -818,10 +818,11 @@
                 if (property) {
                     compareHtml += `
                         <div class="compare-property">
-                            <h4 style="margin: 0 0 8px 0; color: #2c3e50;">${property.situs_address}</h4>
-                            <div><strong>Owner:</strong> ${property.owner_name}</div>
-                            <div><strong>Parcel ID:</strong> ${property.parcel_id}</div>
+                            <h4 style="margin: 0 0 8px 0; color: #2c3e50;">${property.owner_name} (${property.parcel_id})</h4>
                             <div><strong>Class:</strong> ${property.class_code}</div>
+                            <div><strong>Year Built:</strong> ${property.year_built || '—'}</div>
+                            <div><strong>Living Area:</strong> ${formatNumber(property.living_area_sqft) || '—'} sqft</div>
+                            <div><strong>Bedrooms:</strong> ${property.bedrooms || '—'}</div>
                             <div><strong>Lot Size:</strong> ${property.lot_size_acres} acres</div>
                             <div><strong>Land Value:</strong> ${formatCurrency(property.land_value)}</div>
                             <div><strong>Building Value:</strong> ${formatCurrency(property.building_value)}</div>
@@ -843,7 +844,6 @@
             // Build suggestions array
             allSuggestions = [];
             allParcels.forEach(parcel => {
-                if (parcel.situs_address) allSuggestions.push({ type: 'address', value: parcel.situs_address });
                 if (parcel.owner_name) allSuggestions.push({ type: 'owner', value: parcel.owner_name });
                 if (parcel.parcel_id) allSuggestions.push({ type: 'parcel', value: parcel.parcel_id });
             });
