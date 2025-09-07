@@ -610,6 +610,17 @@
                     // Direct match with parcel_id
                     prop = propertyData.get(mapLot);
                     
+                    // Check if color coding is enabled
+                    if (!shouldShowColorCoding()) {
+                        return {
+                            color: '#000000',
+                            weight: 2,
+                            fillColor: '#87CEEB',
+                            fillOpacity: getDefaultOpacity(),
+                            opacity: 1.0
+                        };
+                    }
+                    
                     const color = getParcelColor(prop, colorBy);
                     
                     return {
@@ -739,15 +750,17 @@
             return true;
         }
         
-        // Get opacity values based on transparency setting
+        // Get opacity values and color coding based on overlay setting  
         function getDefaultOpacity() {
-            const transparent = document.getElementById('transparent-colors').checked;
-            return transparent ? 0.05 : 0.1;  // Very low for uncolored parcels to see building footprints
+            return 0.05;  // Always very transparent for uncolored parcels to see building footprints
         }
         
         function getColorOpacity() {
-            const transparent = document.getElementById('transparent-colors').checked;
-            return transparent ? 0.15 : 0.3;  // Transparent enough to see building footprints clearly
+            return 0.15;  // Always transparent enough to see building footprints clearly
+        }
+        
+        function shouldShowColorCoding() {
+            return document.getElementById('transparent-colors').checked;
         }
         
         // Create popup content for parcel
