@@ -227,6 +227,21 @@ function updateWorkingFilter(containerId, clickedElement = null) {
                     }
                 });
             }
+        } else {
+            // This might be a child class - check if we need to uncheck its parent
+            if (!clickedElement.checked) {
+                // Child was unchecked - find and uncheck its parent
+                for (const [parentCode, parentInfo] of Object.entries(PROPERTY_CLASS_HIERARCHY)) {
+                    if (parentInfo.primary && parentInfo.subclasses && parentInfo.subclasses.includes(clickedCode)) {
+                        const parentCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="${parentCode}"]`);
+                        if (parentCheckbox && parentCheckbox.checked) {
+                            parentCheckbox.checked = false;
+                            console.log('DEBUG: Child unchecked, so unchecked parent', parentCode);
+                        }
+                        break;
+                    }
+                }
+            }
         }
     }
     
