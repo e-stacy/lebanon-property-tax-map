@@ -1227,71 +1227,80 @@
                     // Uncheck "All" option first
                     if (allCheckbox) allCheckbox.checked = false;
                     
-                    // Check if this is a primary class with subclasses
-                    const classInfo = propertyClassHierarchy[value];
-                    if (classInfo && classInfo.primary && classInfo.subclasses) {
-                        // Primary class selected - add it and all its subclasses
-                        if (!selectedFilters[type].includes(value)) {
-                            selectedFilters[type].push(value);
-                        }
-                        classInfo.subclasses.forEach(subclass => {
-                            if (!selectedFilters[type].includes(subclass)) {
-                                selectedFilters[type].push(subclass);
+                    // Check if this is a primary class with subclasses (only for class filter)
+                    if (type === 'class' && propertyClassHierarchy[value]) {
+                        const classInfo = propertyClassHierarchy[value];
+                        if (classInfo.primary && classInfo.subclasses) {
+                            // Primary class selected - add it and all its subclasses
+                            if (!selectedFilters[type].includes(value)) {
+                                selectedFilters[type].push(value);
                             }
-                            // Check the subclass checkbox in the UI
-                            const subCheckbox = document.getElementById(`${type}-${subclass}`);
-                            if (subCheckbox) subCheckbox.checked = true;
-                        });
-                    } else {
-                        // Regular class or subclass selected
-                        if (!selectedFilters[type].includes(value)) {
-                            selectedFilters[type].push(value);
-                        }
-                        
-                        // If this is a subclass, check if all subclasses of its parent are now selected
-                        const parentClass = Object.keys(propertyClassHierarchy).find(key => {
-                            const info = propertyClassHierarchy[key];
-                            return info.subclasses && info.subclasses.includes(value);
-                        });
-                        
-                        if (parentClass) {
-                            const parentInfo = propertyClassHierarchy[parentClass];
-                            const allSubclassesSelected = parentInfo.subclasses.every(sub => 
-                                selectedFilters[type].includes(sub)
-                            );
+                            classInfo.subclasses.forEach(subclass => {
+                                if (!selectedFilters[type].includes(subclass)) {
+                                    selectedFilters[type].push(subclass);
+                                }
+                                // Check the subclass checkbox in the UI
+                                const subCheckbox = document.getElementById(`${type}-${subclass}`);
+                                if (subCheckbox) subCheckbox.checked = true;
+                            });
+                        } else {
+                            // Regular class or subclass selected
+                            if (!selectedFilters[type].includes(value)) {
+                                selectedFilters[type].push(value);
+                            }
                             
-                            if (allSubclassesSelected && !selectedFilters[type].includes(parentClass)) {
-                                selectedFilters[type].push(parentClass);
-                                const parentCheckbox = document.getElementById(`${type}-${parentClass}`);
-                                if (parentCheckbox) parentCheckbox.checked = true;
+                            // If this is a subclass, check if all subclasses of its parent are now selected
+                            const parentClass = Object.keys(propertyClassHierarchy).find(key => {
+                                const info = propertyClassHierarchy[key];
+                                return info.subclasses && info.subclasses.includes(value);
+                            });
+                            
+                            if (parentClass) {
+                                const parentInfo = propertyClassHierarchy[parentClass];
+                                const allSubclassesSelected = parentInfo.subclasses.every(sub => 
+                                    selectedFilters[type].includes(sub)
+                                );
+                                
+                                if (allSubclassesSelected && !selectedFilters[type].includes(parentClass)) {
+                                    selectedFilters[type].push(parentClass);
+                                    const parentCheckbox = document.getElementById(`${type}-${parentClass}`);
+                                    if (parentCheckbox) parentCheckbox.checked = true;
+                                }
                             }
+                        }
+                    } else {
+                        // Non-class filter or simple addition
+                        if (!selectedFilters[type].includes(value)) {
+                            selectedFilters[type].push(value);
                         }
                     }
                 } else {
                     // Remove from selection
                     selectedFilters[type] = selectedFilters[type].filter(v => v !== value);
                     
-                    // Check if this is a primary class being unchecked
-                    const classInfo = propertyClassHierarchy[value];
-                    if (classInfo && classInfo.primary && classInfo.subclasses) {
-                        // Primary class unchecked - remove all its subclasses
-                        classInfo.subclasses.forEach(subclass => {
-                            selectedFilters[type] = selectedFilters[type].filter(v => v !== subclass);
-                            // Uncheck the subclass checkbox in the UI
-                            const subCheckbox = document.getElementById(`${type}-${subclass}`);
-                            if (subCheckbox) subCheckbox.checked = false;
-                        });
-                    } else {
-                        // Subclass unchecked - uncheck its parent if it was checked
-                        const parentClass = Object.keys(propertyClassHierarchy).find(key => {
-                            const info = propertyClassHierarchy[key];
-                            return info.subclasses && info.subclasses.includes(value);
-                        });
-                        
-                        if (parentClass && selectedFilters[type].includes(parentClass)) {
-                            selectedFilters[type] = selectedFilters[type].filter(v => v !== parentClass);
-                            const parentCheckbox = document.getElementById(`${type}-${parentClass}`);
-                            if (parentCheckbox) parentCheckbox.checked = false;
+                    // Check if this is a primary class being unchecked (only for class filter)
+                    if (type === 'class' && propertyClassHierarchy[value]) {
+                        const classInfo = propertyClassHierarchy[value];
+                        if (classInfo.primary && classInfo.subclasses) {
+                            // Primary class unchecked - remove all its subclasses
+                            classInfo.subclasses.forEach(subclass => {
+                                selectedFilters[type] = selectedFilters[type].filter(v => v !== subclass);
+                                // Uncheck the subclass checkbox in the UI
+                                const subCheckbox = document.getElementById(`${type}-${subclass}`);
+                                if (subCheckbox) subCheckbox.checked = false;
+                            });
+                        } else {
+                            // Subclass unchecked - uncheck its parent if it was checked
+                            const parentClass = Object.keys(propertyClassHierarchy).find(key => {
+                                const info = propertyClassHierarchy[key];
+                                return info.subclasses && info.subclasses.includes(value);
+                            });
+                            
+                            if (parentClass && selectedFilters[type].includes(parentClass)) {
+                                selectedFilters[type] = selectedFilters[type].filter(v => v !== parentClass);
+                                const parentCheckbox = document.getElementById(`${type}-${parentClass}`);
+                                if (parentCheckbox) parentCheckbox.checked = false;
+                            }
                         }
                     }
                     
