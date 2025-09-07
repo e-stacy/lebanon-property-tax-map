@@ -142,6 +142,8 @@ function updateWorkingFilter(containerId) {
     const otherCheckboxes = document.querySelectorAll(`#${containerId}-checkboxes input[type="checkbox"]:not([value="all"])`);
     const dropdownText = document.querySelector(`#${containerId}-checkboxes`).parentNode.querySelector('.dropdown-text');
     
+    console.log('updateWorkingFilter called for:', containerId);
+    
     if (allCheckbox.checked) {
         // If "All" is checked, uncheck others
         otherCheckboxes.forEach(cb => cb.checked = false);

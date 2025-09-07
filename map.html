@@ -1567,18 +1567,14 @@
     <!-- Working Checkbox Filter System -->
     <script src="working-checkbox-filters.js"></script>
     <script>
-        // Initialize working filters after data loads for map
-        function initializeWorkingMapFilters() {
-            if (propertyData && propertyData.size > 0) {
-                workingFilters.createPropertyClassFilter('class-filter', propertyData);
-            }
-        }
-        
-        // Update the existing applyFilters function to work with working checkboxes
+        // Override applyFilters for map page
         const originalMapApplyFilters = applyFilters;
         applyFilters = function() {
-            // Get selected property classes from working checkboxes
+            console.log('Map applyFilters called');
+            
+            // Get selected property classes
             const selectedClasses = getSelectedValues('class-filter');
+            console.log('Selected classes:', selectedClasses);
             
             // Apply filters to map layers
             let visibleCount = 0;
@@ -1646,15 +1642,18 @@
             document.getElementById('value-percentage').textContent = allTotalValue > 0 ? ((totalValue / allTotalValue) * 100).toFixed(1) + '%' : '0%';
         };
         
-        // Initialize filters after data loads
-        const originalMapUpdateStats = updateStats;
+        // Initialize filter after data loads using existing updateStats hook
+        const originalUpdateStats = updateStats;
         updateStats = function() {
-            originalMapUpdateStats();
+            originalUpdateStats();
+            
+            // Initialize checkbox filter after data is loaded
             if (propertyData && propertyData.size > 0 && !window.mapFiltersInitialized) {
+                console.log('Initializing map filters with', propertyData.size, 'properties');
                 setTimeout(() => {
-                    initializeWorkingMapFilters();
+                    workingFilters.createPropertyClassFilter('class-filter', propertyData);
                     window.mapFiltersInitialized = true;
-                }, 100);
+                }, 10);
             }
         };
     </script>

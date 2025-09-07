@@ -953,20 +953,16 @@
     <!-- Working Checkbox Filter System -->
     <script src="working-checkbox-filters.js"></script>
     <script>
-        // Initialize working filters after data loads
-        function initializeWorkingIndexFilters() {
-            if (allParcels && allParcels.length > 0) {
-                workingFilters.createPropertyClassFilter('class-filter', allParcels);
-            }
-        }
-        
-        // Update the existing applyFilters function to work with working checkboxes
+        // Override applyFilters for index page
         const originalIndexApplyFilters = applyFilters;
         applyFilters = function() {
-            // Get selected property classes from working checkboxes
-            const selectedClasses = getSelectedValues('class-filter');
+            console.log('Index applyFilters called');
             
-            // Apply filters using existing logic
+            // Get selected property classes
+            const selectedClasses = getSelectedValues('class-filter');
+            console.log('Selected classes:', selectedClasses);
+            
+            // Apply filters
             filteredParcels = allParcels.filter(parcel => {
                 // Property class filter
                 if (selectedClasses.length > 0) {
@@ -1006,15 +1002,18 @@
             updateStats();
         };
         
-        // Initialize filters after data loads
+        // Initialize filter after data loads using existing updateStats hook
         const originalUpdateStats = updateStats;
         updateStats = function() {
             originalUpdateStats();
+            
+            // Initialize checkbox filter after data is loaded
             if (allParcels && allParcels.length > 0 && !window.indexFiltersInitialized) {
+                console.log('Initializing index filters with', allParcels.length, 'parcels');
                 setTimeout(() => {
-                    initializeWorkingIndexFilters();
+                    workingFilters.createPropertyClassFilter('class-filter', allParcels);
                     window.indexFiltersInitialized = true;
-                }, 100);
+                }, 10);
             }
         };
     </script>
