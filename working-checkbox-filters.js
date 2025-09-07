@@ -99,7 +99,7 @@ class WorkingCheckboxFilters {
                     </div>
                     <div class="checkbox-list" id="${containerId}-checkboxes">
                         <label class="checkbox-item">
-                            <input type="checkbox" value="all" checked onchange="updateWorkingFilter('${containerId}')" onclick="console.log('All checkbox clicked')">
+                            <input type="checkbox" value="all" checked onchange="updateWorkingFilter('${containerId}', this)" onclick="console.log('All checkbox clicked')">
                             <span>All Classes</span>
                         </label>
                         ${this.generateClassCheckboxes(classCounts, containerId)}
@@ -129,7 +129,7 @@ class WorkingCheckboxFilters {
             html += `
                 <div class="checkbox-item primary-class">
                     <label>
-                        <input type="checkbox" value="${code}" onchange="updateWorkingFilter('${containerId}')" onclick="console.log('Primary checkbox clicked:', '${code}')">
+                        <input type="checkbox" value="${code}" onchange="updateWorkingFilter('${containerId}', this)" onclick="console.log('Primary checkbox clicked:', '${code}')">
                         <span>${code} - ${info.name} (${count})</span>
                     </label>
                 </div>
@@ -144,7 +144,7 @@ class WorkingCheckboxFilters {
                         html += `
                             <div class="checkbox-item sub-class">
                                 <label>
-                                    <input type="checkbox" value="${subcode}" onchange="updateWorkingFilter('${containerId}')" onclick="console.log('Sub checkbox clicked:', '${subcode}')">
+                                    <input type="checkbox" value="${subcode}" onchange="updateWorkingFilter('${containerId}', this)" onclick="console.log('Sub checkbox clicked:', '${subcode}')">
                                     <span>${subcode} - ${subInfo.name} (${subCount})</span>
                                 </label>
                             </div>
@@ -189,32 +189,48 @@ function toggleWorkingDropdown(containerId) {
     dropdown.style.display = isVisible ? 'none' : 'block';
 }
 
-function updateWorkingFilter(containerId) {
+// Track which checkbox was clicked to handle hierarchical behavior
+let lastClickedCheckbox = null;
+
+function updateWorkingFilter(containerId, clickedElement = null) {
     const allCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="all"]`);
     const otherCheckboxes = document.querySelectorAll(`#${containerId}-checkboxes input[type="checkbox"]:not([value="all"])`);
     const dropdownText = document.querySelector(`#${containerId}-checkboxes`).parentNode.querySelector('.dropdown-text');
     
     console.log('updateWorkingFilter called for:', containerId);
     
-    // HIERARCHICAL AUTO-SELECTION: Check if any parent class was just checked
-    Array.from(otherCheckboxes).forEach(checkbox => {
-        const classCode = checkbox.value;
-        const classInfo = PROPERTY_CLASS_HIERARCHY[classCode];
+    // HIERARCHICAL BEHAVIOR: Handle parent-child relationships
+    if (clickedElement && clickedElement !== allCheckbox) {
+        const clickedCode = clickedElement.value;
+        const clickedInfo = PROPERTY_CLASS_HIERARCHY[clickedCode];
         
-        // If this is a primary class that was just checked, check all its subclasses
-        if (checkbox.checked && classInfo && classInfo.primary && classInfo.subclasses) {
-            console.log('DEBUG: Auto-checking subclasses for', classCode);
-            classInfo.subclasses.forEach(subcode => {
-                const subCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="${subcode}"]`);
-                if (subCheckbox) {
-                    subCheckbox.checked = true;
-                    console.log('DEBUG: Auto-checked', subcode);
-                }
-            });
+        if (clickedInfo && clickedInfo.primary && clickedInfo.subclasses) {
+            // This is a parent class
+            if (clickedElement.checked) {
+                // Parent was checked - check all children
+                console.log('DEBUG: Parent checked, auto-checking children for', clickedCode);
+                clickedInfo.subclasses.forEach(subcode => {
+                    const subCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="${subcode}"]`);
+                    if (subCheckbox) {
+                        subCheckbox.checked = true;
+                        console.log('DEBUG: Auto-checked child', subcode);
+                    }
+                });
+            } else {
+                // Parent was unchecked - uncheck all children
+                console.log('DEBUG: Parent unchecked, clearing children for', clickedCode);
+                clickedInfo.subclasses.forEach(subcode => {
+                    const subCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="${subcode}"]`);
+                    if (subCheckbox) {
+                        subCheckbox.checked = false;
+                        console.log('DEBUG: Unchecked child', subcode);
+                    }
+                });
+            }
         }
-    });
+    }
     
-    // Check how many specific checkboxes are checked (after auto-selection)
+    // Check how many specific checkboxes are checked (after hierarchical changes)
     const checkedOthers = Array.from(otherCheckboxes).filter(cb => cb.checked);
     console.log('DEBUG: Found', checkedOthers.length, 'specific checkboxes checked');
     
