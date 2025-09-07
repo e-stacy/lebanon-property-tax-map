@@ -721,7 +721,7 @@
         
         function handleDropdownSelection(type, value, checked) {
             const menu = document.getElementById(type + '-menu');
-            const allCheckbox = document.getElementById(`${type}-all`);
+            const allCheckbox = document.getElementById(type + '-all');
             
             if (value === '') {
                 // "All" option selected
@@ -751,7 +751,7 @@
                                 selectedFilters[type].push(subclass);
                             }
                             // Check the subclass checkbox in the UI
-                            const subCheckbox = document.getElementById(`${type}-${subclass}`);
+                            const subCheckbox = document.getElementById(type + '-' + subclass);
                             if (subCheckbox) subCheckbox.checked = true;
                         });
                     } else {
@@ -774,7 +774,7 @@
                             
                             if (allSubclassesSelected && !selectedFilters[type].includes(parentClass)) {
                                 selectedFilters[type].push(parentClass);
-                                const parentCheckbox = document.getElementById(`${type}-${parentClass}`);
+                                const parentCheckbox = document.getElementById(type + '-' + parentClass);
                                 if (parentCheckbox) parentCheckbox.checked = true;
                             }
                         }
@@ -790,7 +790,7 @@
                         classInfo.subclasses.forEach(subclass => {
                             selectedFilters[type] = selectedFilters[type].filter(v => v !== subclass);
                             // Uncheck the subclass checkbox in the UI
-                            const subCheckbox = document.getElementById(`${type}-${subclass}`);
+                            const subCheckbox = document.getElementById(type + '-' + subclass);
                             if (subCheckbox) subCheckbox.checked = false;
                         });
                     } else {
@@ -802,7 +802,7 @@
                         
                         if (parentClass && selectedFilters[type].includes(parentClass)) {
                             selectedFilters[type] = selectedFilters[type].filter(v => v !== parentClass);
-                            const parentCheckbox = document.getElementById(`${type}-${parentClass}`);
+                            const parentCheckbox = document.getElementById(type + '-' + parentClass);
                             if (parentCheckbox) parentCheckbox.checked = false;
                         }
                     }
@@ -821,7 +821,7 @@
         
         // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
-            if (openDropdown && !e.target.closest(`#${openDropdown}-dropdown`)) {
+            if (openDropdown && !e.target.closest('#' + openDropdown + '-dropdown')) {
                 closeDropdown(openDropdown);
             }
         });
