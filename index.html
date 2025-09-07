@@ -108,20 +108,20 @@
         }
         .table-container {
             background: white;
-            border-radius: 8px;
+            border-radius: 6px;
             overflow-y: auto;
             overflow-x: hidden; /* Hide the built-in scrollbar */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 100px; /* Space for fixed pagination and scrollbar */
-            height: 65vh; /* Fixed percentage of viewport height */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 90px; /* Space for fixed pagination and scrollbar */
+            height: 55vh; /* Reduced viewport height */
             border: 1px solid #e1e5e9;
         }
         .horizontal-scroll {
             position: fixed;
-            bottom: 50px;
+            bottom: 45px;
             left: 20px;
             right: 20px;
-            height: 12px;
+            height: 10px;
             overflow-x: auto;
             overflow-y: hidden;
             background: #f8f9fa;
@@ -131,7 +131,7 @@
         }
         .scroll-content {
             height: 1px;
-            min-width: 1800px; /* Match table min-width */
+            min-width: 1600px; /* Match table min-width */
         }
         .pagination {
             position: fixed;
@@ -171,20 +171,20 @@
         }
         table { 
             width: 100%; 
-            min-width: 1800px;
+            min-width: 1600px;
             border-collapse: collapse;
             table-layout: fixed;
         }
         th, td { 
-            padding: 4px 8px; 
+            padding: 2px 6px; 
             text-align: left; 
-            border-bottom: 1px solid #e1e5e9;
-            font-size: 0.75em;
+            border-bottom: 0.5px solid #e1e5e9;
+            font-size: 0.7em;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             position: relative;
-            line-height: 1.2;
+            line-height: 1.1;
         }
         th { 
             background: #f8f9fa; 
@@ -194,9 +194,10 @@
             color: #2c3e50;
             cursor: col-resize;
             user-select: none;
-            min-width: 80px;
-            border-bottom: 2px solid #dee2e6;
+            min-width: 70px;
+            border-bottom: 1px solid #dee2e6;
             z-index: 10;
+            font-size: 0.68em;
         }
         th:hover {
             background: #e9ecef;
@@ -494,25 +495,25 @@
         <table id="data-table">
             <thead>
                 <tr id="table-headers">
-                    <th style="width: 80px;">Parcel ID</th>
-                    <th style="width: 200px;">Owner</th>
-                    <th style="width: 70px;">Class</th>
-                    <th style="width: 80px;">Zone</th>
-                    <th style="width: 90px;">Style</th>
-                    <th style="width: 80px;">Grade</th>
-                    <th style="width: 80px;">Year Built</th>
-                    <th style="width: 90px;">Living Area (sqft)</th>
-                    <th style="width: 80px;">Bedrooms</th>
-                    <th style="width: 80px;">Total Rooms</th>
-                    <th style="width: 80px;">Full Baths</th>
-                    <th style="width: 80px;">Half Baths</th>
-                    <th style="width: 90px;">Heat Type</th>
-                    <th style="width: 80px;">Fuel</th>
-                    <th style="width: 90px;">Neighborhood</th>
-                    <th style="width: 90px;">Lot Size (acres)</th>
-                    <th style="width: 110px;">Land Value</th>
-                    <th style="width: 110px;">Building Value</th>
-                    <th style="width: 110px;">Total Value</th>
+                    <th style="width: 70px;">Parcel ID</th>
+                    <th style="width: 180px;">Owner</th>
+                    <th style="width: 60px;">Class</th>
+                    <th style="width: 70px;">Zone</th>
+                    <th style="width: 80px;">Style</th>
+                    <th style="width: 70px;">Grade</th>
+                    <th style="width: 70px;">Year Built</th>
+                    <th style="width: 80px;">Living Area (sqft)</th>
+                    <th style="width: 70px;">Bedrooms</th>
+                    <th style="width: 70px;">Total Rooms</th>
+                    <th style="width: 70px;">Full Baths</th>
+                    <th style="width: 70px;">Half Baths</th>
+                    <th style="width: 80px;">Heat Type</th>
+                    <th style="width: 70px;">Fuel</th>
+                    <th style="width: 80px;">Neighborhood</th>
+                    <th style="width: 80px;">Lot Size (acres)</th>
+                    <th style="width: 100px;">Land Value</th>
+                    <th style="width: 100px;">Building Value</th>
+                    <th style="width: 100px;">Total Value</th>
                 </tr>
             </thead>
             <tbody id="parcels-table">
