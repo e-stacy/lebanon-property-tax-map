@@ -69,21 +69,21 @@
         }
         .control-row { 
             display: flex; 
-            gap: 12px; 
-            margin-bottom: 8px; 
-            align-items: center;
+            gap: 15px; 
+            margin-bottom: 12px; 
+            align-items: flex-start;
             flex-wrap: wrap;
         }
         .control-group {
             display: flex;
             flex-direction: column;
             flex: 1;
-            min-width: 120px;
+            min-width: 140px;
         }
         .control-label {
-            font-size: 0.85em;
-            color: #666;
-            margin-bottom: 4px;
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 6px;
             font-weight: 500;
         }
         input, select { 
@@ -100,7 +100,8 @@
         .table-container {
             background: white;
             border-radius: 8px;
-            overflow: auto;
+            overflow-y: auto;
+            overflow-x: scroll; /* Always show horizontal scrollbar */
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 80px; /* Space for fixed pagination */
             max-height: calc(100vh - 320px); /* Optimized height for more rows */
@@ -144,13 +145,19 @@
         }
         table { 
             width: 100%; 
+            min-width: 1800px;
             border-collapse: collapse;
+            table-layout: fixed;
         }
         th, td { 
-            padding: 12px; 
+            padding: 8px 10px; 
             text-align: left; 
             border-bottom: 1px solid #e1e5e9;
-            font-size: 0.95em;
+            font-size: 0.8em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
         }
         th { 
             background: #f8f9fa; 
@@ -158,6 +165,21 @@
             position: sticky; 
             top: 0;
             color: #2c3e50;
+            cursor: col-resize;
+            user-select: none;
+            min-width: 80px;
+        }
+        th:hover {
+            background: #e9ecef;
+        }
+        .column-resizer {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 5px;
+            height: 100%;
+            cursor: col-resize;
+            z-index: 15;
         }
         tbody tr:hover {
             background: #f8f9fa;
@@ -310,33 +332,33 @@
 
     <div class="controls">
         <div class="control-row">
-            <button class="btn" onclick="clearFilters()" style="margin-right: 15px;">🔄 Reset Filters</button>
-            <label>
-                Property Class: <small>(Ctrl+click for multiple)</small>
-                <select id="class-filter" multiple size="1">
+            <button class="btn" onclick="clearFilters()" style="margin-right: 15px; align-self: flex-end; margin-bottom: 6px;">🔄 Reset Filters</button>
+            <div class="control-group">
+                <div class="control-label">Property Class <small style="color: #888;">(Ctrl+click for multiple)</small></div>
+                <select id="class-filter" multiple size="1" style="min-height: 36px;">
                     <option value="">All Classes</option>
                 </select>
-            </label>
-            <label>
-                Year Built: <small>(Ctrl+click for multiple)</small>
-                <select id="year-built-filter" multiple size="1">
+            </div>
+            <div class="control-group">
+                <div class="control-label">Year Built <small style="color: #888;">(Ctrl+click for multiple)</small></div>
+                <select id="year-built-filter" multiple size="1" style="min-height: 36px;">
                     <option value="">All Years</option>
                 </select>
-            </label>
-            <label>
-                Zone: <small>(Ctrl+click for multiple)</small>
-                <select id="zoning-filter" multiple size="1">
+            </div>
+            <div class="control-group">
+                <div class="control-label">Zone <small style="color: #888;">(Ctrl+click for multiple)</small></div>
+                <select id="zoning-filter" multiple size="1" style="min-height: 36px;">
                     <option value="">All Zones</option>
                 </select>
-            </label>
-            <label>
-                Min Value: $
-                <input id="min-value" type="number" placeholder="0" style="width: 120px;">
-            </label>
-            <label>
-                Max Value: $
-                <input id="max-value" type="number" placeholder="Any" style="width: 120px;">
-            </label>
+            </div>
+            <div class="control-group">
+                <div class="control-label">Min Value ($)</div>
+                <input id="min-value" type="number" placeholder="0" style="width: 100%;">
+            </div>
+            <div class="control-group">
+                <div class="control-label">Max Value ($)</div>
+                <input id="max-value" type="number" placeholder="Any" style="width: 100%;">
+            </div>
         </div>
         <div style="color: #666; font-size: 0.9em;">
             Showing <span id="filtered-count">0</span> properties
@@ -457,6 +479,9 @@
                 updateStats();
                 populateFilters();
                 applyFilters();
+                
+                // Initialize column resizing after table is rendered
+                setTimeout(initializeColumnResizing, 100);
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('parcels-table').innerHTML = '<tr><td colspan="19" class="no-results">Error loading data</td></tr>';
@@ -1009,6 +1034,62 @@
         document.getElementById('min-value').addEventListener('input', () => { currentPage = 1; applyFilters(); });
         document.getElementById('max-value').addEventListener('input', () => { currentPage = 1; applyFilters(); });
 
+        // Column resizing functionality
+        let isResizing = false;
+        let currentColumn = null;
+        let startX = 0;
+        let startWidth = 0;
+
+        function initializeColumnResizing() {
+            const table = document.querySelector('.table-container table');
+            const headers = table.querySelectorAll('th');
+            
+            headers.forEach((header, index) => {
+                // Add resizer div
+                const resizer = document.createElement('div');
+                resizer.className = 'column-resizer';
+                header.appendChild(resizer);
+                
+                // Add resize functionality
+                resizer.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    isResizing = true;
+                    currentColumn = index;
+                    startX = e.clientX;
+                    startWidth = header.offsetWidth;
+                    document.body.style.cursor = 'col-resize';
+                    document.body.style.userSelect = 'none';
+                });
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                
+                const diff = e.clientX - startX;
+                const newWidth = startWidth + diff;
+                const minWidth = 60;
+                
+                if (newWidth > minWidth) {
+                    const headers = table.querySelectorAll('th');
+                    const cells = table.querySelectorAll(`td:nth-child(${currentColumn + 1})`);
+                    
+                    headers[currentColumn].style.width = newWidth + 'px';
+                    cells.forEach(cell => {
+                        cell.style.width = newWidth + 'px';
+                    });
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                if (isResizing) {
+                    isResizing = false;
+                    currentColumn = null;
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                }
+            });
+        }
+
         // Initialize
         loadParcels();
         
@@ -1040,6 +1121,9 @@
                 updateStats();
                 populateFilters();
                 applyFilters();
+                
+                // Initialize column resizing after table is rendered
+                setTimeout(initializeColumnResizing, 100);
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('parcels-table').innerHTML = '<tr><td colspan="19" class="no-results">Error loading data</td></tr>';
