@@ -196,7 +196,25 @@ function updateWorkingFilter(containerId) {
     
     console.log('updateWorkingFilter called for:', containerId);
     
-    // Check how many specific checkboxes are checked
+    // HIERARCHICAL AUTO-SELECTION: Check if any parent class was just checked
+    Array.from(otherCheckboxes).forEach(checkbox => {
+        const classCode = checkbox.value;
+        const classInfo = PROPERTY_CLASS_HIERARCHY[classCode];
+        
+        // If this is a primary class that was just checked, check all its subclasses
+        if (checkbox.checked && classInfo && classInfo.primary && classInfo.subclasses) {
+            console.log('DEBUG: Auto-checking subclasses for', classCode);
+            classInfo.subclasses.forEach(subcode => {
+                const subCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="${subcode}"]`);
+                if (subCheckbox) {
+                    subCheckbox.checked = true;
+                    console.log('DEBUG: Auto-checked', subcode);
+                }
+            });
+        }
+    });
+    
+    // Check how many specific checkboxes are checked (after auto-selection)
     const checkedOthers = Array.from(otherCheckboxes).filter(cb => cb.checked);
     console.log('DEBUG: Found', checkedOthers.length, 'specific checkboxes checked');
     
