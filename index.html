@@ -700,20 +700,21 @@
             const selected = selectedFilters[type];
             
             if (selected.length === 0) {
-                const defaultText = type === 'class' ? 'All Classes' : 
-                                  type === 'year' ? 'All Years' : 'All Zones';
+                let defaultText = 'All Classes';
+                if (type === 'year') defaultText = 'All Years';
+                if (type === 'zone') defaultText = 'All Zones';
+                
                 textElement.textContent = defaultText;
                 textElement.style.color = '#666';
             } else if (selected.length === 1) {
-                // Show the single selected option name
                 if (type === 'class' && propertyClassHierarchy[selected[0]]) {
-                    textElement.textContent = `${selected[0]} - ${propertyClassHierarchy[selected[0]].name}`;
+                    textElement.textContent = selected[0] + ' - ' + propertyClassHierarchy[selected[0]].name;
                 } else {
                     textElement.textContent = selected[0];
                 }
                 textElement.style.color = '#333';
             } else {
-                textElement.textContent = `${selected.length} selected`;
+                textElement.textContent = selected.length + ' selected';
                 textElement.style.color = '#333';
             }
         }
