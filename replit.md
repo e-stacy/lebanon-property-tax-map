@@ -2,7 +2,11 @@
 
 ## Overview
 
-This is a property tax database and data explorer for Lebanon, New Hampshire. The project provides a comprehensive system for processing, normalizing, and visualizing property assessment data from the city. It includes normalized CSV datasets for parcels, buildings, land, sales, and NHDRA data, along with a web-based data explorer interface that displays property information in both tabular and map formats. The system follows a "Clerk mode" approach that prioritizes evidence-based processing and maintains clear data provenance throughout the transformation pipeline.
+This is a property tax database and data explorer for Lebanon, New Hampshire. The project provides a comprehensive system for processing, normalizing, and visualizing property assessment data from the city. It now uses NHDRA (New Hampshire Department of Revenue Administration) data as the primary data source, providing expanded property information including building characteristics, year built, living area, bedrooms, heating systems, and construction details. The web-based data explorer interface displays this rich property information in both tabular and map formats. The system follows a "Clerk mode" approach that prioritizes evidence-based processing and maintains clear data provenance throughout the transformation pipeline.
+
+## Recent Changes
+
+**September 2025**: Successfully integrated comprehensive NHDRA data as the primary data source, expanding from 12 basic property fields to 25 detailed property characteristics. The new dataset includes building specifications (year built, style, living area, bedrooms, bathrooms), construction details (roofing, exterior walls, heating systems), assessment values, and sales history while maintaining existing filtering and visualization capabilities.
 
 ## User Preferences
 
@@ -22,7 +26,7 @@ The project uses a file-based architecture with multiple processing stages and o
 
 **Evidence Management**: SHA-256 manifesting system tracks all file changes with timestamped inventory reports. PowerShell-based tooling for intake, quality control, and evidence logging maintains audit trail.
 
-**Schema Design**: Five normalized tables (parcels, buildings, land, sales, nhdra) with standardized column naming. Header normalization handled client-side to accommodate variations in source data while maintaining consistent UI expectations.
+**Schema Design**: Primary parcels dataset merged from NHDRA source containing 25 standardized columns including basic parcel information (ID, owner, class, values) and expanded building characteristics (year built, style, living area, bedrooms, bathrooms, heating systems, construction details). Header normalization handled client-side to accommodate variations in source data while maintaining consistent UI expectations.
 
 ## External Dependencies
 
