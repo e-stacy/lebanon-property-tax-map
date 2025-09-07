@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Lebanon Property Tax Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: system-ui, Arial, sans-serif;
+        }
+        
+        #map { 
+            height: 100vh; 
+            width: 100%; 
+        }
+        
+        .map-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+            min-width: 150px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+        
+        .control-section {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+        
+        .control-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .control-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        
+        .filter-group {
+            margin-bottom: 10px;
+        }
+        
+        .stats {
+            font-size: 0.9em;
+        }
+        
+        .color-legend {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 0.85em;
+        }
+        
+        .color-box {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            border: 1px solid #ccc;
+            flex-shrink: 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        select, input[type="text"], input[type="search"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        input[type="number"] {
+            width: calc(100% - 16px);
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        /* Custom Dropdown Styles */
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+        }
+        .dropdown-button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.9em;
+            min-height: 20px;
+            transition: border-color 0.2s;
+        }
+        .dropdown-button:hover {
+            border-color: #2196f3;
+        }
+        .dropdown-button.active {
+            border-color: #2196f3;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+        }
+        .dropdown-text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #333;
+        }
+        .dropdown-arrow {
+            color: #666;
+            font-size: 0.8em;
+            transition: transform 0.2s;
+        }
+        .dropdown-button.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+        .dropdown-menu {
+            position: fixed;
+            background: white;
+            border: 2px solid #2196f3;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 10000;
+            display: none;
+            min-width: 200px;
+        }
+        .dropdown-option {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .dropdown-option:hover {
+            background: #f8f9fa;
+        }
+        .dropdown-option:last-child {
+            border-bottom: none;
+        }
+        .dropdown-option input[type="checkbox"] {
+            margin: 0 8px 0 0;
+            width: auto;
+        }
+        .dropdown-option label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin: 0;
+        }
+        
+        input[type="checkbox"] {
+            width: auto;
+        }
+        
+        .color-legend {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 0.85em;
+        }
+        
+        .color-box {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            border: 1px solid #999;
+            border-radius: 2px;
+        }
+        
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .stats {
+            font-size: 0.85em;
+            color: #666;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        
+        .leaflet-popup-content {
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        
+        .popup-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .popup-row {
+            margin-bottom: 3px;
+        }
+        
+        .popup-label {
+            font-weight: bold;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <div class="map-controls">
+        <div class="control-section">
+            <div class="control-title">Property Filters</div>
+            
+            <div class="filter-group">
+                <label>Color Parcels By:</label>
+                <select id="color-by">
+                    <option value="class">Property Class</option>
+                    <option value="value">Total Value</option>
+                    <option value="density">Value per Acre</option>
+                    <option value="year">Year Built</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Property Class <small style="color: #888;">(Click for options)</small></label>
+                <div class="custom-dropdown" id="class-dropdown">
+                    <div class="dropdown-button" onclick="toggleDropdown('class')">
+                        <span class="dropdown-text" id="class-text">All Classes</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="dropdown-menu" id="class-menu">
+                        <div class="dropdown-option" data-value="">
+                            <input type="checkbox" id="class-all" checked>
+                            <label for="class-all">All Classes</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <label>Min Value ($):</label>
+                <input type="number" id="min-value" placeholder="0">
+            </div>
+            
+            <div class="filter-group">
+                <label>Max Value ($):</label>
+                <input type="number" id="max-value" placeholder="Any">
+            </div>
+            
+            <div class="filter-group">
+                <button class="btn" onclick="applyFilters()">Apply Filters</button>
+                <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <div class="control-title">Map Layers</div>
+            <table style="width: 100%; border-collapse: collapse; margin: 0; padding: 0;">
+                <tr>
+                    <td style="width: 20px; padding: 2px 0; margin: 0; text-align: left;">
+                        <input type="checkbox" id="show-parcels" checked style="margin: 0; padding: 0;">
+                    </td>
+                    <td style="padding: 2px 0 2px 5px; margin: 0; text-align: left;">
+                        <label for="show-parcels" style="margin: 0; padding: 0; cursor: pointer;">Parcel Boundaries</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 20px; padding: 2px 0; margin: 0; text-align: left;">
+                        <input type="checkbox" id="show-labels" style="margin: 0; padding: 0;">
+                    </td>
+                    <td style="padding: 2px 0 2px 5px; margin: 0; text-align: left;">
+                        <label for="show-labels" style="margin: 0; padding: 0; cursor: pointer;">Map-Block-Lot</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 20px; padding: 2px 0; margin: 0; text-align: left;">
+                        <input type="checkbox" id="show-values" style="margin: 0; padding: 0;">
+                    </td>
+                    <td style="padding: 2px 0 2px 5px; margin: 0; text-align: left;">
+                        <label for="show-values" style="margin: 0; padding: 0; cursor: pointer;">Assessed Value</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 20px; padding: 2px 0; margin: 0; text-align: left;">
+                        <input type="checkbox" id="transparent-colors" checked style="margin: 0; padding: 0;">
+                    </td>
+                    <td style="padding: 2px 0 2px 5px; margin: 0; text-align: left;">
+                        <label for="transparent-colors" style="margin: 0; padding: 0; cursor: pointer;">Color Legend Overlay</label>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="control-section">
+            <div class="control-title">Color Legend</div>
+            <div id="legend-content">
+                <!-- Legend will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <div class="control-title">Lebanon Total Value</div>
+            <div class="stats">
+                <div>All Parcels: <span id="total-parcels">5,698</span></div>
+                <div>Total Value: $<span id="all-total-value">4.1B</span></div>
+                <div>Median Value: $<span id="all-median-value">720K</span></div>
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <div class="control-title">Current View: <span id="filter-description">All Properties</span></div>
+            <table class="stats-table" style="width: 100%; font-size: 0.85em;">
+                <thead>
+                    <tr style="background: #f0f0f0; font-weight: bold;">
+                        <td style="padding: 4px; border-bottom: 1px solid #ddd;">Metric</td>
+                        <td style="padding: 4px; border-bottom: 1px solid #ddd; text-align: right;">Value</td>
+                        <td style="padding: 4px; border-bottom: 1px solid #ddd; text-align: right;">% of Total</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 2px 4px;">Parcels</td>
+                        <td style="padding: 2px 4px; text-align: right;"><span id="visible-count">0</span></td>
+                        <td style="padding: 2px 4px; text-align: right;"><span id="parcel-percentage">0%</span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 2px 4px;">Total Value</td>
+                        <td style="padding: 2px 4px; text-align: right;">$<span id="total-value">0</span></td>
+                        <td style="padding: 2px 4px; text-align: right;"><span id="value-percentage">0%</span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 2px 4px;">Median Value</td>
+                        <td style="padding: 2px 4px; text-align: right;">$<span id="median-value">0</span></td>
+                        <td style="padding: 2px 4px; text-align: right;"><span id="median-percentage">0%</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="control-section">
+            <div class="filter-group">
+                <button class="btn" onclick="window.location.href='index.html'">← Back to Data View</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // Global variables
+        let map;
+        let parcelsLayer;
+        let parcelData = [];
+        let propertyData = new Map();
+        let currentFilters = {};
+        
+        // Custom dropdown functionality
+        let openDropdown = null;
+        let selectedFilters = {
+            class: []
+        };
+        
+        // Color schemes for different visualization modes
+        // Hierarchical property class structure for Lebanon, NH
+        const propertyClassHierarchy = {
+            '1010': {
+                name: 'Residential Single Family',
+                primary: true,
+                subclasses: ['1012', '101A', '101C', '101T']
+            },
+            '1012': { name: 'Residential Multi-Unit', parent: '1010' },
+            '101A': { name: 'Residential Accessory', parent: '1010' },
+            '101C': { name: 'Residential Commercial', parent: '1010' },
+            '101T': { name: 'Residential Temp', parent: '1010' },
+            
+            '1020': {
+                name: 'Manufactured Housing',
+                primary: true,
+                subclasses: ['102C', '102V']
+            },
+            '102C': { name: 'Manufactured Commercial', parent: '1020' },
+            '102V': { name: 'Manufactured Village', parent: '1020' },
+            
+            '1030': {
+                name: 'Condominium',
+                primary: true,
+                subclasses: ['103V']
+            },
+            '103V': { name: 'Condo Village', parent: '1030' },
+            
+            '1040': { name: 'Multi-Family 2-4 Units', primary: true },
+            '1050': { name: 'Multi-Family 5+ Units', primary: true },
+            '1060': { name: 'Multi-Family Other', primary: true },
+            '1090': { name: 'Residential Other', primary: true },
+            '1100': { name: 'Dormitory', primary: true },
+            
+            '1110': {
+                name: 'Hotel/Motel',
+                primary: true,
+                subclasses: ['111C']
+            },
+            '111C': { name: 'Hotel Commercial', parent: '1110' },
+            
+            '1120': {
+                name: 'Resort',
+                primary: true,
+                subclasses: ['112C']
+            },
+            '112C': { name: 'Resort Commercial', parent: '1120' },
+            
+            '1210': { name: 'Camp', primary: true },
+            '1300': { name: 'Vacant Residential Land', primary: true },
+            '1310': { name: 'Vacant Commercial Land', primary: true },
+            '1320': { name: 'Vacant Industrial Land', primary: true },
+            
+            '3000': { name: 'Agricultural', primary: true },
+            '3010': { name: 'Agricultural Productive', primary: true },
+            '3040': { name: 'Agricultural Other', primary: true },
+            '3050': { name: 'Forest', primary: true },
+            '3110': { name: 'Vacant Rural', primary: true },
+            
+            '3160': {
+                name: 'Conservation/Preservation',
+                primary: true,
+                subclasses: ['316C']
+            },
+            '316C': { name: 'Conservation Commercial', parent: '3160' },
+            
+            '3230': {
+                name: 'Wetlands',
+                primary: true,
+                subclasses: ['323I']
+            },
+            '323I': { name: 'Wetlands Industrial', parent: '3230' },
+            
+            '3240': { name: 'Floodplain', primary: true },
+            
+            '3250': {
+                name: 'Current Use',
+                primary: true,
+                subclasses: ['325I', '325R', '325V']
+            },
+            '325I': { name: 'Current Use Industrial', parent: '3250' },
+            '325R': { name: 'Current Use Recreational', parent: '3250' },
+            '325V': { name: 'Current Use Village', parent: '3250' },
+            
+            '3260': { name: 'Open Space', primary: true },
+            '3300': { name: 'Waste Disposal', primary: true },
+            
+            '3330': {
+                name: 'Mining/Extraction',
+                primary: true,
+                subclasses: ['333V']
+            },
+            '333V': { name: 'Mining Village', parent: '3330' },
+            
+            '3400': {
+                name: 'Transportation',
+                primary: true,
+                subclasses: ['340I', '340R']
+            },
+            '340I': { name: 'Transportation Industrial', parent: '3400' },
+            '340R': { name: 'Transportation Recreational', parent: '3400' },
+            
+            '3410': { name: 'Utilities', primary: true },
+            '3420': { name: 'Other Utilities', primary: true },
+            '3900': { name: 'Commercial Land', primary: true },
+            
+            '4000': {
+                name: 'Commercial/Industrial',
+                primary: true,
+                subclasses: ['400C']
+            },
+            '400C': { name: 'Commercial Mix', parent: '4000' },
+            
+            '4010': {
+                name: 'Office Building',
+                primary: true,
+                subclasses: ['401V']
+            },
+            '401V': { name: 'Office Village', parent: '4010' },
+            
+            '4020': {
+                name: 'Bank',
+                primary: true,
+                subclasses: ['402C']
+            },
+            '402C': { name: 'Bank Commercial', parent: '4020' },
+            
+            '4040': { name: 'Professional Service', primary: true },
+            
+            '4100': {
+                name: 'Retail Trade',
+                primary: true,
+                subclasses: ['410V']
+            },
+            '410V': { name: 'Retail Village', parent: '4100' },
+            
+            '4300': {
+                name: 'Warehouse',
+                primary: true,
+                subclasses: ['430V']
+            },
+            '430V': { name: 'Warehouse Village', parent: '4300' },
+            
+            '4310': {
+                name: 'Storage',
+                primary: true,
+                subclasses: ['433C']
+            },
+            '433C': { name: 'Storage Commercial', parent: '4310' },
+            
+            '4400': { name: 'Light Manufacturing', primary: true },
+            '4410': { name: 'Heavy Manufacturing', primary: true },
+            '4500': { name: 'Research/Development', primary: true },
+            
+            '6000': { name: 'Exempt Charitable', primary: true },
+            '6001': { name: 'Exempt Educational', primary: true },
+            '6111': { name: 'Exempt Religious', primary: true },
+            '6220': { name: 'Government School', primary: true },
+            '6231': { name: 'Government Other', primary: true },
+            
+            '9010': {
+                name: 'School District',
+                primary: true,
+                subclasses: ['901C', '901I']
+            },
+            '901C': { name: 'School Commercial', parent: '9010' },
+            '901I': { name: 'School Industrial', parent: '9010' },
+            
+            '9030': {
+                name: 'Water/Sewer Department',
+                primary: true,
+                subclasses: ['903C', '903I', '903R']
+            },
+            '903C': { name: 'Water/Sewer Commercial', parent: '9030' },
+            '903I': { name: 'Water/Sewer Industrial', parent: '9030' },
+            '903R': { name: 'Water/Sewer Recreational', parent: '9030' },
+            
+            '9050': {
+                name: 'Fire Department',
+                primary: true,
+                subclasses: ['905I', '905R', '905V']
+            },
+            '905I': { name: 'Fire Industrial', parent: '9050' },
+            '905R': { name: 'Fire Recreational', parent: '9050' },
+            '905V': { name: 'Fire Village', parent: '9050' },
+            
+            '9060': {
+                name: 'Highway Department',
+                primary: true,
+                subclasses: ['906R']
+            },
+            '906R': { name: 'Highway Recreational', parent: '9060' },
+            
+            '9080': {
+                name: 'Other Municipal',
+                primary: true,
+                subclasses: ['908R']
+            },
+            '908R': { name: 'Municipal Recreational', parent: '9080' },
+            
+            '9090': { name: 'Municipal Association', primary: true },
+            
+            '9130': {
+                name: 'Electric Department',
+                primary: true,
+                subclasses: ['913C']
+            },
+            '913C': { name: 'Electric Commercial', parent: '9130' },
+            
+            '9150': { name: 'Airport', primary: true },
+            '9200': { name: 'Hospital', primary: true },
+            '9550': { name: 'Authority/Commission', primary: true }
+        };
+        
+        // Get all Lebanon class codes from hierarchy
+        const lebanonClassCodes = Object.keys(propertyClassHierarchy);
+        
+        // Helper functions for hierarchy
+        function getPrimaryClasses() {
+            return Object.entries(propertyClassHierarchy)
+                .filter(([code, info]) => info.primary)
+                .map(([code, info]) => ({ code, name: info.name }));
+        }
+        
+        function getClassesForFilter(selectedClasses) {
+            const result = [];
+            selectedClasses.forEach(selectedClass => {
+                const classInfo = propertyClassHierarchy[selectedClass];
+                if (!classInfo) {
+                    result.push(selectedClass);
+                    return;
+                }
+                
+                // If it's a primary class with subclasses, include all subclasses
+                if (classInfo.primary && classInfo.subclasses) {
+                    result.push(selectedClass, ...classInfo.subclasses);
+                } else {
+                    result.push(selectedClass);
+                }
+            });
+            return [...new Set(result)]; // Remove duplicates
+        }
+        
+        // Generate colors for all actual Lebanon class codes
+        function generateClassColors() {
+            const colors = {};
+            const colorPalette = [
+                '#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#e67e22', '#1abc9c', '#34495e',
+                '#f1c40f', '#d35400', '#8e44ad', '#27ae60', '#2980b9', '#16a085', '#c0392b', '#7f8c8d',
+                '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4',
+                '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722',
+                '#795548', '#9e9e9e', '#607d8b', '#ff1744', '#f50057', '#d500f9', '#651fff', '#3d5afe',
+                '#2979ff', '#00b0ff', '#00e5ff', '#1de9b6', '#00e676', '#76ff03', '#c6ff00', '#ffff00',
+                '#ffd600', '#ffab00', '#ff6d00', '#dd2c00', '#bf360c', '#3e2723', '#212121', '#263238'
+            ];
+            
+            lebanonClassCodes.forEach((code, index) => {
+                colors[code] = colorPalette[index % colorPalette.length];
+            });
+            colors['default'] = '#95a5a6';
+            return colors;
+        }
+        
+        const colorSchemes = {
+            class: generateClassColors(),
+            value: {
+                ranges: [
+                    { min: 0, max: 100000, color: '#2ecc71' },
+                    { min: 100000, max: 250000, color: '#f1c40f' },
+                    { min: 250000, max: 500000, color: '#e67e22' },
+                    { min: 500000, max: 1000000, color: '#e74c3c' },
+                    { min: 1000000, max: Infinity, color: '#8e44ad' }
+                ]
+            },
+            density: {
+                ranges: [
+                    { min: 0, max: 50000, color: '#2ecc71' },
+                    { min: 50000, max: 100000, color: '#f1c40f' },
+                    { min: 100000, max: 200000, color: '#e67e22' },
+                    { min: 200000, max: 500000, color: '#e74c3c' },
+                    { min: 500000, max: Infinity, color: '#8e44ad' }
+                ]
+            },
+            year: {
+                ranges: [
+                    { min: 0, max: 1950, color: '#8e44ad' },
+                    { min: 1950, max: 1970, color: '#e74c3c' },
+                    { min: 1970, max: 1990, color: '#e67e22' },
+                    { min: 1990, max: 2010, color: '#f1c40f' },
+                    { min: 2010, max: Infinity, color: '#2ecc71' }
+                ]
+            }
+        };
+        
+        // Initialize map
+        function initMap() {
+            // Center on Lebanon, NH
+            map = L.map('map').setView([43.6424, -72.2517], 13);
+            
+            // Add OpenStreetMap tiles
+            // Use OpenStreetMap tiles with good contrast
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 20
+            }).addTo(map);
+            
+            // Update labels when map zoom changes
+            map.on('zoomend', function() {
+                const showMBL = document.getElementById('show-labels').checked;
+                const showValue = document.getElementById('show-values').checked;
+                
+                if (showMBL || showValue) {
+                    toggleMapLabels();
+                }
+            });
+
+            // Load data
+            loadPropertyData().then(() => {
+                // Make sure legend appears initially
+                updateLegend();
+            });
+        }
+        
+        // Load property data
+        async function loadPropertyData() {
+            try {
+                console.log('Loading property data...');
+                
+                // Load property database
+                const response = await fetch('data/parcels.csv');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const text = await response.text();
+                console.log('Raw CSV text length:', text.length);
+                console.log('First 200 chars:', text.substring(0, 200));
+                
+                const lines = text.trim().split('\n');
+                console.log('Number of lines:', lines.length);
+                
+                if (lines.length < 2) {
+                    throw new Error('CSV file appears to be empty or malformed');
+                }
+                
+                const headers = parseCSVLine(lines[0]);
+                console.log('Headers found:', headers);
+                
+                const properties = lines.slice(1).map((line, index) => {
+                    try {
+                        const values = parseCSVLine(line);
+                        const property = {};
+                        headers.forEach((header, index) => {
+                            property[header] = values[index] || '';
+                        });
+                        return property;
+                    } catch (err) {
+                        console.warn(`Error parsing line ${index + 2}:`, err);
+                        return null;
+                    }
+                }).filter(p => p && p.parcel_id && p.parcel_id.trim());
+                
+                // Index properties by parcel ID for quick lookup
+                properties.forEach(prop => {
+                    propertyData.set(prop.parcel_id, prop);
+                });
+                
+                console.log(`Successfully loaded ${properties.length} properties`);
+                if (properties.length > 0) {
+                    console.log('Sample property:', properties[0]);
+                }
+                
+                // Populate class filter
+                populateClassFilter(properties);
+                
+                // Load spatial data
+                loadActualSpatialData(properties);
+                
+            } catch (error) {
+                console.error('Error loading property data:', error);
+                alert('Error loading property data: ' + error.message);
+            }
+        }
+        
+        // Parse CSV line (same function as in main app)
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim());
+            return result;
+        }
+        
+        // Load actual spatial data
+        async function loadActualSpatialData(properties) {
+            try {
+                console.log('Loading parcel boundaries...');
+                
+                const response = await fetch('spatial/parcels_wgs84.geojson');
+                if (!response.ok) {
+                    throw new Error(`Failed to load spatial data: ${response.status}`);
+                }
+                
+                const geojsonText = await response.text();
+                console.log('GeoJSON loaded, size:', geojsonText.length);
+                
+                const geojsonData = JSON.parse(geojsonText);
+                console.log('Parsed GeoJSON, features:', geojsonData.features?.length || 0);
+                
+                if (geojsonData.features && geojsonData.features.length > 0) {
+                    parcelData = geojsonData.features;
+                    console.log(`Successfully loaded ${parcelData.length} parcel boundaries`);
+                    
+                    // Add parcels directly to map with prominent boundaries
+                    parcelsLayer = L.geoJSON(geojsonData, {
+                        style: {
+                            color: '#000000',
+                            weight: 3,
+                            fillColor: '#87CEEB',
+                            fillOpacity: getDefaultOpacity(),
+                            opacity: 1.0
+                        },
+                        onEachFeature: function(feature, layer) {
+                            const mapLot = feature.properties.MAP_LOT;
+                            
+                            // Simple popup with spatial data
+                            const popupContent = `
+                                <div class="popup-title">Parcel ${mapLot}</div>
+                                <div class="popup-row"><span class="popup-label">GIS ID:</span> ${feature.properties.GIS_ID || 'Unknown'}</div>
+                                <div class="popup-row"><span class="popup-label">Acres:</span> ${(feature.properties.CALC_ACRES || 0).toFixed(2)}</div>
+                            `;
+                            
+                            layer.bindPopup(popupContent);
+                            
+                            layer.on('mouseover', function() {
+                                this.setStyle({ weight: 4, color: '#000' });
+                            });
+                            
+                            layer.on('mouseout', function() {
+                                this.setStyle({ weight: 2, color: '#333' });
+                            });
+                        }
+                    }).addTo(map);
+                    
+                    console.log('Parcel boundaries added to map successfully');
+                    
+                    // Store parcel data for later processing
+                    parcelData = geojsonData.features;
+                    
+                    // Remove the basic layer and add properly colored parcels
+                    map.removeLayer(parcelsLayer);
+                    
+                    // Add parcels with proper coloring
+                    updateParcelLayer();
+                    
+                } else {
+                    throw new Error('No features found in GeoJSON data');
+                }
+                
+            } catch (error) {
+                console.error('Error loading spatial data:', error);
+                console.log('Creating fallback visualization...');
+                createTestParcels(properties);
+            }
+        }
+        
+        // Create test parcels to verify property data quality
+        function createTestParcels(properties) {
+            const features = [];
+            
+            // Create a more organized grid to test data quality
+            const centerLat = 43.6424;
+            const centerLng = -72.2517;
+            const testCount = Math.min(100, properties.length); // Test first 100 properties
+            const gridSize = Math.ceil(Math.sqrt(testCount));
+            const spacing = 0.003;
+            
+            console.log(`Creating ${testCount} test parcels to verify data quality`);
+            
+            properties.slice(0, testCount).forEach((prop, index) => {
+                const row = Math.floor(index / gridSize);
+                const col = index % gridSize;
+                
+                const baseLat = centerLat - (gridSize * spacing / 2) + (row * spacing);
+                const baseLng = centerLng - (gridSize * spacing / 2) + (col * spacing);
+                
+                // Size based on property value for testing
+                const value = parseFloat(prop.total_value) || 0;
+                let size = 0.002;
+                if (value > 500000) size = 0.003;
+                if (value > 1000000) size = 0.004;
+                
+                const feature = {
+                    type: 'Feature',
+                    properties: { parcel_id: prop.parcel_id },
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [[
+                            [baseLng, baseLat],
+                            [baseLng + size, baseLat],
+                            [baseLng + size, baseLat + size],
+                            [baseLng, baseLat + size],
+                            [baseLng, baseLat]
+                        ]]
+                    }
+                };
+                features.push(feature);
+            });
+            
+            parcelData = features;
+            console.log(`Created ${features.length} test parcels for data verification`);
+            
+            // Add parcels to map
+            updateParcelLayer();
+            
+            return true; // Make function properly async
+        }
+        
+        // Update parcel layer based on current filters and styling
+        function updateParcelLayer() {
+            if (parcelsLayer) {
+                map.removeLayer(parcelsLayer);
+            }
+            
+            // Also remove existing labels when updating parcels
+            if (combinedLabelsLayer) {
+                map.removeLayer(combinedLabelsLayer);
+                combinedLabelsLayer = null;
+            }
+            
+            const colorBy = document.getElementById('color-by').value;
+            
+            parcelsLayer = L.geoJSON(parcelData, {
+                filter: function(feature) {
+                    // Only show parcels that pass the filters
+                    const mapLot = feature.properties.MAP_LOT;
+                    let prop = null;
+                    
+                    // Direct match with parcel_id
+                    prop = propertyData.get(mapLot);
+                    
+                    // If no property data found, show the parcel
+                    if (!prop) return true;
+                    
+                    // Only show parcels that pass current filters
+                    return passesFilters(prop);
+                },
+                style: function(feature) {
+                    const mapLot = feature.properties.MAP_LOT;
+                    let prop = null;
+                    
+                    // Direct match with parcel_id
+                    prop = propertyData.get(mapLot);
+                    
+                    // Check if color coding is enabled
+                    if (!shouldShowColorCoding()) {
+                        return {
+                            color: '#000000',
+                            weight: 2,
+                            fillColor: '#87CEEB',
+                            fillOpacity: getDefaultOpacity(),
+                            opacity: 1.0
+                        };
+                    }
+                    
+                    const color = getParcelColor(prop, colorBy);
+                    
+                    return {
+                        color: '#000000',
+                        weight: 3,
+                        fillColor: color,
+                        fillOpacity: getColorOpacity(),
+                        opacity: 1.0
+                    };
+                },
+                onEachFeature: function(feature, layer) {
+                    // Try to link spatial data to property data
+                    const mapLot = feature.properties.MAP_LOT;
+                    let prop = null;
+                    
+                    // Direct match with parcel_id
+                    prop = propertyData.get(mapLot);
+                    
+                    // Strategy 3: Try map-block match (e.g., "107-6" matches map 107, block 6)
+                    if (!prop && mapLot.includes('-')) {
+                        const parts = mapLot.split('-');
+                        if (parts.length >= 2) {
+                            const mapNum = parts[0];
+                            const blockNum = parts[1];
+                            
+                            for (const [id, property] of propertyData) {
+                                if (property.map_number === mapNum && property.block_number === blockNum) {
+                                    prop = property;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Create popup content
+                    let popupContent;
+                    if (prop) {
+                        popupContent = createPopupContent(prop);
+                    } else {
+                        popupContent = `
+                            <div class="popup-title">Parcel ${mapLot}</div>
+                            <div class="popup-row"><span class="popup-label">GIS ID:</span> ${feature.properties.GIS_ID || 'Unknown'}</div>
+                            <div class="popup-row"><span class="popup-label">Acres:</span> ${(feature.properties.CALC_ACRES || 0).toFixed(2)}</div>
+                            <div class="popup-row"><span class="popup-label">Status:</span> No property data match found</div>
+                        `;
+                    }
+                    
+                    layer.bindPopup(popupContent);
+                    
+                    // Add hover effects
+                    layer.on('mouseover', function() {
+                        this.setStyle({ weight: 4, color: '#000' });
+                    });
+                    
+                    layer.on('mouseout', function() {
+                        this.setStyle({ weight: 2, color: '#333' });
+                    });
+                }
+            }).addTo(map);
+            
+            updateLegend();
+            updateStats();
+            
+            // Re-apply labels if checkboxes are checked
+            const showMBL = document.getElementById('show-labels').checked;
+            const showValue = document.getElementById('show-values').checked;
+            if (showMBL || showValue) {
+                addCombinedLabels(showMBL, showValue);
+            }
+        }
+        
+        // Get color for parcel based on visualization mode
+        function getParcelColor(property, colorBy) {
+            switch (colorBy) {
+                case 'class':
+                    return colorSchemes.class[property?.class_code] || colorSchemes.class.default;
+                    
+                case 'value':
+                    const value = parseFloat(property.total_value) || 0;
+                    for (const range of colorSchemes.value.ranges) {
+                        if (value >= range.min && value < range.max) {
+                            return range.color;
+                        }
+                    }
+                    return '#bdc3c7';
+                    
+                case 'density':
+                    const totalValue = parseFloat(property.total_value) || 0;
+                    const acres = parseFloat(property.lot_size_acres) || 1;
+                    const density = totalValue / acres;
+                    for (const range of colorSchemes.density.ranges) {
+                        if (density >= range.min && density < range.max) {
+                            return range.color;
+                        }
+                    }
+                    return '#bdc3c7';
+                    
+                case 'year':
+                    const year = parseInt(property.year_built) || 0;
+                    for (const range of colorSchemes.year.ranges) {
+                        if (year >= range.min && year < range.max) {
+                            return range.color;
+                        }
+                    }
+                    return '#bdc3c7';
+                    
+                default:
+                    return '#3498db';
+            }
+        }
+        
+        // Check if property passes current filters
+        function passesFilters(property) {
+            const selectedClasses = selectedFilters.class;
+            const minValue = parseFloat(document.getElementById('min-value').value) || 0;
+            const maxValue = parseFloat(document.getElementById('max-value').value) || Infinity;
+            
+            // Hierarchical class filtering with multi-select support
+            if (selectedClasses.length > 0 && property?.class_code) {
+                const allowedClasses = getClassesForFilter(selectedClasses);
+                if (!allowedClasses.includes(property.class_code)) {
+                    return false;
+                }
+            }
+            
+            const value = parseFloat(property.total_value) || 0;
+            if (value < minValue || value > maxValue) {
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Get opacity values and color coding based on overlay setting  
+        function getDefaultOpacity() {
+            return 0.05;  // Always very transparent for uncolored parcels to see building footprints
+        }
+        
+        function getColorOpacity() {
+            return 0.15;  // Always transparent enough to see building footprints clearly
+        }
+        
+        function shouldShowColorCoding() {
+            return document.getElementById('transparent-colors').checked;
+        }
+        
+        // Create popup content for parcel
+        function createPopupContent(property) {
+            return `
+                <div class="popup-title">${property.situs_address || 'No Address'}</div>
+                <div class="popup-row"><span class="popup-label">Parcel:</span> ${property.parcel_id}</div>
+                <div class="popup-row"><span class="popup-label">Owner:</span> ${property.owner_name || 'Unknown'}</div>
+                <div class="popup-row"><span class="popup-label">Class:</span> ${property?.class_code || 'Unknown'}</div>
+                <div class="popup-row"><span class="popup-label">Lot Size:</span> ${property.lot_size_acres || '0'} acres</div>
+                <div class="popup-row"><span class="popup-label">Total Value:</span> $${formatNumber(property.total_value || 0)}</div>
+                <div class="popup-row"><span class="popup-label">Land Value:</span> $${formatNumber(property.land_value || 0)}</div>
+                <div class="popup-row"><span class="popup-label">Building Value:</span> $${formatNumber(property.building_value || 0)}</div>
+                ${property.year_built ? `<div class="popup-row"><span class="popup-label">Year Built:</span> ${property.year_built}</div>` : ''}
+                ${property.building_gla ? `<div class="popup-row"><span class="popup-label">Building Area:</span> ${formatNumber(property.building_gla)} sq ft</div>` : ''}
+            `;
+        }
+        
+        // Dropdown functions (shared with main page)
+        function toggleDropdown(type) {
+            const menu = document.getElementById(type + '-menu');
+            const button = document.querySelector(`#${type}-dropdown .dropdown-button`);
+            
+            // Close any other open dropdown
+            if (openDropdown && openDropdown !== type) {
+                closeDropdown(openDropdown);
+            }
+            
+            if (menu.style.display === 'block') {
+                closeDropdown(type);
+            } else {
+                openDropdownMenu(type);
+            }
+        }
+        
+        function openDropdownMenu(type) {
+            const menu = document.getElementById(type + '-menu');
+            const button = document.querySelector(`#${type}-dropdown .dropdown-button`);
+            const rect = button.getBoundingClientRect();
+            
+            // Position the dropdown
+            menu.style.top = (rect.bottom + 5) + 'px';
+            menu.style.left = rect.left + 'px';
+            menu.style.width = rect.width + 'px';
+            menu.style.display = 'block';
+            
+            button.classList.add('active');
+            openDropdown = type;
+        }
+        
+        function closeDropdown(type) {
+            const menu = document.getElementById(type + '-menu');
+            const button = document.querySelector(`#${type}-dropdown .dropdown-button`);
+            
+            menu.style.display = 'none';
+            button.classList.remove('active');
+            if (openDropdown === type) {
+                openDropdown = null;
+            }
+        }
+        
+        function updateDropdownText(type) {
+            const textElement = document.getElementById(type + '-text');
+            const selected = selectedFilters[type];
+            
+            if (selected.length === 0) {
+                textElement.textContent = 'All Classes';
+                textElement.style.color = '#666';
+            } else if (selected.length === 1) {
+                // Show the single selected option name
+                if (propertyClassHierarchy[selected[0]]) {
+                    textElement.textContent = `${selected[0]} - ${propertyClassHierarchy[selected[0]].name}`;
+                } else {
+                    textElement.textContent = selected[0];
+                }
+                textElement.style.color = '#333';
+            } else {
+                textElement.textContent = `${selected.length} selected`;
+                textElement.style.color = '#333';
+            }
+        }
+        
+        function handleDropdownSelection(type, value, checked) {
+            const menu = document.getElementById(type + '-menu');
+            const allCheckbox = document.getElementById(`${type}-all`);
+            
+            if (value === '') {
+                // "All" option selected
+                if (checked) {
+                    // Uncheck all other options and clear the array
+                    const otherCheckboxes = menu.querySelectorAll('input[type="checkbox"]:not(#' + type + '-all)');
+                    otherCheckboxes.forEach(cb => cb.checked = false);
+                    selectedFilters[type] = [];
+                } else {
+                    // "All" unchecked, keep current selections
+                }
+            } else {
+                // Specific option selected
+                if (checked) {
+                    // Uncheck "All" option first
+                    if (allCheckbox) allCheckbox.checked = false;
+                    
+                    // Check if this is a primary class with subclasses
+                    const classInfo = propertyClassHierarchy[value];
+                    if (classInfo && classInfo.primary && classInfo.subclasses) {
+                        // Primary class selected - add it and all its subclasses
+                        if (!selectedFilters[type].includes(value)) {
+                            selectedFilters[type].push(value);
+                        }
+                        classInfo.subclasses.forEach(subclass => {
+                            if (!selectedFilters[type].includes(subclass)) {
+                                selectedFilters[type].push(subclass);
+                            }
+                            // Check the subclass checkbox in the UI
+                            const subCheckbox = document.getElementById(`${type}-${subclass}`);
+                            if (subCheckbox) subCheckbox.checked = true;
+                        });
+                    } else {
+                        // Regular class or subclass selected
+                        if (!selectedFilters[type].includes(value)) {
+                            selectedFilters[type].push(value);
+                        }
+                        
+                        // If this is a subclass, check if all subclasses of its parent are now selected
+                        const parentClass = Object.keys(propertyClassHierarchy).find(key => {
+                            const info = propertyClassHierarchy[key];
+                            return info.subclasses && info.subclasses.includes(value);
+                        });
+                        
+                        if (parentClass) {
+                            const parentInfo = propertyClassHierarchy[parentClass];
+                            const allSubclassesSelected = parentInfo.subclasses.every(sub => 
+                                selectedFilters[type].includes(sub)
+                            );
+                            
+                            if (allSubclassesSelected && !selectedFilters[type].includes(parentClass)) {
+                                selectedFilters[type].push(parentClass);
+                                const parentCheckbox = document.getElementById(`${type}-${parentClass}`);
+                                if (parentCheckbox) parentCheckbox.checked = true;
+                            }
+                        }
+                    }
+                } else {
+                    // Remove from selection
+                    selectedFilters[type] = selectedFilters[type].filter(v => v !== value);
+                    
+                    // Check if this is a primary class being unchecked
+                    const classInfo = propertyClassHierarchy[value];
+                    if (classInfo && classInfo.primary && classInfo.subclasses) {
+                        // Primary class unchecked - remove all its subclasses
+                        classInfo.subclasses.forEach(subclass => {
+                            selectedFilters[type] = selectedFilters[type].filter(v => v !== subclass);
+                            // Uncheck the subclass checkbox in the UI
+                            const subCheckbox = document.getElementById(`${type}-${subclass}`);
+                            if (subCheckbox) subCheckbox.checked = false;
+                        });
+                    } else {
+                        // Subclass unchecked - uncheck its parent if it was checked
+                        const parentClass = Object.keys(propertyClassHierarchy).find(key => {
+                            const info = propertyClassHierarchy[key];
+                            return info.subclasses && info.subclasses.includes(value);
+                        });
+                        
+                        if (parentClass && selectedFilters[type].includes(parentClass)) {
+                            selectedFilters[type] = selectedFilters[type].filter(v => v !== parentClass);
+                            const parentCheckbox = document.getElementById(`${type}-${parentClass}`);
+                            if (parentCheckbox) parentCheckbox.checked = false;
+                        }
+                    }
+                    
+                    // If no selections left, check "All" option
+                    if (selectedFilters[type].length === 0 && allCheckbox) {
+                        allCheckbox.checked = true;
+                    }
+                }
+            }
+            
+            updateDropdownText(type);
+            applyFilters();
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (openDropdown && !e.target.closest(`#${openDropdown}-dropdown`)) {
+                closeDropdown(openDropdown);
+            }
+        });
+        
+        // Populate hierarchical class filter dropdown
+        function populateClassFilter(properties) {
+            const classMenu = document.getElementById('class-menu');
+            const usedClasses = new Set(properties.map(p => p?.class_code).filter(c => c && propertyClassHierarchy[c]));
+            
+            // Clear existing options (keep "All" option)
+            classMenu.innerHTML = '<div class="dropdown-option" data-value=""><input type="checkbox" id="class-all" checked><label for="class-all">All Classes</label></div>';
+            
+            // Add event listener for "All" checkbox
+            document.getElementById('class-all').addEventListener('change', (e) => {
+                handleDropdownSelection('class', '', e.target.checked);
+            });
+            
+            // Get primary classes that are actually used
+            const primaryClassesToShow = getPrimaryClasses().filter(({code}) => {
+                const classInfo = propertyClassHierarchy[code];
+                
+                // Show if primary class itself is used
+                if (usedClasses.has(code)) return true;
+                
+                // Show if any of its subclasses are used
+                if (classInfo.subclasses) {
+                    return classInfo.subclasses.some(sub => usedClasses.has(sub));
+                }
+                
+                return false;
+            });
+            
+            // Sort by class code for consistent ordering
+            primaryClassesToShow.sort((a, b) => a.code.localeCompare(b.code));
+            
+            primaryClassesToShow.forEach(({code, name}) => {
+                const classInfo = propertyClassHierarchy[code];
+                
+                // Add primary class option
+                if (usedClasses.has(code)) {
+                    const option = document.createElement('div');
+                    option.className = 'dropdown-option';
+                    option.dataset.value = code;
+                    option.innerHTML = `<input type="checkbox" id="class-${code}"><label for="class-${code}">${code} - ${name}</label>`;
+                    classMenu.appendChild(option);
+                    
+                    // Add event listener
+                    const checkbox = option.querySelector('input');
+                    checkbox.addEventListener('change', (e) => {
+                        handleDropdownSelection('class', code, e.target.checked);
+                    });
+                }
+                
+                // Add subclass options (indented)
+                if (classInfo.subclasses) {
+                    classInfo.subclasses
+                        .filter(sub => usedClasses.has(sub) && propertyClassHierarchy[sub])
+                        .sort()
+                        .forEach(subcode => {
+                            const option = document.createElement('div');
+                            option.className = 'dropdown-option';
+                            option.dataset.value = subcode;
+                            option.innerHTML = `<input type="checkbox" id="class-${subcode}"><label for="class-${subcode}" style="padding-left: 20px;">${subcode} - ${propertyClassHierarchy[subcode].name}</label>`;
+                            classMenu.appendChild(option);
+                            
+                            // Add event listener
+                            const checkbox = option.querySelector('input');
+                            checkbox.addEventListener('change', (e) => {
+                                handleDropdownSelection('class', subcode, e.target.checked);
+                            });
+                        });
+                }
+            });
+        }
+        
+        // Class code descriptions
+        // Enhanced class descriptions for Lebanon property classes
+        const classDescriptions = {
+            '013R': 'Seasonal Residential',
+            '0310': 'Seasonal Land',
+            '0430': 'Forest Land',
+            '1010': 'Residential Single Family',
+            '1012': 'Residential Multi-Unit',
+            '101A': 'Residential Accessory',
+            '101C': 'Residential Commercial',
+            '101T': 'Residential Temp',
+            '1020': 'Manufactured Housing',
+            '102C': 'Manufactured Commercial',
+            '102V': 'Manufactured Village',
+            '1030': 'Condominium',
+            '103V': 'Condo Village',
+            '1040': 'Multi-Family 2-4 Units',
+            '1050': 'Multi-Family 5+ Units',
+            '1060': 'Multi-Family Other',
+            '1090': 'Residential Other',
+            '1100': 'Dormitory',
+            '1110': 'Hotel/Motel',
+            '111C': 'Hotel Commercial',
+            '1120': 'Resort',
+            '112C': 'Resort Commercial',
+            '1210': 'Camp',
+            '1300': 'Vacant Residential Land',
+            '1310': 'Vacant Commercial Land',
+            '1320': 'Vacant Industrial Land',
+            '3000': 'Agricultural',
+            '3010': 'Agricultural Productive',
+            '3040': 'Agricultural Other',
+            '3050': 'Forest',
+            '3110': 'Vacant Rural',
+            '3160': 'Conservation/Preservation',
+            '316C': 'Conservation Commercial',
+            '3230': 'Wetlands',
+            '323I': 'Wetlands Industrial',
+            '3240': 'Floodplain',
+            '3250': 'Current Use',
+            '325I': 'Current Use Industrial',
+            '325R': 'Current Use Recreational',
+            '325V': 'Current Use Village',
+            '3260': 'Open Space',
+            '3300': 'Waste Disposal',
+            '3310': 'Mining/Quarrying',
+            '3320': 'Sand/Gravel',
+            '3330': 'Other Mining',
+            '333V': 'Mining Village',
+            '3340': 'Extractive Other',
+            '3350': 'Power Generation',
+            '3370': 'Communication',
+            '3380': 'Water Supply',
+            '3400': 'Transportation',
+            '340I': 'Transportation Industrial',
+            '340R': 'Transportation Recreational',
+            '3410': 'Utilities',
+            '3420': 'Other Utilities',
+            '3520': 'Wild/Forest Land',
+            '3530': 'Recreation Land',
+            '3540': 'Cemeteries',
+            '354C': 'Cemetery Commercial',
+            '3550': 'Other Land',
+            '3740': 'Parking',
+            '3800': 'Industrial Land',
+            '3880': 'Special Purpose',
+            '3900': 'Commercial Land',
+            '3910': 'Commercial Office',
+            '3920': 'Commercial Retail',
+            '4000': 'Commercial/Industrial',
+            '400C': 'Commercial Mix',
+            '4010': 'Office Building',
+            '401V': 'Office Village',
+            '4020': 'Bank',
+            '402C': 'Bank Commercial',
+            '4040': 'Professional Service',
+            '4100': 'Retail Trade',
+            '410V': 'Retail Village',
+            '4270': 'Auto Sales',
+            '4300': 'Warehouse',
+            '430V': 'Warehouse Village',
+            '4310': 'Mini Storage',
+            '433C': 'Storage Commercial',
+            '4400': 'Light Manufacturing',
+            '4410': 'Heavy Manufacturing',
+            '4420': 'Food Processing',
+            '4440': 'Other Manufacturing',
+            '4500': 'Research/Development',
+            '450I': 'Research Industrial',
+            '6000': 'Exempt Charitable',
+            '6001': 'Exempt Educational',
+            '6111': 'Exempt Religious',
+            '6120': 'Exempt Cemetery',
+            '6121': 'Exempt Cemetery Other',
+            '6200': 'Government Federal',
+            '6201': 'Government State',
+            '6210': 'Government County',
+            '6211': 'Government Municipal',
+            '6220': 'Government School',
+            '6221': 'Government School Other',
+            '6230': 'Government Hospital',
+            '6231': 'Government Other',
+            '9000': 'Municipal Property',
+            '900I': 'Municipal Industrial',
+            '9010': 'School District',
+            '901C': 'School Commercial',
+            '901I': 'School Industrial',
+            '9030': 'Water/Sewer Department',
+            '903C': 'Water/Sewer Commercial',
+            '903I': 'Water/Sewer Industrial',
+            '903R': 'Water/Sewer Recreational',
+            '9040': 'Parks/Recreation',
+            '9050': 'Fire Department',
+            '905I': 'Fire Industrial',
+            '905R': 'Fire Recreational',
+            '905V': 'Fire Village',
+            '9060': 'Highway Department',
+            '906R': 'Highway Recreational',
+            '9080': 'Other Municipal',
+            '908R': 'Municipal Recreational',
+            '9090': 'Municipal Association',
+            '9130': 'Electric Department',
+            '913C': 'Electric Commercial',
+            '9150': 'Airport',
+            '9200': 'Hospital',
+            '9550': 'Authority/Commission',
+            '9700': 'State Property',
+            '9730': 'State Forest',
+            '9740': 'State Park',
+            '9780': 'Other State'
+        };
+
+        // Update legend based on current color scheme
+        function updateLegend() {
+            const colorBy = document.getElementById('color-by').value;
+            const legendContent = document.getElementById('legend-content');
+            
+            let html = '';
+            
+            // Check if color coding is enabled
+            if (!shouldShowColorCoding()) {
+                html = '<div style="font-style: italic; color: #666; padding: 8px; background: #f8f9fa; border-radius: 4px;">Color Legend Overlay is disabled. Toggle to show color coding.</div>';
+            } else if (colorBy === 'class') {
+                const selectedClasses = selectedFilters.class;
+                
+                if (selectedClasses.length > 0) {
+                    // Show legend for selected class hierarchy
+                    selectedClasses.forEach(classFilter => {
+                        const classInfo = propertyClassHierarchy[classFilter];
+                        
+                        if (classInfo && classInfo.primary && classInfo.subclasses) {
+                            // Primary class selected - show it and its subclasses
+                            html += `<div class="color-legend" style="font-weight: bold; margin-bottom: 4px;">
+                                <div class="color-box" style="background-color: ${colorSchemes.class[classFilter]}"></div>
+                                ${classFilter} - ${classInfo.name}
+                            </div>`;
+                        
+                        classInfo.subclasses
+                            .filter(sub => allowedClasses.includes(sub) && colorSchemes.class[sub])
+                            .forEach(subCode => {
+                                const subInfo = propertyClassHierarchy[subCode];
+                                html += `<div class="color-legend" style="margin-left: 20px; font-style: italic;">
+                                    <div class="color-box" style="background-color: ${colorSchemes.class[subCode]}"></div>
+                                    ${subCode} - ${subInfo.name}
+                                </div>`;
+                            });
+                    } else {
+                            // Sub-class selected - show just that one
+                            html += `<div class="color-legend">
+                                <div class="color-box" style="background-color: ${colorSchemes.class[classFilter]}"></div>
+                                ${classFilter} - ${classInfo ? classInfo.name : 'Unknown'}
+                            </div>`;
+                        }
+                    });
+                    }
+                } else {
+                    // No filter - show primary classes only
+                    getPrimaryClasses()
+                        .filter(({code}) => colorSchemes.class[code])
+                        .slice(0, 15) // Limit to prevent overcrowding
+                        .forEach(({code, name}) => {
+                            html += `<div class="color-legend">
+                                <div class="color-box" style="background-color: ${colorSchemes.class[code]}"></div>
+                                ${code} - ${name}
+                            </div>`;
+                        });
+                    
+                    if (getPrimaryClasses().length > 15) {
+                        html += '<div style="font-style: italic; color: #666; margin-top: 8px; word-wrap: break-word;">+ additional classes<br>(use filter to see specific classes)</div>';
+                    }
+                }
+            } else if (colorBy === 'value') {
+                colorSchemes.value.ranges.forEach(range => {
+                    const label = range.max === Infinity ? 
+                        `$${formatNumber(range.min)}+` : 
+                        `$${formatNumber(range.min)} - $${formatNumber(range.max)}`;
+                    html += `<div class="color-legend">
+                        <div class="color-box" style="background-color: ${range.color}"></div>
+                        ${label}
+                    </div>`;
+                });
+            }
+            // Add other legend types as needed
+            
+            legendContent.innerHTML = html;
+        }
+        
+        // Calculate total value for all properties (once)
+        let allPropertiesTotal = 0;
+        let allPropertiesCount = 0;
+        
+        function calculateTotalValue() {
+            if (allPropertiesTotal > 0) return; // Already calculated
+            
+            for (const [id, prop] of propertyData) {
+                allPropertiesTotal += parseFloat(prop.total_value) || 0;
+                allPropertiesCount++;
+            }
+            
+            // Update total value section
+            document.getElementById('total-parcels').textContent = formatNumber(allPropertiesCount);
+            document.getElementById('all-total-value').textContent = '$' + formatLargeNumber(allPropertiesTotal);
+            // Calculate median value for all properties
+            const allValues = [...propertyData.values()]
+                .map(p => parseFloat(p.total_value) || 0)
+                .filter(v => v > 0)
+                .sort((a, b) => a - b);
+            const allMedianValue = allValues.length > 0 ? allValues[Math.floor(allValues.length / 2)] : 0;
+            document.getElementById('all-median-value').textContent = '$' + formatLargeNumber(allMedianValue);
+        }
+
+        // Format large numbers with K, M, B suffixes
+        function formatLargeNumber(num) {
+            if (num >= 1000000000) return (num / 1000000000).toFixed(1) + 'B';
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(0) + 'K';
+            return formatNumber(num);
+        }
+
+        // Update statistics
+        function updateStats() {
+            calculateTotalValue();
+            
+            // Calculate stats based on current filters, not just visible parcels
+            let visibleCount = 0;
+            let totalValue = 0;
+            
+            // Check if any filters are applied
+            const selectedClasses = selectedFilters.class;
+            const minValue = document.getElementById('min-value').value;
+            const maxValue = document.getElementById('max-value').value;
+            const hasFilters = selectedClasses.length > 0 || minValue || maxValue;
+            
+            if (!hasFilters) {
+                // No filters applied - show total statistics
+                visibleCount = propertyData.size;
+                totalValue = allPropertiesTotal; // Use pre-calculated city total
+            } else {
+                // Filters applied - calculate filtered statistics
+                for (const [id, prop] of propertyData) {
+                    if (passesFilters(prop)) {
+                        visibleCount++;
+                        totalValue += parseFloat(prop.total_value) || 0;
+                    }
+                }
+            }
+            
+            // Calculate median value
+            let medianValue = 0;
+            if (!hasFilters) {
+                // No filters - use city-wide median
+                const allValues = [...propertyData.values()]
+                    .map(p => parseFloat(p.total_value) || 0)
+                    .filter(v => v > 0)
+                    .sort((a, b) => a - b);
+                medianValue = allValues.length > 0 ? allValues[Math.floor(allValues.length / 2)] : 0;
+            } else {
+                // Filters applied - calculate filtered median
+                if (visibleCount > 0) {
+                    const values = [];
+                    for (const [id, prop] of propertyData) {
+                        if (passesFilters(prop)) {
+                            const value = parseFloat(prop.total_value) || 0;
+                            if (value > 0) values.push(value);
+                        }
+                    }
+                    values.sort((a, b) => a - b);
+                    medianValue = values.length > 0 ? values[Math.floor(values.length / 2)] : 0;
+                }
+            }
+            const percentage = allPropertiesTotal > 0 ? (totalValue / allPropertiesTotal * 100) : 0;
+            
+            // Update filter description
+            
+            let filterDesc = 'All Properties';
+            if (selectedClasses.length > 0) {
+                if (selectedClasses.length === 1) {
+                    const code = selectedClasses[0];
+                    const description = classDescriptions[code] || code;
+                    filterDesc = `${code} - ${description}`;
+                } else {
+                    filterDesc = `${selectedClasses.length} Property Classes Selected`;
+                }
+            }
+            if (minValue || maxValue) {
+                const valueRange = minValue && maxValue ? 
+                    `$${formatLargeNumber(minValue)} - $${formatLargeNumber(maxValue)}` :
+                    minValue ? `≥ $${formatLargeNumber(minValue)}` :
+                    `≤ $${formatLargeNumber(maxValue)}`;
+                filterDesc += selectedClasses.length > 0 ? `, ${valueRange}` : valueRange;
+            }
+            
+            document.getElementById('filter-description').textContent = filterDesc;
+            document.getElementById('visible-count').textContent = formatNumber(visibleCount);
+            document.getElementById('total-value').textContent = formatLargeNumber(totalValue);
+            document.getElementById('median-value').textContent = formatLargeNumber(medianValue);
+            
+            // Calculate all percentages
+            const parcelPercentage = !hasFilters ? 100 : (allPropertiesCount > 0 ? (visibleCount / allPropertiesCount * 100) : 0);
+            const valuePercentage = !hasFilters ? 100 : (allPropertiesTotal > 0 ? (totalValue / allPropertiesTotal * 100) : 0);
+            // Get all values for median calculation
+            const allPropValues = [...propertyData.values()]
+                .map(p => parseFloat(p.total_value) || 0)
+                .filter(v => v > 0)
+                .sort((a, b) => a - b);
+            const allMedianValue = allPropValues.length > 0 ? allPropValues[Math.floor(allPropValues.length / 2)] : 0;
+            const medianPercentage = !hasFilters ? 100 : (allMedianValue > 0 ? (medianValue / allMedianValue * 100) : 0);
+            
+            document.getElementById('parcel-percentage').textContent = parcelPercentage.toFixed(1) + '%';
+            document.getElementById('value-percentage').textContent = valuePercentage.toFixed(1) + '%';
+            document.getElementById('median-percentage').textContent = medianPercentage.toFixed(1) + '%';
+        }
+        
+        // Apply filters
+        function applyFilters() {
+            updateParcelLayer();
+        }
+        
+        // Clear filters
+        function clearFilters() {
+            // Reset dropdown selections
+            selectedFilters = { class: [] };
+            
+            // Update dropdown text
+            updateDropdownText('class');
+            
+            // Reset all checkboxes
+            const menu = document.getElementById('class-menu');
+            const checkboxes = menu.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            // Check the "All" option
+            const allCheckbox = document.getElementById('class-all');
+            if (allCheckbox) allCheckbox.checked = true;
+            
+            document.getElementById('min-value').value = '';
+            document.getElementById('max-value').value = '';
+            updateParcelLayer();
+        }
+        
+        // Format number with commas
+        function formatNumber(num) {
+            return parseFloat(num).toLocaleString();
+        }
+        
+        // Toggle parcel boundaries visibility
+        function toggleParcels() {
+            const checkbox = document.getElementById('show-parcels');
+            if (checkbox.checked) {
+                if (parcelsLayer) {
+                    map.addLayer(parcelsLayer);
+                }
+            } else {
+                if (parcelsLayer) {
+                    map.removeLayer(parcelsLayer);
+                }
+            }
+        }
+        
+        // Global variable for combined labels
+        let combinedLabelsLayer;
+        
+        // Toggle combined labels based on checkboxes
+        function toggleMapLabels() {
+            const showMBL = document.getElementById('show-labels').checked;
+            const showValue = document.getElementById('show-values').checked;
+            
+            // Remove existing labels
+            if (combinedLabelsLayer) {
+                map.removeLayer(combinedLabelsLayer);
+                combinedLabelsLayer = null;
+            }
+            
+            // Add new labels if either checkbox is checked
+            if (showMBL || showValue) {
+                addCombinedLabels(showMBL, showValue);
+            }
+        }
+        
+        // Add combined labels to map
+        function addCombinedLabels(showMBL, showValue) {
+            if (!parcelsLayer) return;
+            
+            const labels = [];
+            const currentZoom = map.getZoom();
+            console.log(`Adding combined labels at zoom level: ${currentZoom}, MBL: ${showMBL}, Values: ${showValue}`);
+            
+            // Determine minimum zoom level needed (lower thresholds for better testing)
+            const minZoomForMBL = 14;
+            const minZoomForValue = 15;
+            const canShowMBL = showMBL && currentZoom >= minZoomForMBL;
+            const canShowValue = showValue && currentZoom >= minZoomForValue;
+            
+            if (!canShowMBL && !canShowValue) {
+                console.log('Zoom level too low for any labels');
+                return;
+            }
+            
+            parcelsLayer.eachLayer(layer => {
+                const bounds = layer.getBounds();
+                const center = bounds.getCenter();
+                const mapLot = layer.feature.properties.MAP_LOT;
+                
+                if (!mapLot) return;
+                
+                let labelContent = '';
+                let showThisLabel = false;
+                
+                // Add Map-Block-Lot if requested and zoom allows
+                if (canShowMBL) {
+                    // Get property data for complete identifier
+                    let prop = propertyData.get(mapLot);
+                    // Use the parcel_id which contains the complete map-block-lot identifier
+                    const fullId = prop?.parcel_id || mapLot;
+                    // console.log(`Label for ${mapLot}: found prop with parcel_id = ${prop?.parcel_id}, using ${fullId}`);
+                    labelContent = fullId;
+                    showThisLabel = true;
+                }
+                
+                // Add assessed value if requested and zoom allows
+                if (canShowValue) {
+                    // Find property data
+                    let prop = propertyData.get(mapLot);
+                    
+                    if (prop) {
+                        const value = formatLargeNumber(parseFloat(prop.total_value) || 0);
+                        if (labelContent) {
+                            // Both MBL and value - MBL on top, value on bottom
+                            // Keep the complete parcel_id, not just mapLot
+                            const fullId = prop?.parcel_id || mapLot;
+                            labelContent = `${fullId}<br/>$${value}`;
+                        } else {
+                            // Only value
+                            labelContent = `$${value}`;
+                        }
+                        showThisLabel = true;
+                    }
+                }
+                
+                if (showThisLabel && labelContent) {
+                    const label = L.marker(center, {
+                        icon: L.divIcon({
+                            className: 'combined-label',
+                            html: `<div style="background: rgba(255,255,255,0.95); padding: 3px 8px; border: 1px solid #333; border-radius: 4px; font-size: 11px; font-weight: bold; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3); line-height: 1.2; min-width: 60px; white-space: nowrap;">${labelContent}</div>`,
+                            iconSize: [null, null],
+                            iconAnchor: [null, null]
+                        })
+                    });
+                    labels.push(label);
+                }
+            });
+            
+            console.log(`Created ${labels.length} combined labels`);
+            if (labels.length > 0) {
+                combinedLabelsLayer = L.layerGroup(labels).addTo(map);
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('color-by').addEventListener('change', updateParcelLayer);
+        
+        // Add checkbox event listeners
+        document.getElementById('show-parcels').addEventListener('change', toggleParcels);
+        document.getElementById('show-labels').addEventListener('change', toggleMapLabels);
+        document.getElementById('show-values').addEventListener('change', toggleMapLabels);
+        document.getElementById('transparent-colors').addEventListener('change', updateParcelLayer);
+        
+        // Initialize map when page loads
+        document.addEventListener('DOMContentLoaded', initMap);
+    </script>
+</body>
+</html>
