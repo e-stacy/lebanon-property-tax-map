@@ -29,7 +29,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.3);
             z-index: 1000;
-            min-width: 280px;
+            min-width: 168px;
             max-height: calc(100vh - 40px);
             overflow-y: auto;
         }
@@ -259,7 +259,7 @@
             <div class="stats">
                 <div>All Parcels: <span id="total-parcels">5,698</span></div>
                 <div>Total Value: $<span id="all-total-value">4.1B</span></div>
-                <div>Avg Value: $<span id="all-avg-value">720K</span></div>
+                <div>Median Value: $<span id="all-median-value">720K</span></div>
             </div>
         </div>
         
@@ -285,9 +285,9 @@
                         <td style="padding: 2px 4px; text-align: right;"><span id="value-percentage">0%</span></td>
                     </tr>
                     <tr>
-                        <td style="padding: 2px 4px;">Avg Value</td>
-                        <td style="padding: 2px 4px; text-align: right;">$<span id="avg-value">0</span></td>
-                        <td style="padding: 2px 4px; text-align: right;"><span id="avg-percentage">0%</span></td>
+                        <td style="padding: 2px 4px;">Median Value</td>
+                        <td style="padding: 2px 4px; text-align: right;">$<span id="median-value">0</span></td>
+                        <td style="padding: 2px 4px; text-align: right;"><span id="median-percentage">0%</span></td>
                     </tr>
                 </tbody>
             </table>
@@ -1079,9 +1079,8 @@
                             const subInfo = propertyClassHierarchy[subCode];
                             const option = document.createElement('option');
                             option.value = subCode;
-                            option.textContent = `    ${subCode} - ${subInfo.name}`;
-                            option.style.paddingLeft = '20px';
-                            option.style.fontStyle = 'italic';
+                            option.textContent = `  - ${subCode} - ${subInfo.name}`;
+                            option.style.paddingLeft = '15px';
                             classFilter.appendChild(option);
                         });
                 }
@@ -1274,7 +1273,7 @@
                         });
                     
                     if (getPrimaryClasses().length > 15) {
-                        html += '<div style="font-style: italic; color: #666; margin-top: 8px;">+ additional classes (use filter to see specific classes)</div>';
+                        html += '<div style="font-style: italic; color: #666; margin-top: 8px; word-wrap: break-word;">+ additional classes<br>(use filter to see specific classes)</div>';
                     }
                 }
             } else if (colorBy === 'value') {
@@ -1308,7 +1307,13 @@
             // Update total value section
             document.getElementById('total-parcels').textContent = formatNumber(allPropertiesCount);
             document.getElementById('all-total-value').textContent = '$' + formatLargeNumber(allPropertiesTotal);
-            document.getElementById('all-avg-value').textContent = '$' + formatLargeNumber(allPropertiesTotal / allPropertiesCount);
+            // Calculate median value for all properties
+            const allValues = [...propertyData.values()]
+                .map(p => parseFloat(p.total_value) || 0)
+                .filter(v => v > 0)
+                .sort((a, b) => a - b);
+            const allMedianValue = allValues.length > 0 ? allValues[Math.floor(allValues.length / 2)] : 0;
+            document.getElementById('all-median-value').textContent = '$' + formatLargeNumber(allMedianValue);
         }
 
         // Format large numbers with K, M, B suffixes
@@ -1347,7 +1352,19 @@
                 }
             }
             
-            const avgValue = visibleCount > 0 ? totalValue / visibleCount : 0;
+            // Calculate median value for filtered properties
+            let medianValue = 0;
+            if (visibleCount > 0) {
+                const values = [];
+                for (const [id, prop] of propertyData) {
+                    if (passesFilters(prop)) {
+                        const value = parseFloat(prop.total_value) || 0;
+                        if (value > 0) values.push(value);
+                    }
+                }
+                values.sort((a, b) => a - b);
+                medianValue = values.length > 0 ? values[Math.floor(values.length / 2)] : 0;
+            }
             const percentage = allPropertiesTotal > 0 ? (totalValue / allPropertiesTotal * 100) : 0;
             
             // Update filter description
@@ -1368,17 +1385,17 @@
             document.getElementById('filter-description').textContent = filterDesc;
             document.getElementById('visible-count').textContent = formatNumber(visibleCount);
             document.getElementById('total-value').textContent = formatLargeNumber(totalValue);
-            document.getElementById('avg-value').textContent = formatLargeNumber(avgValue);
+            document.getElementById('median-value').textContent = formatLargeNumber(medianValue);
             
             // Calculate all percentages
             const parcelPercentage = allPropertiesCount > 0 ? (visibleCount / allPropertiesCount * 100) : 0;
             const valuePercentage = allPropertiesTotal > 0 ? (totalValue / allPropertiesTotal * 100) : 0;
-            const allAvgValue = allPropertiesCount > 0 ? allPropertiesTotal / allPropertiesCount : 0;
-            const avgPercentage = allAvgValue > 0 ? (avgValue / allAvgValue * 100) : 0;
+            const allMedianValue = allValues.length > 0 ? allValues[Math.floor(allValues.length / 2)] : 0;
+            const medianPercentage = allMedianValue > 0 ? (medianValue / allMedianValue * 100) : 0;
             
             document.getElementById('parcel-percentage').textContent = parcelPercentage.toFixed(1) + '%';
             document.getElementById('value-percentage').textContent = valuePercentage.toFixed(1) + '%';
-            document.getElementById('avg-percentage').textContent = avgPercentage.toFixed(1) + '%';
+            document.getElementById('median-percentage').textContent = medianPercentage.toFixed(1) + '%';
         }
         
         // Apply filters
