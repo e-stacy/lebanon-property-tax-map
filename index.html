@@ -545,13 +545,34 @@
         // Populate filter dropdowns
         function populateFilters() {
             const classFilter = document.getElementById('class-filter');
-            const classes = [...new Set(allParcels.map(p => p.class_code).filter(c => c))].sort();
+            const yearFilter = document.getElementById('year-built-filter');
+            const zoneFilter = document.getElementById('zoning-filter');
             
+            // Populate property class filter
+            const classes = [...new Set(allParcels.map(p => p.class_code).filter(c => c))].sort();
             classes.forEach(cls => {
                 const option = document.createElement('option');
                 option.value = cls;
                 option.textContent = cls;
                 classFilter.appendChild(option);
+            });
+            
+            // Populate year built filter
+            const years = [...new Set(allParcels.map(p => p.year_built ? parseInt(p.year_built) : null).filter(y => y))].sort((a, b) => b - a);
+            years.forEach(year => {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearFilter.appendChild(option);
+            });
+            
+            // Populate zoning filter
+            const zones = [...new Set(allParcels.map(p => p.zoning).filter(z => z))].sort();
+            zones.forEach(zone => {
+                const option = document.createElement('option');
+                option.value = zone;
+                option.textContent = zone;
+                zoneFilter.appendChild(option);
             });
         }
 
@@ -559,6 +580,8 @@
         function applyFilters() {
             const searchTerm = document.getElementById('search').value.toLowerCase();
             const classFilter = document.getElementById('class-filter').value;
+            const yearFilter = document.getElementById('year-built-filter').value;
+            const zoneFilter = document.getElementById('zoning-filter').value;
             const minValue = parseNumber(document.getElementById('min-value').value);
             const maxValue = parseNumber(document.getElementById('max-value').value);
 
@@ -571,6 +594,16 @@
 
                 // Class filter
                 if (classFilter && parcel.class_code !== classFilter) {
+                    return false;
+                }
+                
+                // Year built filter
+                if (yearFilter && parseInt(parcel.year_built) != parseInt(yearFilter)) {
+                    return false;
+                }
+                
+                // Zoning filter
+                if (zoneFilter && parcel.zoning !== zoneFilter) {
                     return false;
                 }
 
