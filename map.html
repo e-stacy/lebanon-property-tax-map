@@ -7,7 +7,7 @@
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="filter-styles.css">
+    <link rel="stylesheet" href="simple-checkbox-styles.css">
     
     <style>
         body { 
@@ -187,20 +187,21 @@
                 </select>
             </div>
             
-            <div id="property-class-filter"></div>
-            
-            <div id="zoning-filter"></div>
-            
-            <div id="year-built-filter"></div>
+            <div class="filter-group">
+                <label>Property Class Filter:</label>
+                <select id="class-filter">
+                    <option value="">All Classes</option>
+                </select>
+            </div>
             
             <div class="filter-group">
-                <label>Value Range:</label>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <span style="font-size: 0.9em;">$</span>
-                    <input id="min-value" type="number" placeholder="0" style="width: 80px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;">
-                    <span style="font-size: 0.9em;">to $</span>
-                    <input id="max-value" type="number" placeholder="Any" style="width: 80px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;">
-                </div>
+                <label>Min Value ($):</label>
+                <input type="number" id="min-value" placeholder="0">
+            </div>
+            
+            <div class="filter-group">
+                <label>Max Value ($):</label>
+                <input type="number" id="max-value" placeholder="Any">
             </div>
             
             <div class="filter-group">
@@ -1566,61 +1567,34 @@
         document.addEventListener('DOMContentLoaded', initMap);
     </script>
     
-    <!-- Hierarchical Filter System -->
-    <script src="filter-system.js"></script>
+    <!-- Simple Checkbox Filter System -->
+    <script src="simple-checkbox-filters.js"></script>
     <script>
-        let mapFilterSystem = null;
+        // Initialize checkboxes after data loads for map
+        const originalPopulateFilterss = populateFilters;
+        populateFilters = function() {
+            originalPopulateFilterss();
+            
+            // Get property class counts from loaded data
+            const propertyClasses = {};
+            propertyData.forEach(prop => {
+                const classCode = prop.class_code;
+                if (classCode) {
+                    propertyClasses[classCode] = (propertyClasses[classCode] || 0) + 1;
+                }
+            });
+            
+            // Initialize checkbox filters
+            initializeCheckboxFilters(propertyClasses);
+        };
         
-        // Initialize hierarchical filters after data loads
-        function initializeMapHierarchicalFilters() {
-            if (propertyData.size > 0 && window.filterSystem) {
-                console.log('Initializing map hierarchical filters with', propertyData.size, 'properties');
-                
-                // Convert map to array for filter system
-                const parcelArray = Array.from(propertyData.values());
-                
-                // Build filters from actual data
-                window.filterSystem.buildFiltersFromData(parcelArray);
-                
-                // Create filter UI components
-                window.filterSystem.createPropertyClassFilter('property-class-filter');
-                window.filterSystem.createZoningFilter('zoning-filter');
-                window.filterSystem.createYearBuiltFilter('year-built-filter');
-                
-                // Override the filter system's apply function to update map
-                window.filterSystem.applyFilters = function() {
-                    applyFilters();
-                };
-                
-                console.log('Map hierarchical filters initialized successfully');
-                mapFilterSystem = window.filterSystem;
-            }
-        }
-        
-        // Update the existing applyFilters function to work with hierarchical filters
-        const originalApplyFilters = applyFilters;
+        // Update the existing applyFilters function to work with checkboxes
+        const originalApplyFilterss = applyFilters;
         applyFilters = function() {
-            if (!mapFilterSystem) {
-                return originalApplyFilters();
-            }
+            // Get selected property classes from checkboxes
+            const selectedClasses = getSelectedValues('class-filter');
             
-            console.log('Applying hierarchical filters on map');
-            
-            // Get value filters
-            const minValue = document.getElementById('min-value').value;
-            const maxValue = document.getElementById('max-value').value;
-            
-            // Update value filters in filter system
-            if (minValue || maxValue) {
-                mapFilterSystem.filters.valueRange = {
-                    min: minValue ? parseFloat(minValue) : null,
-                    max: maxValue ? parseFloat(maxValue) : null
-                };
-            } else {
-                mapFilterSystem.filters.valueRange = { min: null, max: null };
-            }
-            
-            // Apply filters to parcel layer
+            // Apply filters to map layers
             let visibleCount = 0;
             let totalValue = 0;
             let visibleValues = [];
@@ -1632,18 +1606,21 @@
                 let isVisible = true;
                 
                 if (prop) {
-                    // Apply hierarchical filters
-                    isVisible = mapFilterSystem.matchesFilters(prop);
+                    // Property class filter
+                    if (selectedClasses.length > 0 && selectedClasses[0] !== '') {
+                        if (!selectedClasses.includes(prop.class_code)) {
+                            isVisible = false;
+                        }
+                    }
                     
-                    // Apply value range filter
+                    // Value range filter
                     if (isVisible) {
-                        const value = parseFloat(prop.total_value) || 0;
-                        if (mapFilterSystem.filters.valueRange.min && value < mapFilterSystem.filters.valueRange.min) {
-                            isVisible = false;
-                        }
-                        if (mapFilterSystem.filters.valueRange.max && value > mapFilterSystem.filters.valueRange.max) {
-                            isVisible = false;
-                        }
+                        const minValue = parseFloat(document.getElementById('min-value').value);
+                        const maxValue = parseFloat(document.getElementById('max-value').value);
+                        const totalVal = parseFloat(prop.total_value) || 0;
+                        
+                        if (!isNaN(minValue) && totalVal < minValue) isVisible = false;
+                        if (!isNaN(maxValue) && totalVal > maxValue) isVisible = false;
                     }
                     
                     if (isVisible) {
@@ -1681,94 +1658,8 @@
             
             document.getElementById('parcel-percentage').textContent = totalParcels > 0 ? ((visibleCount / totalParcels) * 100).toFixed(1) + '%' : '0%';
             document.getElementById('value-percentage').textContent = allTotalValue > 0 ? ((totalValue / allTotalValue) * 100).toFixed(1) + '%' : '0%';
-            
-            // Update filter description
-            if (mapFilterSystem) {
-                const summary = mapFilterSystem.getFilterSummary();
-                const additionalFilters = [];
-                if (minValue || maxValue) {
-                    const range = `${minValue ? '$' + (minValue/1000).toFixed(0) + 'K' : 'Any'} - ${maxValue ? '$' + (maxValue/1000).toFixed(0) + 'K' : 'Any'}`;
-                    additionalFilters.push(`Value: ${range}`);
-                }
-                
-                let fullSummary = summary;
-                if (additionalFilters.length > 0) {
-                    if (summary !== 'All Properties') {
-                        fullSummary += ', ' + additionalFilters.join(', ');
-                    } else {
-                        fullSummary = additionalFilters.join(', ');
-                    }
-                }
-                
-                document.getElementById('filter-description').textContent = fullSummary;
-            }
-            
-            console.log(`Applied filters: ${visibleCount} visible parcels, $${(totalValue/1000000).toFixed(1)}M total value`);
         };
-        
-        // Update the existing clearFilters function
-        const originalClearFilters = clearFilters;
-        clearFilters = function() {
-            if (mapFilterSystem) {
-                mapFilterSystem.clearAllFilters();
-            }
-            
-            // Clear value inputs
-            document.getElementById('min-value').value = '';
-            document.getElementById('max-value').value = '';
-            
-            // Reset to show all parcels
-            if (parcelsLayer) {
-                parcelsLayer.eachLayer(function(layer) {
-                    layer.addTo(map);
-                });
-            }
-            
-            // Reset statistics to full dataset
-            updateStats();
-            document.getElementById('filter-description').textContent = 'All Properties';
-            
-            console.log('All filters cleared');
-        };
-        
-        // Hook into the original updateStats function to initialize filters
-        const originalUpdateStats = updateStats;
-        updateStats = function() {
-            originalUpdateStats();
-            
-            // Initialize hierarchical filters after data loads
-            if (propertyData.size > 0 && !window.mapFiltersInitialized) {
-                setTimeout(() => {
-                    initializeMapHierarchicalFilters();
-                    window.mapFiltersInitialized = true;
-                }, 500);
-            }
-        };
-        
-        // Add value range filter event listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                ['min-value', 'max-value'].forEach(id => {
-                    const input = document.getElementById(id);
-                    if (input) {
-                        input.addEventListener('input', function() {
-                            if (mapFilterSystem) {
-                                applyFilters();
-                            }
-                        });
-                    }
-                });
-            }, 1000);
-        });
-        
-        // Add support for clicking outside dropdowns to close them
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.filter-dropdown')) {
-                document.querySelectorAll('.filter-dropdown.open').forEach(dropdown => {
-                    dropdown.classList.remove('open');
-                });
-            }
-        });
     </script>
+    
 </body>
 </html>

@@ -1,0 +1,118 @@
+/* Simple Checkbox Filter Styles */
+.checkbox-filter {
+    margin-bottom: 10px;
+}
+
+.filter-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #2c3e50;
+}
+
+.checkbox-dropdown {
+    position: relative;
+}
+
+.dropdown-button {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-width: 200px;
+}
+
+.dropdown-button:hover {
+    border-color: #2196F3;
+}
+
+.dropdown-arrow {
+    font-size: 0.8em;
+    transition: transform 0.2s;
+}
+
+.checkbox-list {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    margin: 0;
+}
+
+.checkbox-item:hover {
+    background-color: #f8f9fa;
+}
+
+.checkbox-item:last-child {
+    border-bottom: none;
+}
+
+.checkbox-item input[type="checkbox"] {
+    margin-right: 8px;
+    margin: 0 8px 0 0;
+}
+
+.checkbox-item span {
+    font-size: 0.9em;
+    flex-grow: 1;
+}
+
+/* Map-specific adjustments */
+.map-controls .checkbox-filter {
+    margin-bottom: 15px;
+}
+
+.map-controls .dropdown-button {
+    min-width: 180px;
+}
+
+.map-controls .checkbox-list {
+    max-height: 200px;
+}
+
+/* Table interface adjustments */
+.controls .checkbox-filter {
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.controls .dropdown-button {
+    min-width: 160px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dropdown-button {
+        min-width: 150px;
+    }
+    
+    .checkbox-list {
+        max-height: 180px;
+    }
+    
+    .controls .checkbox-filter {
+        display: block;
+        margin-bottom: 10px;
+        margin-right: 0;
+    }
+}

@@ -7,7 +7,7 @@
     <meta name="description" content="Lebanon NH property tax database - 5,622 properties with assessments, building details, and NHDRA data. Direct access to CSV files for analysis.">
     <meta name="keywords" content="Lebanon New Hampshire property tax assessment database CSV data transparency">
     <link rel="canonical" href="https://e-stacy.github.io/lebanon-property-tax-map/">
-    <link rel="stylesheet" href="filter-styles.css">
+    <link rel="stylesheet" href="simple-checkbox-styles.css">
     <style>
         body { 
             font-family: system-ui, Arial, sans-serif; 
@@ -338,34 +338,27 @@
             </div>
         </div>
         
-        <!-- New Hierarchical Filter Section -->
-        <div class="filter-summary" id="filter-summary" style="display: none;">
-            <div class="summary-text">Active Filters: <span id="filter-description">All Properties</span></div>
-        </div>
-        
-        <div class="control-row" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-            <div id="property-class-filter"></div>
-            <div id="zoning-filter"></div>
-            <div id="year-built-filter"></div>
-            <div class="filter-group">
-                <label>Value Range:</label>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <span style="font-size: 0.9em;">$</span>
-                    <input id="min-value" type="number" placeholder="0" style="width: 100px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;">
-                    <span style="font-size: 0.9em;">to $</span>
-                    <input id="max-value" type="number" placeholder="Any" style="width: 100px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;">
-                </div>
-            </div>
-        </div>
-        <div class="filter-actions">
-            <button class="btn btn-primary" onclick="applyAllFilters()">Apply Filters</button>
-            <button class="btn btn-secondary" onclick="clearAllFilters()">Clear All</button>
+            <label>
+                Property Class:
+                <select id="class-filter">
+                    <option value="">All Classes</option>
+                </select>
+            </label>
+            <label>
+                Min Value: $
+                <input id="min-value" type="number" placeholder="0" style="width: 120px;">
+            </label>
+            <label>
+                Max Value: $
+                <input id="max-value" type="number" placeholder="Any" style="width: 120px;">
+            </label>
         </div>
         
         <div class="action-buttons">
             <button class="btn btn-success" onclick="exportFilteredData()">📊 Export CSV</button>
             <button class="btn btn-warning" onclick="toggleAnalytics()">📈 Analytics</button>
             <button class="btn" onclick="toggleComparison()">⚖️ Compare</button>
+            <button class="btn" onclick="clearFilters()">🔄 Reset Filters</button>
         </div>
         <div style="color: #666; font-size: 0.9em;">
             Showing <span id="filtered-count">0</span> properties
@@ -975,71 +968,43 @@
         }
     </script>
     
-    <!-- Hierarchical Filter System -->
-    <script src="filter-system.js"></script>
+    <!-- Simple Checkbox Filter System -->
+    <script src="simple-checkbox-filters.js"></script>
     <script>
-        // Initialize hierarchical filters after data loads
-        function initializeHierarchicalFilters() {
-            if (allParcels.length > 0 && window.filterSystem) {
-                console.log('Initializing hierarchical filters with', allParcels.length, 'parcels');
-                
-                // Build filters from actual data
-                filterSystem.buildFiltersFromData(allParcels);
-                
-                // Create filter UI components
-                filterSystem.createPropertyClassFilter('property-class-filter');
-                filterSystem.createZoningFilter('zoning-filter');
-                filterSystem.createYearBuiltFilter('year-built-filter');
-                
-                // Connect value range filters
-                ['min-value', 'max-value'].forEach(id => {
-                    const input = document.getElementById(id);
-                    if (input) {
-                        input.addEventListener('input', () => {
-                            updateFilterSummary();
-                            applyAllFilters();
-                        });
-                    }
-                });
-                
-                console.log('Hierarchical filters initialized successfully');
-            }
-        }
+        // Initialize checkboxes after data loads
+        const originalPopulateFilters = populateFilters;
+        populateFilters = function() {
+            originalPopulateFilters();
+            
+            // Get property class counts from loaded data
+            const propertyClasses = {};
+            allParcels.forEach(parcel => {
+                const classCode = parcel.class_code;
+                if (classCode) {
+                    propertyClasses[classCode] = (propertyClasses[classCode] || 0) + 1;
+                }
+            });
+            
+            // Initialize checkbox filters
+            initializeCheckboxFilters(propertyClasses);
+        };
         
-        // Apply all filters function
-        function applyAllFilters() {
-            if (!window.filterSystem) return;
+        // Update the existing applyFilters function to work with checkboxes
+        const originalApplyFilters = applyFilters;
+        applyFilters = function() {
+            // Get selected property classes from checkboxes
+            const selectedClasses = getSelectedValues('class-filter');
             
-            // Update value filters in filter system
-            const minValue = document.getElementById('min-value').value;
-            const maxValue = document.getElementById('max-value').value;
-            
-            if (minValue || maxValue) {
-                filterSystem.filters.valueRange = {
-                    min: minValue ? parseFloat(minValue) : null,
-                    max: maxValue ? parseFloat(maxValue) : null
-                };
-            } else {
-                filterSystem.filters.valueRange = { min: null, max: null };
-            }
-            
-            // Apply all filters
+            // Apply filters using existing logic
             filteredParcels = allParcels.filter(parcel => {
-                // Apply hierarchical filters
-                if (!filterSystem.matchesFilters(parcel)) {
-                    return false;
+                // Property class filter
+                if (selectedClasses.length > 0 && selectedClasses[0] !== '') {
+                    if (!selectedClasses.includes(parcel.class_code)) {
+                        return false;
+                    }
                 }
                 
-                // Apply value range filter
-                const totalValue = parseFloat(parcel.total_value) || 0;
-                if (filterSystem.filters.valueRange.min && totalValue < filterSystem.filters.valueRange.min) {
-                    return false;
-                }
-                if (filterSystem.filters.valueRange.max && totalValue > filterSystem.filters.valueRange.max) {
-                    return false;
-                }
-                
-                // Apply search filter if exists
+                // Search filter
                 const searchTerm = document.getElementById('search').value.toLowerCase();
                 if (searchTerm) {
                     const searchFields = [
@@ -1053,103 +1018,23 @@
                     }
                 }
                 
+                // Value range filter
+                const minValue = parseFloat(document.getElementById('min-value').value);
+                const maxValue = parseFloat(document.getElementById('max-value').value);
+                const totalValue = parseFloat(parcel.total_value) || 0;
+                
+                if (!isNaN(minValue) && totalValue < minValue) return false;
+                if (!isNaN(maxValue) && totalValue > maxValue) return false;
+                
                 return true;
             });
             
             // Update display
+            currentPage = 1;
             renderTable();
-            updateFilterSummary();
             updateStats();
-        }
-        
-        // Clear all filters function
-        function clearAllFilters() {
-            if (window.filterSystem) {
-                filterSystem.clearAllFilters();
-            }
-            
-            // Clear search and value inputs
-            document.getElementById('search').value = '';
-            document.getElementById('min-value').value = '';
-            document.getElementById('max-value').value = '';
-            
-            // Reset filtered data
-            filteredParcels = [...allParcels];
-            
-            // Update display
-            renderTable();
-            updateFilterSummary();
-            updateStats();
-        }
-        
-        // Update filter summary
-        function updateFilterSummary() {
-            const summaryElement = document.getElementById('filter-summary');
-            const descriptionElement = document.getElementById('filter-description');
-            
-            if (!window.filterSystem) return;
-            
-            const summary = filterSystem.getFilterSummary();
-            const searchTerm = document.getElementById('search').value;
-            const minValue = document.getElementById('min-value').value;
-            const maxValue = document.getElementById('max-value').value;
-            
-            let additionalFilters = [];
-            if (searchTerm) additionalFilters.push(`Search: "${searchTerm}"`);
-            if (minValue || maxValue) {
-                const range = `${minValue ? '$' + formatNumber(minValue) : 'Any'} - ${maxValue ? '$' + formatNumber(maxValue) : 'Any'}`;
-                additionalFilters.push(`Value: ${range}`);
-            }
-            
-            let fullSummary = summary;
-            if (additionalFilters.length > 0) {
-                if (summary !== 'All Properties') {
-                    fullSummary += ', ' + additionalFilters.join(', ');
-                } else {
-                    fullSummary = additionalFilters.join(', ');
-                }
-            }
-            
-            descriptionElement.textContent = fullSummary;
-            
-            // Show/hide summary based on active filters
-            const hasActiveFilters = summary !== 'All Properties' || additionalFilters.length > 0;
-            summaryElement.style.display = hasActiveFilters ? 'block' : 'none';
-        }
-        
-        // Initialize filters after the original data loads
-        const originalUpdateStats = updateStats;
-        updateStats = function() {
-            originalUpdateStats();
-            
-            // Initialize hierarchical filters after data loads
-            if (allParcels.length > 0 && !window.filtersInitialized) {
-                setTimeout(() => {
-                    initializeHierarchicalFilters();
-                    updateFilterSummary();
-                    window.filtersInitialized = true;
-                }, 200);
-            }
         };
-        
-        // Override search functionality to work with hierarchical filters
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('search');
-            if (searchInput) {
-                searchInput.addEventListener('input', function() {
-                    applyAllFilters();
-                });
-            }
-        });
-        
-        // Add support for clicking outside dropdowns to close them
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.filter-dropdown')) {
-                document.querySelectorAll('.filter-dropdown.open').forEach(dropdown => {
-                    dropdown.classList.remove('open');
-                });
-            }
-        });
     </script>
+    
 </body>
 </html>
