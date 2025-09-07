@@ -376,7 +376,7 @@
         .dropdown-option:last-child {
             border-bottom: none;
         }
-        .dropdown-option input[type="radio"] {
+        .dropdown-option input[type="checkbox"] {
             margin: 0 8px 0 0;
             width: auto;
         }
@@ -430,7 +430,7 @@
                     </div>
                     <div class="dropdown-menu" id="class-menu">
                         <div class="dropdown-option" data-value="">
-                            <input type="radio" name="class-filter" id="class-all" checked>
+                            <input type="checkbox" id="class-all" checked>
                             <label for="class-all">All Classes</label>
                         </div>
                     </div>
@@ -445,7 +445,7 @@
                     </div>
                     <div class="dropdown-menu" id="year-menu">
                         <div class="dropdown-option" data-value="">
-                            <input type="radio" name="year-filter" id="year-all" checked>
+                            <input type="checkbox" id="year-all" checked>
                             <label for="year-all">All Years</label>
                         </div>
                     </div>
@@ -460,7 +460,7 @@
                     </div>
                     <div class="dropdown-menu" id="zone-menu">
                         <div class="dropdown-option" data-value="">
-                            <input type="radio" name="zone-filter" id="zone-all" checked>
+                            <input type="checkbox" id="zone-all" checked>
                             <label for="zone-all">All Zones</label>
                         </div>
                     </div>
@@ -541,9 +541,9 @@
         // Custom dropdown functionality
         let openDropdown = null;
         let selectedFilters = {
-            class: '',
-            year: '',
-            zone: ''
+            class: [],
+            year: [],
+            zone: []
         };
 
         // Parse CSV line handling quoted fields properly
@@ -694,39 +694,59 @@
             const textElement = document.getElementById(type + '-text');
             const selected = selectedFilters[type];
             
-            if (!selected) {
+            if (selected.length === 0) {
                 const defaultText = type === 'class' ? 'All Classes' : 
                                   type === 'year' ? 'All Years' : 'All Zones';
                 textElement.textContent = defaultText;
                 textElement.style.color = '#666';
-            } else {
-                // Show the selected option name
-                if (type === 'class' && propertyClassHierarchy[selected]) {
-                    textElement.textContent = `${selected} - ${propertyClassHierarchy[selected].name}`;
+            } else if (selected.length === 1) {
+                // Show the single selected option name
+                if (type === 'class' && propertyClassHierarchy[selected[0]]) {
+                    textElement.textContent = `${selected[0]} - ${propertyClassHierarchy[selected[0]].name}`;
                 } else {
-                    textElement.textContent = selected;
+                    textElement.textContent = selected[0];
                 }
+                textElement.style.color = '#333';
+            } else {
+                textElement.textContent = `${selected.length} selected`;
                 textElement.style.color = '#333';
             }
         }
         
-        function handleDropdownSelection(type, value) {
-            // Clear all checkboxes in this dropdown first
+        function handleDropdownSelection(type, value, checked) {
             const menu = document.getElementById(type + '-menu');
-            const checkboxes = menu.querySelectorAll('input[type="radio"]');
-            checkboxes.forEach(cb => cb.checked = false);
+            const allCheckbox = document.getElementById(`${type}-all`);
             
-            // Set the selected value
-            selectedFilters[type] = value;
-            
-            // Check the selected radio button
-            const selectedRadio = document.getElementById(`${type}-${value || 'all'}`);
-            if (selectedRadio) {
-                selectedRadio.checked = true;
+            if (value === '') {
+                // "All" option selected
+                if (checked) {
+                    // Uncheck all other options and clear the array
+                    const otherCheckboxes = menu.querySelectorAll('input[type="checkbox"]:not(#' + type + '-all)');
+                    otherCheckboxes.forEach(cb => cb.checked = false);
+                    selectedFilters[type] = [];
+                } else {
+                    // "All" unchecked, keep current selections
+                }
+            } else {
+                // Specific option selected
+                if (checked) {
+                    // Uncheck "All" option first
+                    if (allCheckbox) allCheckbox.checked = false;
+                    // Add to selection if not already there
+                    if (!selectedFilters[type].includes(value)) {
+                        selectedFilters[type].push(value);
+                    }
+                } else {
+                    // Remove from selection
+                    selectedFilters[type] = selectedFilters[type].filter(v => v !== value);
+                    // If no selections left, check "All" option
+                    if (selectedFilters[type].length === 0 && allCheckbox) {
+                        allCheckbox.checked = true;
+                    }
+                }
             }
             
             updateDropdownText(type);
-            closeDropdown(type);
             currentPage = 1;
             applyFilters();
         }
@@ -788,9 +808,20 @@
             const zoneMenu = document.getElementById('zone-menu');
             
             // Clear existing options (keep "All" options)
-            classMenu.innerHTML = '<div class="dropdown-option" onclick="handleDropdownSelection(\'class\', \'\')" data-value=""><input type="radio" name="class-filter" id="class-all" checked><label for="class-all">All Classes</label></div>';
-            yearMenu.innerHTML = '<div class="dropdown-option" onclick="handleDropdownSelection(\'year\', \'\')" data-value=""><input type="radio" name="year-filter" id="year-all" checked><label for="year-all">All Years</label></div>';
-            zoneMenu.innerHTML = '<div class="dropdown-option" onclick="handleDropdownSelection(\'zone\', \'\')" data-value=""><input type="radio" name="zone-filter" id="zone-all" checked><label for="zone-all">All Zones</label></div>';
+            classMenu.innerHTML = '<div class="dropdown-option" data-value=""><input type="checkbox" id="class-all" checked><label for="class-all">All Classes</label></div>';
+            yearMenu.innerHTML = '<div class="dropdown-option" data-value=""><input type="checkbox" id="year-all" checked><label for="year-all">All Years</label></div>';
+            zoneMenu.innerHTML = '<div class="dropdown-option" data-value=""><input type="checkbox" id="zone-all" checked><label for="zone-all">All Zones</label></div>';
+            
+            // Add event listeners for "All" checkboxes
+            document.getElementById('class-all').addEventListener('change', (e) => {
+                handleDropdownSelection('class', '', e.target.checked);
+            });
+            document.getElementById('year-all').addEventListener('change', (e) => {
+                handleDropdownSelection('year', '', e.target.checked);
+            });
+            document.getElementById('zone-all').addEventListener('change', (e) => {
+                handleDropdownSelection('zone', '', e.target.checked);
+            });
             
             // Populate property class filter with hierarchical structure
             const usedClasses = new Set(allParcels.map(p => p.class_code).filter(c => c));
@@ -807,9 +838,14 @@
                     const option = document.createElement('div');
                     option.className = 'dropdown-option';
                     option.dataset.value = code;
-                    option.innerHTML = `<input type="radio" name="class-filter" id="class-${code}"><label for="class-${code}">${code} - ${name}</label>`;
-                    option.onclick = () => handleDropdownSelection('class', code);
+                    option.innerHTML = `<input type="checkbox" id="class-${code}"><label for="class-${code}">${code} - ${name}</label>`;
                     classMenu.appendChild(option);
+                    
+                    // Add event listener
+                    const checkbox = option.querySelector('input');
+                    checkbox.addEventListener('change', (e) => {
+                        handleDropdownSelection('class', code, e.target.checked);
+                    });
                 }
                 
                 // Add subclass options (indented)
@@ -821,9 +857,14 @@
                             const option = document.createElement('div');
                             option.className = 'dropdown-option';
                             option.dataset.value = subcode;
-                            option.innerHTML = `<input type="radio" name="class-filter" id="class-${subcode}"><label for="class-${subcode}" style="padding-left: 20px;">${subcode} - ${propertyClassHierarchy[subcode].name}</label>`;
-                            option.onclick = () => handleDropdownSelection('class', subcode);
+                            option.innerHTML = `<input type="checkbox" id="class-${subcode}"><label for="class-${subcode}" style="padding-left: 20px;">${subcode} - ${propertyClassHierarchy[subcode].name}</label>`;
                             classMenu.appendChild(option);
+                            
+                            // Add event listener
+                            const checkbox = option.querySelector('input');
+                            checkbox.addEventListener('change', (e) => {
+                                handleDropdownSelection('class', subcode, e.target.checked);
+                            });
                         });
                 }
             });
@@ -834,9 +875,14 @@
                 const option = document.createElement('div');
                 option.className = 'dropdown-option';
                 option.dataset.value = year;
-                option.innerHTML = `<input type="radio" name="year-filter" id="year-${year}"><label for="year-${year}">${year}</label>`;
-                option.onclick = () => handleDropdownSelection('year', year.toString());
+                option.innerHTML = `<input type="checkbox" id="year-${year}"><label for="year-${year}">${year}</label>`;
                 yearMenu.appendChild(option);
+                
+                // Add event listener
+                const checkbox = option.querySelector('input');
+                checkbox.addEventListener('change', (e) => {
+                    handleDropdownSelection('year', year.toString(), e.target.checked);
+                });
             });
             
             // Populate zoning filter
@@ -845,9 +891,14 @@
                 const option = document.createElement('div');
                 option.className = 'dropdown-option';
                 option.dataset.value = zone;
-                option.innerHTML = `<input type="radio" name="zone-filter" id="zone-${zone}"><label for="zone-${zone}">${zone}</label>`;
-                option.onclick = () => handleDropdownSelection('zone', zone);
+                option.innerHTML = `<input type="checkbox" id="zone-${zone}"><label for="zone-${zone}">${zone}</label>`;
                 zoneMenu.appendChild(option);
+                
+                // Add event listener
+                const checkbox = option.querySelector('input');
+                checkbox.addEventListener('change', (e) => {
+                    handleDropdownSelection('zone', zone, e.target.checked);
+                });
             });
         }
 
@@ -857,26 +908,26 @@
             const maxValue = parseNumber(document.getElementById('max-value').value);
 
             // Get selected values from custom dropdowns
-            const selectedClass = selectedFilters.class;
-            const selectedYear = selectedFilters.year;
-            const selectedZone = selectedFilters.zone;
+            const selectedClasses = selectedFilters.class;
+            const selectedYears = selectedFilters.year;
+            const selectedZones = selectedFilters.zone;
 
             filteredParcels = allParcels.filter(parcel => {
                 // Class filter with hierarchical support
-                if (selectedClass) {
-                    const allowedClasses = getClassesForFilter([selectedClass]);
+                if (selectedClasses.length > 0) {
+                    const allowedClasses = getClassesForFilter(selectedClasses);
                     if (!allowedClasses.includes(parcel.class_code)) {
                         return false;
                     }
                 }
                 
-                // Year built filter (single selection)
-                if (selectedYear && selectedYear !== String(parseInt(parcel.year_built) || '')) {
+                // Year built filter (multiple selection)
+                if (selectedYears.length > 0 && !selectedYears.includes(String(parseInt(parcel.year_built) || ''))) {
                     return false;
                 }
                 
-                // Zoning filter (single selection)
-                if (selectedZone && selectedZone !== parcel.zoning) {
+                // Zoning filter (multiple selection)
+                if (selectedZones.length > 0 && !selectedZones.includes(parcel.zoning)) {
                     return false;
                 }
 
@@ -985,21 +1036,21 @@
         // Clear all filters
         function clearFilters() {
             // Reset all dropdown selections
-            selectedFilters = { class: '', year: '', zone: '' };
+            selectedFilters = { class: [], year: [], zone: [] };
             
             // Update dropdown texts
             updateDropdownText('class');
             updateDropdownText('year');
             updateDropdownText('zone');
             
-            // Set "All" radio buttons as checked
+            // Reset all checkboxes
             ['class', 'year', 'zone'].forEach(type => {
                 const menu = document.getElementById(type + '-menu');
-                const radios = menu.querySelectorAll('input[type="radio"]');
-                radios.forEach(rb => rb.checked = false);
+                const checkboxes = menu.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(cb => cb.checked = false);
                 // Check the "All" option
-                const allRadio = document.getElementById(type + '-all');
-                if (allRadio) allRadio.checked = true;
+                const allCheckbox = document.getElementById(type + '-all');
+                if (allCheckbox) allCheckbox.checked = true;
             });
             
             document.getElementById('min-value').value = '';
