@@ -14,7 +14,7 @@
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 16px 20px;
+            padding: 8px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -22,23 +22,24 @@
         }
         .header-left h1 {
             margin: 0;
-            font-size: 1.6em;
+            font-size: 1.3em;
             font-weight: 600;
         }
         .header-left p {
-            margin: 4px 0 0 0;
-            font-size: 0.85em;
+            margin: 2px 0 0 0;
+            font-size: 0.75em;
             opacity: 0.9;
         }
         .header-right .btn {
             background: rgba(255,255,255,0.2);
             border: 2px solid rgba(255,255,255,0.3);
             color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 6px 12px;
+            border-radius: 4px;
             text-decoration: none;
             font-weight: 500;
             transition: all 0.2s;
+            font-size: 0.85em;
         }
         .header-right .btn:hover {
             background: rgba(255,255,255,0.3);
@@ -47,32 +48,32 @@
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin: 20px;
+            gap: 12px;
+            margin: 15px 20px;
         }
         .stat-card {
             background: white;
-            padding: 16px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 6px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .stat-value {
-            font-size: 1.8em;
+            font-size: 1.5em;
             font-weight: bold;
             color: #2c3e50;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
         .stat-label {
             color: #7f8c8d;
-            font-size: 0.85em;
+            font-size: 0.75em;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         .controls {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 0 20px 20px 20px;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 0 20px 15px 20px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .control-row { 
@@ -111,21 +112,21 @@
             overflow-y: auto;
             overflow-x: hidden; /* Hide the built-in scrollbar */
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 120px; /* Space for fixed pagination and scrollbar */
-            height: 60vh; /* Fixed percentage of viewport height */
+            margin-bottom: 100px; /* Space for fixed pagination and scrollbar */
+            height: 65vh; /* Fixed percentage of viewport height */
             border: 1px solid #e1e5e9;
         }
         .horizontal-scroll {
             position: fixed;
-            bottom: 60px;
+            bottom: 50px;
             left: 20px;
             right: 20px;
-            height: 15px;
+            height: 12px;
             overflow-x: auto;
             overflow-y: hidden;
             background: #f8f9fa;
             border: 1px solid #e1e5e9;
-            border-radius: 4px;
+            border-radius: 3px;
             z-index: 999;
         }
         .scroll-content {
@@ -175,14 +176,15 @@
             table-layout: fixed;
         }
         th, td { 
-            padding: 8px 10px; 
+            padding: 4px 8px; 
             text-align: left; 
             border-bottom: 1px solid #e1e5e9;
-            font-size: 0.8em;
+            font-size: 0.75em;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             position: relative;
+            line-height: 1.2;
         }
         th { 
             background: #f8f9fa; 
@@ -193,6 +195,8 @@
             cursor: col-resize;
             user-select: none;
             min-width: 80px;
+            border-bottom: 2px solid #dee2e6;
+            z-index: 10;
         }
         th:hover {
             background: #e9ecef;
