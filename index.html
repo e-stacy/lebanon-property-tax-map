@@ -1117,16 +1117,19 @@
             summaryElement.style.display = hasActiveFilters ? 'block' : 'none';
         }
         
-        // Override the original loadParcels function to include filter initialization
-        const originalLoadParcels = loadParcels;
-        loadParcels = async function() {
-            await originalLoadParcels();
+        // Initialize filters after the original data loads
+        const originalUpdateStats = updateStats;
+        updateStats = function() {
+            originalUpdateStats();
             
             // Initialize hierarchical filters after data loads
-            setTimeout(() => {
-                initializeHierarchicalFilters();
-                updateFilterSummary();
-            }, 100);
+            if (allParcels.length > 0 && !window.filtersInitialized) {
+                setTimeout(() => {
+                    initializeHierarchicalFilters();
+                    updateFilterSummary();
+                    window.filtersInitialized = true;
+                }, 200);
+            }
         };
         
         // Override search functionality to work with hierarchical filters

@@ -1731,15 +1731,18 @@
             console.log('All filters cleared');
         };
         
-        // Hook into the original loadData function to initialize filters
-        const originalLoadData = loadData;
-        loadData = async function() {
-            await originalLoadData();
+        // Hook into the original updateStats function to initialize filters
+        const originalUpdateStats = updateStats;
+        updateStats = function() {
+            originalUpdateStats();
             
             // Initialize hierarchical filters after data loads
-            setTimeout(() => {
-                initializeMapHierarchicalFilters();
-            }, 500);
+            if (propertyData.size > 0 && !window.mapFiltersInitialized) {
+                setTimeout(() => {
+                    initializeMapHierarchicalFilters();
+                    window.mapFiltersInitialized = true;
+                }, 500);
+            }
         };
         
         // Add value range filter event listeners
