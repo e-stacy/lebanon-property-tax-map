@@ -81,12 +81,24 @@
             color: #666;
         }
         
-        select, input {
+        select, input[type="text"], input[type="search"] {
             width: 100%;
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 0.9em;
+        }
+        
+        input[type="number"] {
+            width: calc(100% - 16px);
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        input[type="checkbox"] {
+            width: auto;
         }
         
         .color-legend {
@@ -300,23 +312,31 @@
         let currentFilters = {};
         
         // Color schemes for different visualization modes
+        // Define actual property class codes used in Lebanon, NH
+        const lebanonClassCodes = ['013R','0310','0430','1010','1012','101A','101C','101T','1020','102C','102V','1030','103V','1040','1050','1060','1090','1100','1110','111C','1120','112C','1210','1300','1310','1320','3000','3010','3040','3050','3110','3160','316C','3230','323I','3240','3250','325I','325R','325V','3260','3300','3310','3320','3330','333V','3340','3350','3370','3380','3400','340I','340R','3410','3420','3520','3530','3540','354C','3550','3740','3800','3880','3900','3910','3920','4000','400C','4010','401V','4020','402C','4040','4100','410V','4270','4300','430V','4310','433C','4400','4410','4420','4440','4500','450I','6000','6001','6111','6120','6121','6200','6201','6210','6211','6220','6221','6230','6231','9000','900I','9010','901C','901I','9030','903C','903I','903R','9040','9050','905I','905R','905V','9060','906R','9080','908R','9090','9130','913C','9150','9200','9550','9700','9730','9740','9780'];
+        
+        // Generate colors for all actual Lebanon class codes
+        function generateClassColors() {
+            const colors = {};
+            const colorPalette = [
+                '#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#e67e22', '#1abc9c', '#34495e',
+                '#f1c40f', '#d35400', '#8e44ad', '#27ae60', '#2980b9', '#16a085', '#c0392b', '#7f8c8d',
+                '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4',
+                '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722',
+                '#795548', '#9e9e9e', '#607d8b', '#ff1744', '#f50057', '#d500f9', '#651fff', '#3d5afe',
+                '#2979ff', '#00b0ff', '#00e5ff', '#1de9b6', '#00e676', '#76ff03', '#c6ff00', '#ffff00',
+                '#ffd600', '#ffab00', '#ff6d00', '#dd2c00', '#bf360c', '#3e2723', '#212121', '#263238'
+            ];
+            
+            lebanonClassCodes.forEach((code, index) => {
+                colors[code] = colorPalette[index % colorPalette.length];
+            });
+            colors['default'] = '#95a5a6';
+            return colors;
+        }
+        
         const colorSchemes = {
-            class: {
-                '1010': '#e74c3c', // Residential - Red
-                '1020': '#e67e22', // Mobile Home - Orange  
-                '1030': '#f39c12', // Condo - Yellow
-                '1040': '#27ae60', // Apartment - Green
-                '1300': '#f1c40f', // Vacant Land - Bright Yellow
-                '1320': '#e8c547', // Small Parcels - Light Yellow
-                '2010': '#3498db', // Commercial - Blue
-                '2020': '#9b59b6', // Industrial - Purple
-                '3010': '#34495e', // Utilities - Dark Gray
-                '3020': '#95a5a6', // Other - Light Gray
-                '3520': '#2980b9', // Commercial (alt) - Dark Blue
-                '9030': '#7f8c8d', // Municipal - Gray
-                '9090': '#bdc3c7', // Association - Light Gray
-                'default': '#95a5a6'
-            },
+            class: generateClassColors(),
             value: {
                 ranges: [
                     { min: 0, max: 100000, color: '#2ecc71' },
@@ -794,20 +814,135 @@
         }
         
         // Class code descriptions
+        // Enhanced class descriptions for Lebanon property classes
         const classDescriptions = {
-            '1010': 'Residential',
-            '1020': 'Mobile Home',
+            '013R': 'Seasonal Residential',
+            '0310': 'Seasonal Land',
+            '0430': 'Forest Land',
+            '1010': 'Residential Single Family',
+            '1012': 'Residential Multi-Unit',
+            '101A': 'Residential Accessory',
+            '101C': 'Residential Commercial',
+            '101T': 'Residential Temp',
+            '1020': 'Manufactured Housing',
+            '102C': 'Manufactured Commercial',
+            '102V': 'Manufactured Village',
             '1030': 'Condominium',
-            '1040': 'Apartment',
-            '1300': 'Vacant Land',
-            '1320': 'Small Parcel',
-            '2010': 'Commercial',
-            '2020': 'Industrial',
-            '3010': 'Utilities',
-            '3020': 'Other',
-            '3520': 'Commercial Alt',
-            '9030': 'Municipal',
-            '9090': 'Association'
+            '103V': 'Condo Village',
+            '1040': 'Multi-Family 2-4 Units',
+            '1050': 'Multi-Family 5+ Units',
+            '1060': 'Multi-Family Other',
+            '1090': 'Residential Other',
+            '1100': 'Dormitory',
+            '1110': 'Hotel/Motel',
+            '111C': 'Hotel Commercial',
+            '1120': 'Resort',
+            '112C': 'Resort Commercial',
+            '1210': 'Camp',
+            '1300': 'Vacant Residential Land',
+            '1310': 'Vacant Commercial Land',
+            '1320': 'Vacant Industrial Land',
+            '3000': 'Agricultural',
+            '3010': 'Agricultural Productive',
+            '3040': 'Agricultural Other',
+            '3050': 'Forest',
+            '3110': 'Vacant Rural',
+            '3160': 'Conservation/Preservation',
+            '316C': 'Conservation Commercial',
+            '3230': 'Wetlands',
+            '323I': 'Wetlands Industrial',
+            '3240': 'Floodplain',
+            '3250': 'Current Use',
+            '325I': 'Current Use Industrial',
+            '325R': 'Current Use Recreational',
+            '325V': 'Current Use Village',
+            '3260': 'Open Space',
+            '3300': 'Waste Disposal',
+            '3310': 'Mining/Quarrying',
+            '3320': 'Sand/Gravel',
+            '3330': 'Other Mining',
+            '333V': 'Mining Village',
+            '3340': 'Extractive Other',
+            '3350': 'Power Generation',
+            '3370': 'Communication',
+            '3380': 'Water Supply',
+            '3400': 'Transportation',
+            '340I': 'Transportation Industrial',
+            '340R': 'Transportation Recreational',
+            '3410': 'Utilities',
+            '3420': 'Other Utilities',
+            '3520': 'Wild/Forest Land',
+            '3530': 'Recreation Land',
+            '3540': 'Cemeteries',
+            '354C': 'Cemetery Commercial',
+            '3550': 'Other Land',
+            '3740': 'Parking',
+            '3800': 'Industrial Land',
+            '3880': 'Special Purpose',
+            '3900': 'Commercial Land',
+            '3910': 'Commercial Office',
+            '3920': 'Commercial Retail',
+            '4000': 'Commercial/Industrial',
+            '400C': 'Commercial Mix',
+            '4010': 'Office Building',
+            '401V': 'Office Village',
+            '4020': 'Bank',
+            '402C': 'Bank Commercial',
+            '4040': 'Professional Service',
+            '4100': 'Retail Trade',
+            '410V': 'Retail Village',
+            '4270': 'Auto Sales',
+            '4300': 'Warehouse',
+            '430V': 'Warehouse Village',
+            '4310': 'Mini Storage',
+            '433C': 'Storage Commercial',
+            '4400': 'Light Manufacturing',
+            '4410': 'Heavy Manufacturing',
+            '4420': 'Food Processing',
+            '4440': 'Other Manufacturing',
+            '4500': 'Research/Development',
+            '450I': 'Research Industrial',
+            '6000': 'Exempt Charitable',
+            '6001': 'Exempt Educational',
+            '6111': 'Exempt Religious',
+            '6120': 'Exempt Cemetery',
+            '6121': 'Exempt Cemetery Other',
+            '6200': 'Government Federal',
+            '6201': 'Government State',
+            '6210': 'Government County',
+            '6211': 'Government Municipal',
+            '6220': 'Government School',
+            '6221': 'Government School Other',
+            '6230': 'Government Hospital',
+            '6231': 'Government Other',
+            '9000': 'Municipal Property',
+            '900I': 'Municipal Industrial',
+            '9010': 'School District',
+            '901C': 'School Commercial',
+            '901I': 'School Industrial',
+            '9030': 'Water/Sewer Department',
+            '903C': 'Water/Sewer Commercial',
+            '903I': 'Water/Sewer Industrial',
+            '903R': 'Water/Sewer Recreational',
+            '9040': 'Parks/Recreation',
+            '9050': 'Fire Department',
+            '905I': 'Fire Industrial',
+            '905R': 'Fire Recreational',
+            '905V': 'Fire Village',
+            '9060': 'Highway Department',
+            '906R': 'Highway Recreational',
+            '9080': 'Other Municipal',
+            '908R': 'Municipal Recreational',
+            '9090': 'Municipal Association',
+            '9130': 'Electric Department',
+            '913C': 'Electric Commercial',
+            '9150': 'Airport',
+            '9200': 'Hospital',
+            '9550': 'Authority/Commission',
+            '9700': 'State Property',
+            '9730': 'State Forest',
+            '9740': 'State Park',
+            '9780': 'Other State'
         };
 
         // Update legend based on current color scheme
