@@ -991,8 +991,12 @@
             const minValue = parseFloat(document.getElementById('min-value').value) || 0;
             const maxValue = parseFloat(document.getElementById('max-value').value) || Infinity;
             
-            if (classFilter && property?.class_code !== classFilter) {
-                return false;
+            // Hierarchical class filtering
+            if (classFilter && property?.class_code) {
+                const allowedClasses = getClassesForFilter(classFilter);
+                if (!allowedClasses.includes(property.class_code)) {
+                    return false;
+                }
             }
             
             const value = parseFloat(property.total_value) || 0;
@@ -1032,17 +1036,55 @@
             `;
         }
         
-        // Populate class filter dropdown
+        // Populate hierarchical class filter dropdown
         function populateClassFilter(properties) {
             const classFilter = document.getElementById('class-filter');
-            const classes = [...new Set(properties.map(p => p?.class_code).filter(c => c))].sort();
+            const usedClasses = new Set(properties.map(p => p?.class_code).filter(c => c && propertyClassHierarchy[c]));
             
-            classes.forEach(cls => {
-                const option = document.createElement('option');
-                option.value = cls;
-                const description = classDescriptions[cls] || 'Unknown';
-                option.textContent = `${cls} - ${description}`;
-                classFilter.appendChild(option);
+            // Get primary classes that are actually used (either directly or have used subclasses)
+            const primaryClassesToShow = getPrimaryClasses().filter(({code}) => {
+                const classInfo = propertyClassHierarchy[code];
+                
+                // Show if primary class itself is used
+                if (usedClasses.has(code)) return true;
+                
+                // Show if any of its subclasses are used
+                if (classInfo.subclasses) {
+                    return classInfo.subclasses.some(sub => usedClasses.has(sub));
+                }
+                
+                return false;
+            });
+            
+            // Sort by class code for consistent ordering
+            primaryClassesToShow.sort((a, b) => a.code.localeCompare(b.code));
+            
+            primaryClassesToShow.forEach(({code, name}) => {
+                const classInfo = propertyClassHierarchy[code];
+                
+                // Add primary class option
+                if (usedClasses.has(code)) {
+                    const option = document.createElement('option');
+                    option.value = code;
+                    option.textContent = `${code} - ${name}`;
+                    classFilter.appendChild(option);
+                }
+                
+                // Add subclass options (indented)
+                if (classInfo.subclasses) {
+                    classInfo.subclasses
+                        .filter(sub => usedClasses.has(sub))
+                        .sort()
+                        .forEach(subCode => {
+                            const subInfo = propertyClassHierarchy[subCode];
+                            const option = document.createElement('option');
+                            option.value = subCode;
+                            option.textContent = `    ${subCode} - ${subInfo.name}`;
+                            option.style.paddingLeft = '20px';
+                            option.style.fontStyle = 'italic';
+                            classFilter.appendChild(option);
+                        });
+                }
             });
         }
         
@@ -1189,13 +1231,50 @@
             if (!shouldShowColorCoding()) {
                 html = '<div style="font-style: italic; color: #666; padding: 8px; background: #f8f9fa; border-radius: 4px;">Color Legend Overlay is disabled. Toggle to show color coding.</div>';
             } else if (colorBy === 'class') {
-                for (const [classCode, color] of Object.entries(colorSchemes.class)) {
-                    if (classCode !== 'default') {
-                        const description = classDescriptions[classCode] || 'Unknown';
-                        html += `<div class="color-legend">
-                            <div class="color-box" style="background-color: ${color}"></div>
-                            ${classCode} - ${description}
+                const classFilter = document.getElementById('class-filter').value;
+                
+                if (classFilter) {
+                    // Show legend for selected class hierarchy
+                    const allowedClasses = getClassesForFilter(classFilter);
+                    const classInfo = propertyClassHierarchy[classFilter];
+                    
+                    if (classInfo && classInfo.primary && classInfo.subclasses) {
+                        // Primary class selected - show it and its subclasses
+                        html += `<div class="color-legend" style="font-weight: bold; margin-bottom: 4px;">
+                            <div class="color-box" style="background-color: ${colorSchemes.class[classFilter]}"></div>
+                            ${classFilter} - ${classInfo.name}
                         </div>`;
+                        
+                        classInfo.subclasses
+                            .filter(sub => allowedClasses.includes(sub) && colorSchemes.class[sub])
+                            .forEach(subCode => {
+                                const subInfo = propertyClassHierarchy[subCode];
+                                html += `<div class="color-legend" style="margin-left: 20px; font-style: italic;">
+                                    <div class="color-box" style="background-color: ${colorSchemes.class[subCode]}"></div>
+                                    ${subCode} - ${subInfo.name}
+                                </div>`;
+                            });
+                    } else {
+                        // Sub-class selected - show just that one
+                        html += `<div class="color-legend">
+                            <div class="color-box" style="background-color: ${colorSchemes.class[classFilter]}"></div>
+                            ${classFilter} - ${classInfo ? classInfo.name : 'Unknown'}
+                        </div>`;
+                    }
+                } else {
+                    // No filter - show primary classes only
+                    getPrimaryClasses()
+                        .filter(({code}) => colorSchemes.class[code])
+                        .slice(0, 15) // Limit to prevent overcrowding
+                        .forEach(({code, name}) => {
+                            html += `<div class="color-legend">
+                                <div class="color-box" style="background-color: ${colorSchemes.class[code]}"></div>
+                                ${code} - ${name}
+                            </div>`;
+                        });
+                    
+                    if (getPrimaryClasses().length > 15) {
+                        html += '<div style="font-style: italic; color: #666; margin-top: 8px;">+ additional classes (use filter to see specific classes)</div>';
                     }
                 }
             } else if (colorBy === 'value') {
