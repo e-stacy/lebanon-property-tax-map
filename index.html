@@ -13,43 +13,52 @@
         }
         .header {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        h1 { 
-            margin: 0 0 8px 0; 
+        .header-left h1 { 
+            margin: 0; 
             color: #2c3e50;
+            font-size: 1.4em;
+            font-weight: 500;
         }
         .subtitle { 
             color: #666; 
-            font-size: 1.1em;
+            font-size: 0.85em;
+            margin-top: 2px;
+        }
+        .header-right {
+            flex-shrink: 0;
         }
         .stats-grid { 
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
-            gap: 12px; 
-            margin-bottom: 20px;
+            gap: 8px; 
+            margin-bottom: 12px;
         }
         .stat-card { 
             background: white;
-            border-radius: 8px; 
-            padding: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 6px; 
+            padding: 8px 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             min-width: 0;
         }
         .stat-number { 
-            font-size: 1.6em; 
+            font-size: 1.1em; 
             font-weight: bold; 
             color: #2c3e50;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         .stat-label { 
             color: #666; 
-            font-size: 0.9em;
+            font-size: 0.75em;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
         .controls {
             background: white;
@@ -94,7 +103,7 @@
             overflow: auto;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 80px; /* Space for fixed pagination */
-            max-height: calc(100vh - 600px); /* Fixed height for vertical scrolling */
+            max-height: calc(100vh - 320px); /* Optimized height for more rows */
             border: 1px solid #e1e5e9;
         }
         .pagination {
@@ -299,10 +308,12 @@
 </head>
 <body>
     <div class="header">
-        <h1>Lebanon Property Tax Database</h1>
-        <div class="subtitle">Comprehensive property assessment data for the City of Lebanon, NH</div>
-        <div style="margin-top: 15px;">
-            <a href="map.html" style="background: #27ae60; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">🗺️ View Map Interface</a>
+        <div class="header-left">
+            <h1>Lebanon Property Tax Database</h1>
+            <div class="subtitle">Comprehensive property assessment data for the City of Lebanon, NH</div>
+        </div>
+        <div class="header-right">
+            <a href="map.html" style="background: #27ae60; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 0.9em;">🗺️ View Map</a>
         </div>
     </div>
 
@@ -338,6 +349,18 @@
                 </select>
             </label>
             <label>
+                Year Built:
+                <select id="year-built-filter">
+                    <option value="">All Years</option>
+                </select>
+            </label>
+            <label>
+                Zone:
+                <select id="zoning-filter">
+                    <option value="">All Zones</option>
+                </select>
+            </label>
+            <label>
                 Min Value: $
                 <input id="min-value" type="number" placeholder="0" style="width: 120px;">
             </label>
@@ -347,9 +370,6 @@
             </label>
         </div>
         <div class="action-buttons">
-            <button class="btn btn-success" onclick="exportFilteredData()">📊 Export CSV</button>
-            <button class="btn btn-warning" onclick="toggleAnalytics()">📈 Analytics</button>
-            <button class="btn" onclick="toggleComparison()">⚖️ Compare</button>
             <button class="btn" onclick="clearFilters()">🔄 Reset Filters</button>
         </div>
         <div style="color: #666; font-size: 0.9em;">
@@ -610,7 +630,7 @@
                     <td>${parcel.zoning || '—'}</td>
                     <td>${parcel.building_style || '—'}</td>
                     <td>${parcel.building_grade || '—'}</td>
-                    <td>${parcel.year_built || '—'}</td>
+                    <td>${parcel.year_built ? parseInt(parcel.year_built) : '—'}</td>
                     <td>${formatNumber(parcel.living_area_sqft) || '—'}</td>
                     <td>${parcel.bedrooms || '—'}</td>
                     <td>${parcel.total_rooms || '—'}</td>
@@ -633,7 +653,7 @@
 
         // Pagination variables
         let currentPage = 1;
-        const rowsPerPage = 500;
+        const rowsPerPage = 200; /* Optimize for better performance */
         
         // Update pagination controls
         function updatePagination() {
@@ -662,6 +682,15 @@
             const startIndex = (currentPage - 1) * rowsPerPage + 1;
             const endIndex = Math.min(currentPage * rowsPerPage, filteredParcels.length);
             paginationHTML += `<span style="margin-left: 16px; color: #666;">Showing ${startIndex}-${endIndex} of ${formatNumber(filteredParcels.length)} properties</span>`;
+            
+            // Add action buttons to pagination area
+            paginationHTML += `
+                <div style="margin-left: auto; display: flex; gap: 8px;">
+                    <button class="btn btn-success" onclick="exportFilteredData()" style="padding: 6px 12px; font-size: 0.85em;">📊 Export CSV</button>
+                    <button class="btn btn-warning" onclick="toggleAnalytics()" style="padding: 6px 12px; font-size: 0.85em;">📈 Analytics</button>
+                    <button class="btn" onclick="toggleComparison()" style="padding: 6px 12px; font-size: 0.85em;">⚖️ Compare</button>
+                </div>
+            `;
             
             paginationDiv.innerHTML = paginationHTML;
         }
