@@ -161,9 +161,13 @@ class WorkingCheckboxFilters {
         const checkboxes = document.querySelectorAll(`#${containerId}-checkboxes input[type="checkbox"]:checked`);
         const selected = Array.from(checkboxes).map(cb => cb.value);
         
+        console.log('DEBUG: All checked boxes:', selected);
+        
         if (selected.includes('all')) {
+            console.log('DEBUG: All is included, returning empty array');
             return []; // Empty array means "all"
         }
+        console.log('DEBUG: Returning specific selections:', selected);
         return selected;
     }
 }
