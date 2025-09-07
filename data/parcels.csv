@@ -1,0 +1,44 @@
+parcel_id,situs_address,owner_name,class_code,lot_size_acres,land_value,building_value,total_value
+101-010,"123 Main St","Smith, John",1010,0.25,75000,225000,300000
+101-011,"125 Main St","Johnson, Mary",1010,0.30,80000,320000,400000
+101-012,"127 Main St","Brown, Robert",1010,0.28,78000,272000,350000
+102-001,"45 Oak Ave","Davis, Lisa",1010,0.35,85000,315000,400000
+102-002,"47 Oak Ave","Wilson, James",1010,0.22,70000,230000,300000
+103-015,"89 Pine St","Miller, Sarah",1030,0.15,60000,190000,250000
+103-016,"91 Pine St","Garcia, Carlos",1030,0.18,65000,235000,300000
+104-020,"200 Elm Dr","Anderson, Karen",1010,0.45,95000,405000,500000
+104-021,"202 Elm Dr","Taylor, Michael",1010,0.50,100000,600000,700000
+104-022,"204 Elm Dr","Thomas, Jennifer",1010,0.38,88000,462000,550000
+105-001,"15 Maple Ln","Jackson, David",1040,2.50,150000,850000,1000000
+105-002,"17 Maple Ln","White, Susan",1040,3.00,180000,1320000,1500000
+106-010,"301 Commercial St","ABC Corporation",2010,1.20,200000,800000,1000000
+106-011,"305 Commercial St","XYZ Industries",2010,2.00,350000,1650000,2000000
+106-012,"309 Commercial St","Main Street LLC",2010,0.80,160000,590000,750000
+107-005,"Vacant Lot A","Vacant Land Trust",1300,5.00,250000,0,250000
+107-006,"Vacant Lot B","Development Corp",1300,3.50,175000,0,175000
+108-001,"12 Industrial Way","Manufacturing Inc",2020,10.00,500000,2500000,3000000
+108-002,"20 Industrial Way","Warehouse LLC",2020,8.50,425000,1575000,2000000
+109-015,"678 Residential Ave","Cooper, Patricia",1010,0.33,82000,368000,450000
+109-016,"680 Residential Ave","Reed, Christopher",1010,0.29,79000,321000,400000
+109-017,"682 Residential Ave","Murphy, Angela",1010,0.31,81000,369000,450000
+110-008,"55 Forest Rd","Brooks, Timothy",1010,1.00,120000,380000,500000
+110-009,"57 Forest Rd","Kelly, Michelle",1010,0.95,115000,485000,600000
+111-001,"789 Valley View","Rodriguez, Antonio",1010,0.42,90000,510000,600000
+111-002,"791 Valley View","Lewis, Rebecca",1010,0.40,88000,462000,550000
+112-020,"33 School St","Educational Trust",9030,2.00,300000,1200000,1500000
+112-021,"Municipal Building","City of Lebanon",9030,1.50,200000,800000,1000000
+113-005,"Highway 89 Access","State of NH",3010,50.00,2500000,500000,3000000
+114-010,"Mobile Home Park A","Johnson, Mobile Home",1020,0.20,40000,60000,100000
+114-011,"Mobile Home Park B","Smith, Mobile Home",1020,0.18,36000,64000,100000
+115-001,"Historic District A","Heritage Foundation",9090,0.75,150000,350000,500000
+115-002,"Historic District B","Preservation Society",9090,0.80,160000,440000,600000
+116-025,"Rural Route 1","Farming Enterprise",1300,25.00,500000,200000,700000
+116-026,"Rural Route 2","Agricultural LLC",1300,30.00,600000,100000,700000
+117-001,"Utility Station A","Power Company",3010,5.00,1000000,2000000,3000000
+117-002,"Water Treatment","Water District",3010,8.00,1600000,3400000,5000000
+118-010,"Small Parcel 1","Micro Development",1320,0.05,25000,75000,100000
+118-011,"Small Parcel 2","Tiny Holdings LLC",1320,0.08,40000,160000,200000
+119-001,"Apartment Complex A","Residential Management",1040,1.50,300000,1700000,2000000
+119-002,"Apartment Complex B","Housing Corp",1040,2.00,400000,2600000,3000000
+120-015,"Condo Unit 1A","Condo Owner Trust",1030,0.12,48000,202000,250000
+120-016,"Condo Unit 1B","Individual Condo LLC",1030,0.12,48000,152000,200000
