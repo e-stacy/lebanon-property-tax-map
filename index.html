@@ -109,11 +109,28 @@
             background: white;
             border-radius: 8px;
             overflow-y: auto;
-            overflow-x: scroll; /* Always show horizontal scrollbar */
+            overflow-x: hidden; /* Hide the built-in scrollbar */
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 80px; /* Space for fixed pagination */
-            max-height: calc(100vh - 320px); /* Optimized height for more rows */
+            margin-bottom: 120px; /* Space for fixed pagination and scrollbar */
+            height: 60vh; /* Fixed percentage of viewport height */
             border: 1px solid #e1e5e9;
+        }
+        .horizontal-scroll {
+            position: fixed;
+            bottom: 60px;
+            left: 20px;
+            right: 20px;
+            height: 15px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            background: #f8f9fa;
+            border: 1px solid #e1e5e9;
+            border-radius: 4px;
+            z-index: 999;
+        }
+        .scroll-content {
+            height: 1px;
+            min-width: 1800px; /* Match table min-width */
         }
         .pagination {
             position: fixed;
@@ -359,7 +376,7 @@
         .dropdown-option:last-child {
             border-bottom: none;
         }
-        .dropdown-option input[type="checkbox"] {
+        .dropdown-option input[type="radio"] {
             margin: 0 8px 0 0;
             width: auto;
         }
@@ -413,7 +430,7 @@
                     </div>
                     <div class="dropdown-menu" id="class-menu">
                         <div class="dropdown-option" data-value="">
-                            <input type="checkbox" id="class-all" checked>
+                            <input type="radio" name="class-filter" id="class-all" checked>
                             <label for="class-all">All Classes</label>
                         </div>
                     </div>
@@ -428,7 +445,7 @@
                     </div>
                     <div class="dropdown-menu" id="year-menu">
                         <div class="dropdown-option" data-value="">
-                            <input type="checkbox" id="year-all" checked>
+                            <input type="radio" name="year-filter" id="year-all" checked>
                             <label for="year-all">All Years</label>
                         </div>
                     </div>
@@ -443,7 +460,7 @@
                     </div>
                     <div class="dropdown-menu" id="zone-menu">
                         <div class="dropdown-option" data-value="">
-                            <input type="checkbox" id="zone-all" checked>
+                            <input type="radio" name="zone-filter" id="zone-all" checked>
                             <label for="zone-all">All Zones</label>
                         </div>
                     </div>
@@ -470,7 +487,7 @@
     </div>
 
     <div class="table-container" style="margin: 0 20px;">
-        <table>
+        <table id="data-table">
             <thead>
                 <tr id="table-headers">
                     <th style="width: 80px;">Parcel ID</th>
@@ -499,6 +516,10 @@
             </tbody>
         </table>
     </div>
+    
+    <div class="horizontal-scroll" id="horizontal-scroll">
+        <div class="scroll-content" id="scroll-content"></div>
+    </div>
 
     <div id="analytics-panel" class="analytics-panel" style="margin: 0 20px 20px 20px; display: none;">
         <h3 style="margin: 0 0 16px 0;">Data Analytics</h3>
@@ -520,9 +541,9 @@
         // Custom dropdown functionality
         let openDropdown = null;
         let selectedFilters = {
-            class: [],
-            year: [],
-            zone: []
+            class: '',
+            year: '',
+            zone: ''
         };
 
         // Parse CSV line handling quoted fields properly
@@ -673,30 +694,39 @@
             const textElement = document.getElementById(type + '-text');
             const selected = selectedFilters[type];
             
-            if (selected.length === 0) {
+            if (!selected) {
                 const defaultText = type === 'class' ? 'All Classes' : 
                                   type === 'year' ? 'All Years' : 'All Zones';
                 textElement.textContent = defaultText;
                 textElement.style.color = '#666';
-            } else if (selected.length === 1) {
-                textElement.textContent = selected[0];
-                textElement.style.color = '#333';
             } else {
-                textElement.textContent = `${selected.length} selected`;
+                // Show the selected option name
+                if (type === 'class' && propertyClassHierarchy[selected]) {
+                    textElement.textContent = `${selected} - ${propertyClassHierarchy[selected].name}`;
+                } else {
+                    textElement.textContent = selected;
+                }
                 textElement.style.color = '#333';
             }
         }
         
-        function handleDropdownSelection(type, value, checked) {
-            if (checked) {
-                if (!selectedFilters[type].includes(value)) {
-                    selectedFilters[type].push(value);
-                }
-            } else {
-                selectedFilters[type] = selectedFilters[type].filter(v => v !== value);
+        function handleDropdownSelection(type, value) {
+            // Clear all checkboxes in this dropdown first
+            const menu = document.getElementById(type + '-menu');
+            const checkboxes = menu.querySelectorAll('input[type="radio"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            
+            // Set the selected value
+            selectedFilters[type] = value;
+            
+            // Check the selected radio button
+            const selectedRadio = document.getElementById(`${type}-${value || 'all'}`);
+            if (selectedRadio) {
+                selectedRadio.checked = true;
             }
             
             updateDropdownText(type);
+            closeDropdown(type);
             currentPage = 1;
             applyFilters();
         }
@@ -758,9 +788,9 @@
             const zoneMenu = document.getElementById('zone-menu');
             
             // Clear existing options (keep "All" options)
-            classMenu.innerHTML = '<div class="dropdown-option" data-value=""><input type="checkbox" id="class-all" checked><label for="class-all">All Classes</label></div>';
-            yearMenu.innerHTML = '<div class="dropdown-option" data-value=""><input type="checkbox" id="year-all" checked><label for="year-all">All Years</label></div>';
-            zoneMenu.innerHTML = '<div class="dropdown-option" data-value=""><input type="checkbox" id="zone-all" checked><label for="zone-all">All Zones</label></div>';
+            classMenu.innerHTML = '<div class="dropdown-option" onclick="handleDropdownSelection(\'class\', \'\')" data-value=""><input type="radio" name="class-filter" id="class-all" checked><label for="class-all">All Classes</label></div>';
+            yearMenu.innerHTML = '<div class="dropdown-option" onclick="handleDropdownSelection(\'year\', \'\')" data-value=""><input type="radio" name="year-filter" id="year-all" checked><label for="year-all">All Years</label></div>';
+            zoneMenu.innerHTML = '<div class="dropdown-option" onclick="handleDropdownSelection(\'zone\', \'\')" data-value=""><input type="radio" name="zone-filter" id="zone-all" checked><label for="zone-all">All Zones</label></div>';
             
             // Populate property class filter with hierarchical structure
             const usedClasses = new Set(allParcels.map(p => p.class_code).filter(c => c));
@@ -777,14 +807,9 @@
                     const option = document.createElement('div');
                     option.className = 'dropdown-option';
                     option.dataset.value = code;
-                    option.innerHTML = `<input type="checkbox" id="class-${code}"><label for="class-${code}">${code} - ${name}</label>`;
+                    option.innerHTML = `<input type="radio" name="class-filter" id="class-${code}"><label for="class-${code}">${code} - ${name}</label>`;
+                    option.onclick = () => handleDropdownSelection('class', code);
                     classMenu.appendChild(option);
-                    
-                    // Add event listener
-                    const checkbox = option.querySelector('input');
-                    checkbox.addEventListener('change', (e) => {
-                        handleDropdownSelection('class', code, e.target.checked);
-                    });
                 }
                 
                 // Add subclass options (indented)
@@ -796,14 +821,9 @@
                             const option = document.createElement('div');
                             option.className = 'dropdown-option';
                             option.dataset.value = subcode;
-                            option.innerHTML = `<input type="checkbox" id="class-${subcode}"><label for="class-${subcode}" style="padding-left: 20px;">${subcode} - ${propertyClassHierarchy[subcode].name}</label>`;
+                            option.innerHTML = `<input type="radio" name="class-filter" id="class-${subcode}"><label for="class-${subcode}" style="padding-left: 20px;">${subcode} - ${propertyClassHierarchy[subcode].name}</label>`;
+                            option.onclick = () => handleDropdownSelection('class', subcode);
                             classMenu.appendChild(option);
-                            
-                            // Add event listener
-                            const checkbox = option.querySelector('input');
-                            checkbox.addEventListener('change', (e) => {
-                                handleDropdownSelection('class', subcode, e.target.checked);
-                            });
                         });
                 }
             });
@@ -814,14 +834,9 @@
                 const option = document.createElement('div');
                 option.className = 'dropdown-option';
                 option.dataset.value = year;
-                option.innerHTML = `<input type="checkbox" id="year-${year}"><label for="year-${year}">${year}</label>`;
+                option.innerHTML = `<input type="radio" name="year-filter" id="year-${year}"><label for="year-${year}">${year}</label>`;
+                option.onclick = () => handleDropdownSelection('year', year.toString());
                 yearMenu.appendChild(option);
-                
-                // Add event listener
-                const checkbox = option.querySelector('input');
-                checkbox.addEventListener('change', (e) => {
-                    handleDropdownSelection('year', year.toString(), e.target.checked);
-                });
             });
             
             // Populate zoning filter
@@ -830,14 +845,9 @@
                 const option = document.createElement('div');
                 option.className = 'dropdown-option';
                 option.dataset.value = zone;
-                option.innerHTML = `<input type="checkbox" id="zone-${zone}"><label for="zone-${zone}">${zone}</label>`;
+                option.innerHTML = `<input type="radio" name="zone-filter" id="zone-${zone}"><label for="zone-${zone}">${zone}</label>`;
+                option.onclick = () => handleDropdownSelection('zone', zone);
                 zoneMenu.appendChild(option);
-                
-                // Add event listener
-                const checkbox = option.querySelector('input');
-                checkbox.addEventListener('change', (e) => {
-                    handleDropdownSelection('zone', zone, e.target.checked);
-                });
             });
         }
 
@@ -847,26 +857,26 @@
             const maxValue = parseNumber(document.getElementById('max-value').value);
 
             // Get selected values from custom dropdowns
-            const selectedClasses = selectedFilters.class;
-            const selectedYears = selectedFilters.year;
-            const selectedZones = selectedFilters.zone;
+            const selectedClass = selectedFilters.class;
+            const selectedYear = selectedFilters.year;
+            const selectedZone = selectedFilters.zone;
 
             filteredParcels = allParcels.filter(parcel => {
                 // Class filter with hierarchical support
-                if (selectedClasses.length > 0) {
-                    const allowedClasses = getClassesForFilter(selectedClasses);
+                if (selectedClass) {
+                    const allowedClasses = getClassesForFilter([selectedClass]);
                     if (!allowedClasses.includes(parcel.class_code)) {
                         return false;
                     }
                 }
                 
-                // Year built filter (multiple selection)
-                if (selectedYears.length > 0 && !selectedYears.includes(String(parseInt(parcel.year_built) || ''))) {
+                // Year built filter (single selection)
+                if (selectedYear && selectedYear !== String(parseInt(parcel.year_built) || '')) {
                     return false;
                 }
                 
-                // Zoning filter (multiple selection)
-                if (selectedZones.length > 0 && !selectedZones.includes(parcel.zoning)) {
+                // Zoning filter (single selection)
+                if (selectedZone && selectedZone !== parcel.zoning) {
                     return false;
                 }
 
@@ -975,18 +985,21 @@
         // Clear all filters
         function clearFilters() {
             // Reset all dropdown selections
-            selectedFilters = { class: [], year: [], zone: [] };
+            selectedFilters = { class: '', year: '', zone: '' };
             
             // Update dropdown texts
             updateDropdownText('class');
             updateDropdownText('year');
             updateDropdownText('zone');
             
-            // Clear checkboxes in all dropdown menus
+            // Set "All" radio buttons as checked
             ['class', 'year', 'zone'].forEach(type => {
                 const menu = document.getElementById(type + '-menu');
-                const checkboxes = menu.querySelectorAll('input[type="checkbox"]');
-                checkboxes.forEach(cb => cb.checked = false);
+                const radios = menu.querySelectorAll('input[type="radio"]');
+                radios.forEach(rb => rb.checked = false);
+                // Check the "All" option
+                const allRadio = document.getElementById(type + '-all');
+                if (allRadio) allRadio.checked = true;
             });
             
             document.getElementById('min-value').value = '';
@@ -1256,7 +1269,8 @@
         document.getElementById('max-value').addEventListener('input', () => { currentPage = 1; applyFilters(); });
 
         // Load data function
-        async function loadParcels() {
+        function loadParcels() {
+            return new Promise(async (resolve, reject) => {
             try {
                 const response = await fetch('data/parcels.csv');
                 const text = await response.text();
@@ -1286,14 +1300,35 @@
                 
                 // Initialize column resizing after table is rendered
                 setTimeout(initializeColumnResizing, 100);
+                resolve();
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('parcels-table').innerHTML = '<tr><td colspan="19" class="no-results">Error loading data</td></tr>';
+                reject(error);
             }
+            });
+        }
+
+        // Sync horizontal scrollbar with table
+        function initializeScrollSync() {
+            const tableContainer = document.querySelector('.table-container');
+            const horizontalScroll = document.getElementById('horizontal-scroll');
+            
+            // Sync scrollbar with table horizontal scroll
+            tableContainer.addEventListener('scroll', () => {
+                horizontalScroll.scrollLeft = tableContainer.scrollLeft;
+            });
+            
+            // Sync table with scrollbar scroll
+            horizontalScroll.addEventListener('scroll', () => {
+                tableContainer.scrollLeft = horizontalScroll.scrollLeft;
+            });
         }
 
         // Initialize
-        loadParcels();
+        loadParcels().then(() => {
+            setTimeout(initializeScrollSync, 500);
+        });
     </script>
 </body>
 </html>
