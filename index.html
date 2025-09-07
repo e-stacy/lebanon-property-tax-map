@@ -94,6 +94,23 @@
             width: 100%;
             box-sizing: border-box;
         }
+        select[multiple] {
+            padding: 4px;
+            background: white;
+        }
+        select[multiple] option {
+            padding: 4px 8px;
+            margin: 1px 0;
+            border-radius: 3px;
+        }
+        select[multiple] option:hover {
+            background: #e3f2fd;
+        }
+        select[multiple] option:checked {
+            background: #2196f3;
+            color: white;
+            font-weight: 500;
+        }
         input[type="search"] {
             min-width: 150px;
         }
@@ -335,20 +352,20 @@
             <button class="btn" onclick="clearFilters()" style="margin-right: 15px; align-self: flex-end; margin-bottom: 6px;">🔄 Reset Filters</button>
             <div class="control-group">
                 <div class="control-label">Property Class <small style="color: #888;">(Ctrl+click for multiple)</small></div>
-                <select id="class-filter" multiple size="1" style="min-height: 36px;">
-                    <option value="">All Classes</option>
+                <select id="class-filter" multiple size="4" style="height: 80px; overflow-y: auto;">
+                    <option value="" style="font-style: italic; color: #666;">All Classes</option>
                 </select>
             </div>
             <div class="control-group">
                 <div class="control-label">Year Built <small style="color: #888;">(Ctrl+click for multiple)</small></div>
-                <select id="year-built-filter" multiple size="1" style="min-height: 36px;">
-                    <option value="">All Years</option>
+                <select id="year-built-filter" multiple size="4" style="height: 80px; overflow-y: auto;">
+                    <option value="" style="font-style: italic; color: #666;">All Years</option>
                 </select>
             </div>
             <div class="control-group">
                 <div class="control-label">Zone <small style="color: #888;">(Ctrl+click for multiple)</small></div>
-                <select id="zoning-filter" multiple size="1" style="min-height: 36px;">
-                    <option value="">All Zones</option>
+                <select id="zoning-filter" multiple size="4" style="height: 80px; overflow-y: auto;">
+                    <option value="" style="font-style: italic; color: #666;">All Zones</option>
                 </select>
             </div>
             <div class="control-group">
@@ -1017,10 +1034,15 @@
         
         // Clear all filters
         function clearFilters() {
-            // Clear multi-select dropdowns
-            document.getElementById('class-filter').selectedIndex = -1;
-            document.getElementById('year-built-filter').selectedIndex = -1;
-            document.getElementById('zoning-filter').selectedIndex = -1;
+            // Clear multi-select dropdowns by deselecting all options
+            const classFilter = document.getElementById('class-filter');
+            const yearFilter = document.getElementById('year-built-filter');
+            const zoneFilter = document.getElementById('zoning-filter');
+            
+            Array.from(classFilter.options).forEach(option => option.selected = false);
+            Array.from(yearFilter.options).forEach(option => option.selected = false);
+            Array.from(zoneFilter.options).forEach(option => option.selected = false);
+            
             document.getElementById('min-value').value = '';
             document.getElementById('max-value').value = '';
             currentPage = 1;
