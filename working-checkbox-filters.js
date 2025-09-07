@@ -99,7 +99,7 @@ class WorkingCheckboxFilters {
                     </div>
                     <div class="checkbox-list" id="${containerId}-checkboxes">
                         <label class="checkbox-item">
-                            <input type="checkbox" value="all" checked onchange="updateWorkingFilter('${containerId}')">
+                            <input type="checkbox" value="all" checked onchange="updateWorkingFilter('${containerId}')" onclick="console.log('All checkbox clicked')">
                             <span>All Classes</span>
                         </label>
                         ${this.generateClassCheckboxes(classCounts, containerId)}
@@ -129,7 +129,7 @@ class WorkingCheckboxFilters {
             html += `
                 <div class="checkbox-item primary-class">
                     <label>
-                        <input type="checkbox" value="${code}" onchange="updateWorkingFilter('${containerId}')">
+                        <input type="checkbox" value="${code}" onchange="updateWorkingFilter('${containerId}')" onclick="console.log('Primary checkbox clicked:', '${code}')">
                         <span>${code} - ${info.name} (${count})</span>
                     </label>
                 </div>
@@ -144,7 +144,7 @@ class WorkingCheckboxFilters {
                         html += `
                             <div class="checkbox-item sub-class">
                                 <label>
-                                    <input type="checkbox" value="${subcode}" onchange="updateWorkingFilter('${containerId}')">
+                                    <input type="checkbox" value="${subcode}" onchange="updateWorkingFilter('${containerId}')" onclick="console.log('Sub checkbox clicked:', '${subcode}')">
                                     <span>${subcode} - ${subInfo.name} (${subCount})</span>
                                 </label>
                             </div>
