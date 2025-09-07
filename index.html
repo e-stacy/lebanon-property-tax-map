@@ -906,46 +906,41 @@
         document.getElementById('max-value').addEventListener('input', () => { currentPage = 1; applyFilters(); });
 
         // Initialize
-        loadParcels().then(() => {
-            setupSearchSuggestions();
-        });
+        loadParcels();
         
-        // Make loadParcels return a promise
+        // Load data function
         async function loadParcels() {
-            return new Promise(async (resolve) => {
-                try {
-                    const response = await fetch('data/parcels.csv');
-                    const text = await response.text();
-                    console.log('Raw CSV length:', text.length);
-                    
-                    // Parse CSV properly handling quoted fields
-                    const lines = text.trim().split('\n');
-                    const headers = parseCSVLine(lines[0]);
-                    console.log('Headers:', headers);
-                    
-                    allParcels = lines.slice(1).map(line => {
-                        const values = parseCSVLine(line);
-                        const parcel = {};
-                        headers.forEach((header, index) => {
-                            parcel[header] = values[index] || '';
-                        });
-                        return parcel;
-                    }).filter(p => p.parcel_id && p.parcel_id.trim());
+            try {
+                const response = await fetch('data/parcels.csv');
+                const text = await response.text();
+                console.log('Raw CSV length:', text.length);
+                
+                // Parse CSV properly handling quoted fields
+                const lines = text.trim().split('\n');
+                const headers = parseCSVLine(lines[0]);
+                console.log('Headers:', headers);
+                
+                allParcels = lines.slice(1).map(line => {
+                    const values = parseCSVLine(line);
+                    const parcel = {};
+                    headers.forEach((header, index) => {
+                        parcel[header] = values[index] || '';
+                    });
+                    return parcel;
+                }).filter(p => p.parcel_id && p.parcel_id.trim());
 
-                    console.log(`Loaded ${allParcels.length} parcels`);
-                    if (allParcels.length > 0) {
-                        console.log('First parcel:', allParcels[0]);
-                    }
-                    updateStats();
-                    populateFilters();
-                    applyFilters();
-                    resolve();
-                } catch (error) {
-                    console.error('Error loading data:', error);
-                    document.getElementById('parcels-table').innerHTML = '<tr><td colspan="10" class="no-results">Error loading data</td></tr>';
-                    resolve();
+                console.log(`Loaded ${allParcels.length} parcels`);
+                if (allParcels.length > 0) {
+                    console.log('First parcel:', allParcels[0]);
                 }
-            });
+                updateStats();
+                populateFilters();
+                applyFilters();
+                setupSearchSuggestions();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('parcels-table').innerHTML = '<tr><td colspan="10" class="no-results">Error loading data</td></tr>';
+            }
         }
     </script>
 </body>
