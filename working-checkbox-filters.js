@@ -3,38 +3,58 @@
  * Provides mobile-friendly checkbox filters with proper property class names
  */
 
-// Property class hierarchy with readable names
-const PROPERTY_CLASSES = {
-    '1010': 'Residential Single Family',
-    '1012': 'Residential Multi-Unit', 
-    '101A': 'Residential Accessory',
-    '101C': 'Residential Commercial',
-    '101T': 'Residential Temp',
-    '1020': 'Manufactured Housing',
-    '102C': 'Manufactured Commercial',
-    '102V': 'Manufactured Village',
-    '1030': 'Condominium',
-    '103V': 'Condo Village',
-    '1040': 'Multi-Family 2-4 Units',
-    '1050': 'Multi-Family 5+ Units',
-    '1060': 'Multi-Family Other',
-    '1090': 'Residential Other',
-    '1100': 'Dormitory',
-    '1110': 'Hotel/Motel',
-    '111C': 'Hotel Commercial',
-    '1120': 'Resort',
-    '112C': 'Resort Commercial',
-    '1300': 'Vacant Residential Land',
-    '1310': 'Vacant Commercial Land',
-    '1320': 'Vacant Industrial Land',
-    '3000': 'Agricultural',
-    '3160': 'Forest Land',
-    '3250': 'Open Space/Recreation',
-    '3400': 'Other Exempt',
-    '6231': 'Utility - Gas',
-    '9010': 'State Property',
-    '9030': 'Municipal Property',
-    '9090': 'Other Government'
+// Property class hierarchy with parent-child relationships
+const PROPERTY_CLASS_HIERARCHY = {
+    '1010': {
+        name: 'Residential Single Family',
+        primary: true,
+        subclasses: ['1012', '101A', '101C', '101T']
+    },
+    '1012': { name: 'Residential Multi-Unit', parent: '1010' },
+    '101A': { name: 'Residential Accessory', parent: '1010' },
+    '101C': { name: 'Residential Commercial', parent: '1010' },
+    '101T': { name: 'Residential Temp', parent: '1010' },
+    
+    '1020': {
+        name: 'Manufactured Housing',
+        primary: true,
+        subclasses: ['102C', '102V']
+    },
+    '102C': { name: 'Manufactured Commercial', parent: '1020' },
+    '102V': { name: 'Manufactured Village', parent: '1020' },
+    
+    '1030': {
+        name: 'Condominium',
+        primary: true,
+        subclasses: ['103V']
+    },
+    '103V': { name: 'Condo Village', parent: '1030' },
+    
+    '1040': { name: 'Multi-Family 2-4 Units', primary: true },
+    '1050': { name: 'Multi-Family 5+ Units', primary: true },
+    '1060': { name: 'Multi-Family Other', primary: true },
+    '1090': { name: 'Residential Other', primary: true },
+    
+    '1100': { name: 'Dormitory', primary: true },
+    '1110': { name: 'Hotel/Motel', primary: true },
+    '111C': { name: 'Hotel Commercial', primary: true },
+    '1120': { name: 'Resort', primary: true },
+    '112C': { name: 'Resort Commercial', primary: true },
+    
+    '1300': { name: 'Vacant Residential Land', primary: true },
+    '1310': { name: 'Vacant Commercial Land', primary: true },
+    '1320': { name: 'Vacant Industrial Land', primary: true },
+    
+    '3000': { name: 'Agricultural', primary: true },
+    '3160': { name: 'Forest Land', primary: true },
+    '3250': { name: 'Open Space/Recreation', primary: true },
+    '3400': { name: 'Other Exempt', primary: true },
+    
+    '6231': { name: 'Utility - Gas', primary: true },
+    
+    '9010': { name: 'State Property', primary: true },
+    '9030': { name: 'Municipal Property', primary: true },
+    '9090': { name: 'Other Government', primary: true }
 };
 
 class WorkingCheckboxFilters {
@@ -92,21 +112,45 @@ class WorkingCheckboxFilters {
     }
 
     generateClassCheckboxes(classCounts, containerId) {
-        // Sort by count (descending) then by name
-        const sortedClasses = Object.entries(classCounts)
+        let html = '';
+        
+        // Get primary classes that exist in data, sorted by count
+        const primaryClasses = Object.entries(classCounts)
+            .filter(([code]) => PROPERTY_CLASS_HIERARCHY[code]?.primary)
             .sort((a, b) => b[1] - a[1])
             .map(([code, count]) => ({
                 code,
                 count,
-                name: PROPERTY_CLASSES[code] || `Class ${code}`
+                info: PROPERTY_CLASS_HIERARCHY[code]
             }));
 
-        return sortedClasses.map(({code, count, name}) => `
-            <label class="checkbox-item">
-                <input type="checkbox" value="${code}" onchange="updateWorkingFilter('${containerId}')">
-                <span>${code} - ${name} (${count})</span>
-            </label>
-        `).join('');
+        primaryClasses.forEach(({ code, count, info }) => {
+            // Add primary class
+            html += `
+                <label class="checkbox-item primary-class">
+                    <input type="checkbox" value="${code}" onchange="updateWorkingFilter('${containerId}')">
+                    <span>${code} - ${info.name} (${count})</span>
+                </label>
+            `;
+            
+            // Add subclasses if they exist in data
+            if (info.subclasses) {
+                info.subclasses.forEach(subcode => {
+                    if (classCounts[subcode]) {
+                        const subInfo = PROPERTY_CLASS_HIERARCHY[subcode];
+                        const subCount = classCounts[subcode];
+                        html += `
+                            <label class="checkbox-item sub-class">
+                                <input type="checkbox" value="${subcode}" onchange="updateWorkingFilter('${containerId}')">
+                                <span>${subcode} - ${subInfo.name} (${subCount})</span>
+                            </label>
+                        `;
+                    }
+                });
+            }
+        });
+
+        return html;
     }
 
     getSelectedClasses(containerId) {

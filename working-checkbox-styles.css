@@ -105,6 +105,27 @@
     background-color: #e9ecef;
 }
 
+/* Hierarchical styling */
+.checkbox-item.primary-class {
+    font-weight: 600;
+    background-color: #f9f9f9;
+}
+
+.checkbox-item.sub-class {
+    padding-left: 32px;
+    font-size: 0.8em;
+    background-color: #fdfdfd;
+    border-left: 3px solid #e9ecef;
+}
+
+.checkbox-item.sub-class:hover {
+    background-color: #f0f8ff;
+}
+
+.checkbox-item.primary-class:hover {
+    background-color: #f0f0f0;
+}
+
 /* Map-specific adjustments */
 .map-controls .working-checkbox-filter {
     margin-bottom: 15px;
