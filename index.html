@@ -687,7 +687,8 @@
                 'nhdra_state', 'nhdra_zip', 'nhdra_grantor', 'nhdra_book pg',
                 'nhdra_ID1 Prior Sale Price', 'nhdra_ID1 Prior Sale Date', 'nhdra_ID1 Prior Book Page',
                 'nhdra_ID2 Prior Sale Price', 'nhdra_ID2 Prior Sale Date', 'nhdra_ID2 Prior Book Page', 
-                'nhdra_ID3 Prior Sale Price', 'nhdra_ID3 Prior Sale Date', 'nhdra_ID3 Prior Book Page'
+                'nhdra_ID3 Prior Sale Price', 'nhdra_ID3 Prior Sale Date', 'nhdra_ID3 Prior Book Page',
+                'nhdra_own name', 'nhdra_co own name', 'nhdra_rem pid'
             ];
             
             const filteredHeaders = allHeaders.filter(h => !excludeColumns.includes(h));
@@ -715,23 +716,20 @@
                 'land_value': 'Land Value',
                 'building_value': 'Building Value', 
                 'total_value': 'Total Value',
-                'nhdra_own name': 'NHDRA Owner',
-                'nhdra_co own name': 'NHDRA Co-Owner',
                 'nhdra_saleprice': 'Sale Price',
                 'nhdra_saledate': 'Sale Date',
-                'nhdra_qualified': 'Sale Qualified',
-                'nhdra_rem use code': 'Use Code',
+                'nhdra_qualified': "Arm's Length",
+                'nhdra_rem use code': 'Property Class',
                 'nhdra_lnd zone': 'Land Zone',
-                'nhdra_prc ttl lnd area acres': 'Parcel Total Land Area (acres)',
-                'nhdra_prc ttl assess bldg': 'Parcel Total Assessed Building',
-                'nhdra_prc ttl assess xf': 'Parcel Total Assessed Exempt',
-                'nhdra_prc ttl assess lnd': 'Parcel Total Assessed Land',
-                'nhdra_prc ttl assess ob': 'Parcel Total Assessed Outbuilding',
-                'nhdra_prc ttl assess': 'Parcel Total Assessment',
+                'nhdra_prc ttl lnd area acres': 'Land Area (acres)',
+                'nhdra_prc ttl assess bldg': 'Assessed Building',
+                'nhdra_prc ttl assess xf': 'Assessed Exempt',
+                'nhdra_prc ttl assess lnd': 'Assessed Land',
+                'nhdra_prc ttl assess ob': 'Assessed Outbuilding',
+                'nhdra_prc ttl assess': 'Assessment',
                 'nhdra_cns area living': 'Construction Living Area',
                 'nhdra_vns ayb': 'Year Built',
                 'nhdra_vns style desc': 'Building Style',
-                'nhdra_rem pid': 'Property ID',
                 'nhdra_vns grade': 'Grade (numeric)',
                 'nhdra_vns grade desc': 'Grade Description',
                 'nhdra_vns roof struct desc': 'Roof Structure',
@@ -756,7 +754,7 @@
                 'nhdra_ahd ttl assess xf': 'Alternative Assessed Exempt',
                 'nhdra_ahd ttl assess lnd': 'Alternative Assessed Land',
                 'nhdra_ahd ttl assess ob': 'Alternative Assessed Outbuilding',
-                'nhdra_ahd ttl assess': 'Alternative Total Assessment'
+                'nhdra_ahd ttl assess': 'Alternative Assessment'
             };
             
             return translations[header] || header.replace('nhdra_', '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -863,6 +861,9 @@
                         } catch (e) {
                             // Keep original value if date parsing fails
                         }
+                    } else if (column === 'nhdra_qualified' && value) {
+                        // Map Q to Y for arm's length display, but keep original data in file
+                        value = value.toString().trim().toUpperCase() === 'Q' ? 'Y' : value;
                     }
                     
                     return `<td>${value}</td>`;
