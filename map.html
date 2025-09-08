@@ -1565,12 +1565,6 @@
                 
                 if (!mapLot) return;
                 
-                // Check if this parcel passes current filters before showing label
-                let prop = propertyData.get(mapLot);
-                if (prop && !passesFilters(prop)) {
-                    return; // Skip this parcel if it doesn't pass filters
-                }
-                
                 let labelContent = '';
                 let showThisLabel = false;
                 
@@ -1578,14 +1572,8 @@
                 if (canShowMBL) {
                     // Get property data for complete identifier
                     let prop = propertyData.get(mapLot);
-                    if (prop) {
-                        // Use the parcel_id which contains the complete map-block-lot identifier
-                        const fullId = prop.parcel_id || mapLot;
-                        labelContent = fullId;
-                        showThisLabel = true;
-                    } else {
-                        // Fallback: use the MAP_LOT from shapefile if no property data found
-                        labelContent = mapLot || 'N/A';
+                    if (prop && prop.parcel_id) {
+                        labelContent = prop.parcel_id;
                         showThisLabel = true;
                     }
                 }
@@ -1595,21 +1583,15 @@
                     // Find property data
                     let prop = propertyData.get(mapLot);
                     
-                    if (prop) {
+                    if (prop && prop.total_value) {
                         const value = formatLargeNumber(parseFloat(prop.total_value) || 0);
                         if (labelContent) {
                             // Both MBL and value - MBL on top, value on bottom
-                            // Keep the complete parcel_id, not just mapLot
-                            const fullId = prop.parcel_id || mapLot;
-                            labelContent = `${fullId}<br/>$${value}`;
+                            labelContent = `${prop.parcel_id}<br/>$${value}`;
                         } else {
                             // Only value
                             labelContent = `$${value}`;
                         }
-                        showThisLabel = true;
-                    } else if (!labelContent) {
-                        // No property data found and no MBL label - show placeholder
-                        labelContent = 'No Data';
                         showThisLabel = true;
                     }
                 }
