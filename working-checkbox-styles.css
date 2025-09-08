@@ -59,22 +59,24 @@ body .control-row .working-checkbox-filter .dropdown-text {
     padding: 0 !important;
 }
 
-/* FIX INDEX PAGE: Override parent container centering and flex alignment */
-.controls .control-row,
-.controls .control-row *,
-.control-row .working-checkbox-filter,
-.control-row .working-checkbox-filter * {
+/* INDEX PAGE GRID LAYOUT: Clean alignment without flex interference */
+.controls .controls-grid,
+.controls .controls-grid *,
+.controls-grid .working-checkbox-filter,
+.controls-grid .working-checkbox-filter * {
     text-align: left !important;
 }
 
-/* CRITICAL FIX: Override flex alignment from .control-row */
-.control-row .working-checkbox-filter {
-    align-self: stretch !important;
+.controls-grid .working-checkbox-filter {
+    width: 100% !important;
+    display: block !important;
 }
 
-.control-row .working-checkbox-filter .dropdown-button {
+.controls-grid .working-checkbox-filter .dropdown-button {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: space-between !important;
     align-items: center !important;
-    justify-content: flex-start !important;
 }
 
 /* Simplified dropdown styles - inline styles handle alignment */
@@ -205,16 +207,18 @@ body .control-row .working-checkbox-filter .dropdown-text {
     max-height: 250px;
 }
 
-/* Table interface adjustments */
-.controls .working-checkbox-filter {
-    display: inline-block;
-    margin-right: 15px;
-    vertical-align: top;
-    min-width: 200px;
+/* Table interface adjustments - Grid Layout */
+.controls .working-checkbox-filter,
+.controls-grid .working-checkbox-filter {
+    display: block;
+    width: 100%;
+    margin: 0;
 }
 
-.controls .dropdown-button {
-    min-width: 160px;
+.controls .dropdown-button,
+.controls-grid .dropdown-button {
+    width: 100%;
+    min-width: auto;
 }
 
 /* Responsive design */
@@ -237,14 +241,16 @@ body .control-row .working-checkbox-filter .dropdown-text {
         font-size: 0.8em;
     }
     
-    .controls .working-checkbox-filter {
+    .controls .working-checkbox-filter,
+    .controls-grid .working-checkbox-filter {
         display: block;
         margin-bottom: 10px;
         margin-right: 0;
         width: 100%;
     }
     
-    .dropdown-button {
+    .dropdown-button,
+    .controls-grid .dropdown-button {
         width: 100%;
     }
 }
