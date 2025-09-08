@@ -379,6 +379,260 @@ class WorkingCheckboxFilters {
         return Array.from(expandedYears);
     }
 
+    // Create Zoning District filter (hierarchical by land use type)
+    createZoningFilter(containerId, propertyData) {
+        const container = document.getElementById(containerId);
+        if (!container) {
+            console.error('FILTER ERROR: Container element not found:', containerId);
+            return;
+        }
+        console.log('FILTER DEBUG: Creating Zoning filter for', containerId);
+
+        // Extract zoning data
+        const zones = [];
+        if (Array.isArray(propertyData)) {
+            propertyData.forEach(property => {
+                const zoneValue = property['nhdra_lnd zone'];
+                if (zoneValue && zoneValue !== '0' && zoneValue !== '') {
+                    zones.push(zoneValue.trim());
+                }
+            });
+        } else {
+            propertyData.forEach(property => {
+                const zoneValue = property['nhdra_lnd zone'];
+                if (zoneValue && zoneValue !== '0' && zoneValue !== '') {
+                    zones.push(zoneValue.trim());
+                }
+            });
+        }
+
+        if (zones.length === 0) {
+            container.innerHTML = '<div>No zoning data available</div>';
+            return;
+        }
+
+        // Count zones
+        const zoneCounts = {};
+        zones.forEach(zone => {
+            zoneCounts[zone] = (zoneCounts[zone] || 0) + 1;
+        });
+
+        // Define hierarchical structure
+        const zoningHierarchy = [
+            {
+                id: 'residential',
+                label: 'Residential',
+                districts: [
+                    { label: 'Urban Residential', districts: ['R1', 'R2', 'R3'] },
+                    { label: 'Rural Residential', districts: ['RL1', 'RL2', 'RL3', 'RL-2'] },
+                    { label: 'Mixed Use Residential', districts: ['RO', 'RO1'] }
+                ]
+            },
+            {
+                id: 'commercial',
+                label: 'Commercial',
+                districts: [
+                    { label: 'Business Districts', districts: ['CBD', 'GC', 'GC1', 'NC', 'PBD', 'MC'] },
+                    { label: 'Development', districts: ['LD'] }
+                ]
+            },
+            {
+                id: 'industrial',
+                label: 'Industrial',
+                districts: [
+                    { label: 'Industrial Districts', districts: ['INDL', 'INDH', 'INDR', 'IND-L', 'INDL5'] }
+                ]
+            }
+        ];
+
+        // Build final hierarchy with counts
+        const hierarchy = [];
+        
+        zoningHierarchy.forEach(category => {
+            const categoryDistricts = [];
+            let categoryCount = 0;
+            
+            category.districts.forEach(subCategory => {
+                const subDistricts = [];
+                let subCount = 0;
+                
+                subCategory.districts.forEach(district => {
+                    if (zoneCounts[district]) {
+                        subDistricts.push({ 
+                            code: district, 
+                            count: zoneCounts[district] 
+                        });
+                        subCount += zoneCounts[district];
+                    }
+                });
+                
+                if (subCount > 0) {
+                    categoryDistricts.push({
+                        id: subCategory.label.toLowerCase().replace(/\s+/g, '-'),
+                        label: subCategory.label,
+                        count: subCount,
+                        children: subDistricts.sort((a, b) => b.count - a.count) // Highest count first
+                    });
+                    categoryCount += subCount;
+                }
+            });
+            
+            if (categoryCount > 0) {
+                hierarchy.push({
+                    id: category.id,
+                    label: category.label,
+                    count: categoryCount,
+                    children: categoryDistricts
+                });
+            }
+        });
+
+        // Add Unknown bucket for properties with no zoning data
+        const totalProperties = propertyData.length || propertyData.size || 0;
+        const unknownCount = totalProperties - zones.length;
+        if (unknownCount > 0) {
+            hierarchy.push({
+                id: 'unknown',
+                label: 'Unknown',
+                count: unknownCount,
+                children: []
+            });
+        }
+
+        // Generate HTML
+        const allZonesCount = zones.length;
+        const filterHtml = `
+            <div class="working-checkbox-filter">
+                <div class="filter-label">Zoning District:</div>
+                <div class="checkbox-dropdown">
+                    <div class="dropdown-button" onclick="toggleWorkingDropdown('${containerId}')" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 4px; width: 100%; box-sizing: border-box;">
+                        <span class="dropdown-text" style="text-align: left; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0; padding: 0;">All Zones</span>
+                        <span class="dropdown-arrow" style="font-size: 0.8em; margin-left: 8px; flex-shrink: 0;">▼</span>
+                    </div>
+                    <div class="checkbox-list" id="${containerId}-checkboxes">
+                        <label class="checkbox-item">
+                            <input type="checkbox" value="all" checked onchange="updateWorkingZoningFilter('${containerId}', this)">
+                            <span>All Zones (${allZonesCount})</span>
+                        </label>
+                        ${this.generateZoningCheckboxes(hierarchy, containerId)}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        container.innerHTML = filterHtml;
+        console.log('FILTER DEBUG: Zoning filter HTML inserted');
+        
+        // Store hierarchy for filtering logic
+        this.zoningHierarchy = hierarchy;
+        
+        // Force alignment
+        setTimeout(() => {
+            const dropdownButton = container.querySelector('.dropdown-button');
+            const dropdownText = container.querySelector('.dropdown-text');
+            if (dropdownButton && dropdownText) {
+                dropdownButton.style.cssText = 'display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 8px 12px !important; border: 1px solid #ddd !important; background: white !important; cursor: pointer !important; border-radius: 4px !important; width: 100% !important; box-sizing: border-box !important;';
+                dropdownText.style.cssText = 'text-align: left !important; flex-grow: 1 !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; margin: 0 !important; padding: 0 !important;';
+                console.log('NUCLEAR: Forced dropdown alignment for', containerId);
+            }
+        }, 100);
+    }
+
+    generateZoningCheckboxes(hierarchy, containerId) {
+        let html = '';
+        
+        hierarchy.forEach(category => {
+            // Add main category (e.g., Residential, Commercial, Industrial)
+            html += `
+                <div class="checkbox-item primary-class">
+                    <label>
+                        <input type="checkbox" value="${category.id}" onchange="updateWorkingZoningFilter('${containerId}', this)">
+                        <span><strong>${category.label} (${category.count})</strong></span>
+                    </label>
+                </div>
+            `;
+            
+            // Add subcategories and individual districts
+            category.children.forEach(subCategory => {
+                html += `
+                    <div class="checkbox-item sub-class">
+                        <label>
+                            <input type="checkbox" value="${subCategory.id}" onchange="updateWorkingZoningFilter('${containerId}', this)">
+                            <span>${subCategory.label} (${subCategory.count})</span>
+                        </label>
+                    </div>
+                `;
+                
+                // Add individual zoning districts
+                subCategory.children.forEach(district => {
+                    html += `
+                        <div class="checkbox-item child-option" style="padding-left: 40px;">
+                            <label>
+                                <input type="checkbox" value="${district.code}" onchange="updateWorkingZoningFilter('${containerId}', this)">
+                                <span>${district.code} (${district.count})</span>
+                            </label>
+                        </div>
+                    `;
+                });
+            });
+        });
+
+        return html;
+    }
+
+    getSelectedZones(containerId) {
+        const checkboxes = document.querySelectorAll(`#${containerId}-checkboxes input[type="checkbox"]:checked`);
+        const selected = Array.from(checkboxes).map(cb => cb.value);
+        
+        console.log('DEBUG: All checked zone boxes:', selected);
+        
+        if (selected.includes('all')) {
+            console.log('DEBUG: All zones selected, returning empty array');
+            return []; // Empty array means "all"
+        }
+        
+        // Expand category selections to individual zones
+        const expandedZones = new Set();
+        
+        selected.forEach(value => {
+            if (this.zoningHierarchy) {
+                // Check if this is a main category (residential, commercial, industrial)
+                const mainCategory = this.zoningHierarchy.find(cat => cat.id === value);
+                if (mainCategory) {
+                    // Add all districts in this category
+                    mainCategory.children.forEach(subCat => {
+                        subCat.children.forEach(district => {
+                            expandedZones.add(district.code);
+                        });
+                    });
+                } else {
+                    // Check if this is a subcategory
+                    let foundSubCat = false;
+                    for (const category of this.zoningHierarchy) {
+                        const subCategory = category.children.find(sub => sub.id === value);
+                        if (subCategory) {
+                            subCategory.children.forEach(district => {
+                                expandedZones.add(district.code);
+                            });
+                            foundSubCat = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!foundSubCat) {
+                        // It's an individual district or unknown
+                        expandedZones.add(value);
+                    }
+                }
+            } else {
+                expandedZones.add(value);
+            }
+        });
+        
+        console.log('DEBUG: Expanded selected zones:', Array.from(expandedZones));
+        return Array.from(expandedZones);
+    }
+
     getSelectedClasses(containerId) {
         const checkboxes = document.querySelectorAll(`#${containerId}-checkboxes input[type="checkbox"]:checked`);
         const selected = Array.from(checkboxes).map(cb => cb.value);
@@ -600,6 +854,137 @@ function updateWorkingYearFilter(containerId, clickedElement = null) {
     }
 }
 
+// Zoning filter update function with hierarchical behavior
+function updateWorkingZoningFilter(containerId, clickedElement = null) {
+    const allCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="all"]`);
+    const otherCheckboxes = document.querySelectorAll(`#${containerId}-checkboxes input[type="checkbox"]:not([value="all"])`);
+    const dropdownText = document.querySelector(`#${containerId}-checkboxes`).parentNode.querySelector('.dropdown-text');
+    
+    console.log('updateWorkingZoningFilter called for:', containerId);
+    
+    // HIERARCHICAL BEHAVIOR: Handle category-district relationships
+    if (clickedElement && clickedElement !== allCheckbox && workingFilters.zoningHierarchy) {
+        const clickedValue = clickedElement.value;
+        
+        // Check if clicked value is a main category (residential, commercial, industrial)
+        const mainCategory = workingFilters.zoningHierarchy.find(cat => cat.id === clickedValue);
+        if (mainCategory) {
+            if (clickedElement.checked) {
+                // Main category checked - check all subcategories and districts
+                console.log('DEBUG: Main category checked, auto-checking subcategories for', clickedValue);
+                mainCategory.children.forEach(subCat => {
+                    const subCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="${subCat.id}"]`);
+                    if (subCheckbox) subCheckbox.checked = true;
+                    
+                    subCat.children.forEach(district => {
+                        const districtCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="${district.code}"]`);
+                        if (districtCheckbox) districtCheckbox.checked = true;
+                    });
+                });
+            } else {
+                // Main category unchecked - uncheck all subcategories and districts
+                console.log('DEBUG: Main category unchecked, clearing subcategories for', clickedValue);
+                mainCategory.children.forEach(subCat => {
+                    const subCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="${subCat.id}"]`);
+                    if (subCheckbox) subCheckbox.checked = false;
+                    
+                    subCat.children.forEach(district => {
+                        const districtCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="${district.code}"]`);
+                        if (districtCheckbox) districtCheckbox.checked = false;
+                    });
+                });
+            }
+        } else {
+            // Check if clicked value is a subcategory
+            let foundSubCat = null;
+            let parentCategory = null;
+            
+            for (const category of workingFilters.zoningHierarchy) {
+                const subCategory = category.children.find(sub => sub.id === clickedValue);
+                if (subCategory) {
+                    foundSubCat = subCategory;
+                    parentCategory = category;
+                    break;
+                }
+            }
+            
+            if (foundSubCat) {
+                if (clickedElement.checked) {
+                    // Subcategory checked - check all its districts
+                    foundSubCat.children.forEach(district => {
+                        const districtCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="${district.code}"]`);
+                        if (districtCheckbox) districtCheckbox.checked = true;
+                    });
+                } else {
+                    // Subcategory unchecked - uncheck all its districts and parent category
+                    foundSubCat.children.forEach(district => {
+                        const districtCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="${district.code}"]`);
+                        if (districtCheckbox) districtCheckbox.checked = false;
+                    });
+                    
+                    // Uncheck parent category
+                    const parentCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="${parentCategory.id}"]`);
+                    if (parentCheckbox) parentCheckbox.checked = false;
+                }
+            } else {
+                // This is an individual district - handle parent unchecking
+                if (!clickedElement.checked) {
+                    // District unchecked - find and uncheck its parents
+                    for (const category of workingFilters.zoningHierarchy) {
+                        for (const subCat of category.children) {
+                            const districtExists = subCat.children.some(d => d.code === clickedValue);
+                            if (districtExists) {
+                                // Uncheck subcategory
+                                const subCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="${subCat.id}"]`);
+                                if (subCheckbox) subCheckbox.checked = false;
+                                
+                                // Uncheck main category
+                                const mainCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="${category.id}"]`);
+                                if (mainCheckbox) mainCheckbox.checked = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // Check how many specific checkboxes are checked (after hierarchical changes)
+    const checkedOthers = Array.from(otherCheckboxes).filter(cb => cb.checked);
+    console.log('DEBUG: Found', checkedOthers.length, 'specific zone checkboxes checked');
+    
+    if (checkedOthers.length > 0) {
+        // If any specific boxes are checked, uncheck "All"
+        if (allCheckbox) {
+            allCheckbox.checked = false;
+            console.log('DEBUG: Unchecked All zones checkbox');
+        }
+        
+        // Update text to show selection
+        if (checkedOthers.length === 1) {
+            const selectedText = checkedOthers[0].nextElementSibling.textContent;
+            dropdownText.textContent = selectedText.length > 30 
+                ? selectedText.substring(0, 27) + '...' 
+                : selectedText;
+        } else {
+            dropdownText.textContent = `${checkedOthers.length} zones selected`;
+        }
+    } else {
+        // If no specific boxes are checked, check "All"
+        if (allCheckbox) {
+            allCheckbox.checked = true;
+            console.log('DEBUG: Checked All zones checkbox');
+        }
+        dropdownText.textContent = 'All Zones';
+    }
+    
+    // Apply filters
+    if (typeof applyFilters === 'function') {
+        applyFilters();
+    }
+}
+
 // Close dropdowns when clicking outside
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.checkbox-dropdown')) {
@@ -615,12 +1000,14 @@ function initializeWorkingFilters() {
     if (typeof allParcels !== 'undefined' && allParcels.length > 0) {
         workingFilters.createPropertyClassFilter('class-filter', allParcels);
         workingFilters.createYearBuiltFilter('year-filter', allParcels);
+        workingFilters.createZoningFilter('zoning-filter', allParcels);
     }
     
     // For map page  
     if (typeof propertyData !== 'undefined' && propertyData.size > 0) {
         workingFilters.createPropertyClassFilter('class-filter', propertyData);
         workingFilters.createYearBuiltFilter('year-filter', propertyData);
+        workingFilters.createZoningFilter('zoning-filter', propertyData);
     }
 }
 
@@ -628,6 +1015,8 @@ function initializeWorkingFilters() {
 function getSelectedValues(containerId) {
     if (containerId === 'year-filter') {
         return workingFilters.getSelectedYears(containerId);
+    } else if (containerId === 'zoning-filter') {
+        return workingFilters.getSelectedZones(containerId);
     }
     return workingFilters.getSelectedClasses(containerId);
 }
