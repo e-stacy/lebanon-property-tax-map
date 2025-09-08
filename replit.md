@@ -37,7 +37,7 @@ This is a property tax database and data explorer for Lebanon, New Hampshire. Th
 - ✅ Automatic deployment workflow configured for future updates
 - ✅ Comprehensive README created for Right-to-Know law support
 
-**STATUS NOTE**: Lebanon Property Tax Database is now publicly accessible with enhanced NHDRA integration (5,622 properties, 25 columns). Mobile-friendly hierarchical filtering is 95% complete with one remaining CSS alignment issue.
+**STATUS NOTE**: Lebanon Property Tax Database is now publicly accessible with enhanced NHDRA integration (5,611 properties, 27 columns). Enhanced dataset contains only parcels with complete NHDRA detail data. Mobile-friendly hierarchical filtering is 95% complete with one remaining CSS alignment issue.
 
 **✅ COMPLETED - Hierarchical Checkbox Functionality**
 - ✅ Touch-friendly checkboxes work without Ctrl+click requirement  
