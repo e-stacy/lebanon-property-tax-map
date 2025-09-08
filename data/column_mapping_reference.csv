@@ -1,41 +1,41 @@
-Source,Raw_File_Name,Source_Column_Header,Mapped_Display_Header,Data_Type,Field_Category,Processing_Notes,Description,Required,Last_Updated,Validation_Rules
-City of Lebanon,parcels.csv,parcel_id,Parcel ID,string,identifier,none,Unique property identifier,yes,2025-09-08,alphanumeric
-City of Lebanon,parcels.csv,situs_address,Situs Address,string,location,excluded_privacy,Physical property address,no,2025-09-08,text
-City of Lebanon,parcels.csv,owner_name,Owner,string,ownership,none,Property owner name,yes,2025-09-08,text
-City of Lebanon,parcels.csv,mailing_address1,Mailing Address,string,ownership,excluded_privacy,Owner mailing address,no,2025-09-08,text
-City of Lebanon,parcels.csv,class_code,Property Class,string,assessment,none,Property classification code,yes,2025-09-08,alphanumeric
-City of Lebanon,parcels.csv,lot_size_acres,Lot Size (acres),decimal,physical,format_number,Property lot size in acres,no,2025-09-08,positive_number
-City of Lebanon,parcels.csv,land_value,Land Value,currency,assessment,format_currency,Assessed land value,yes,2025-09-08,positive_currency
-City of Lebanon,parcels.csv,building_value,Building Value,currency,assessment,format_currency,Assessed building value,yes,2025-09-08,positive_currency
-City of Lebanon,parcels.csv,total_value,Total Value,currency,assessment,format_currency,Total assessed property value,yes,2025-09-08,positive_currency
-NHDRA,nhdra.csv,nhdra_rem prcl locn street,NHDRA Street,string,location,excluded_privacy,Street address from state records,no,2025-09-08,text
-NHDRA,nhdra.csv,nhdra_own name,NHDRA Owner,string,ownership,excluded_privacy,Owner name from state records,no,2025-09-08,text
-NHDRA,nhdra.csv,nhdra_co own name,NHDRA Co-Owner,string,ownership,excluded_privacy,Co-owner name from state records,no,2025-09-08,text
-NHDRA,nhdra.csv,nhdra_saleprice,Sale Price,currency,sales,format_currency,Most recent sale price,no,2025-09-08,positive_currency
-NHDRA,nhdra.csv,nhdra_saledate,Sale Date,date,sales,format_date_only,Most recent sale date,no,2025-09-08,valid_date
-NHDRA,nhdra.csv,nhdra_qualified,Arm's Length,string,sales,map_Q_to_Y_U_to_N,Sale qualification status,no,2025-09-08,single_character
-NHDRA,nhdra.csv,nhdra_rem use code,Property Class,string,assessment,none,Property use classification,no,2025-09-08,alphanumeric
-NHDRA,nhdra.csv,nhdra_lnd zone,Zoning District,string,zoning,none,Municipal zoning designation,no,2025-09-08,alphanumeric
-NHDRA,nhdra.csv,nhdra_prc ttl lnd area acres,Land Area (acres),decimal,physical,format_number,Total parcel land area,no,2025-09-08,positive_number
-NHDRA,nhdra.csv,nhdra_prc ttl assess bldg,Building Assessed,currency,assessment,format_currency,Total assessed building value,no,2025-09-08,positive_currency
-NHDRA,nhdra.csv,nhdra_prc ttl assess xf,Exempt Assessed,currency,assessment,format_currency,Exempt assessed value,no,2025-09-08,positive_currency
-NHDRA,nhdra.csv,nhdra_prc ttl assess lnd,Land Assessed,currency,assessment,format_currency,Total assessed land value,no,2025-09-08,positive_currency
-NHDRA,nhdra.csv,nhdra_prc ttl assess ob,Outbuilding Assessed,currency,assessment,format_currency,Assessed outbuilding value,no,2025-09-08,positive_currency
-NHDRA,nhdra.csv,nhdra_prc ttl assess,Total Assessment,currency,assessment,format_currency,Total property assessment,no,2025-09-08,positive_currency
-NHDRA,nhdra.csv,nhdra_cns area living,Living Area,integer,physical,format_number,Living area square footage,no,2025-09-08,positive_integer
-NHDRA,nhdra.csv,nhdra_vns ayb,Year Built,integer,construction,format_year,Actual year built,no,2025-09-08,year_range_1800_current
-NHDRA,nhdra.csv,nhdra_vns style desc,Building Style,string,construction,none,Architectural building style,no,2025-09-08,text
-NHDRA,nhdra.csv,nhdra_vns grade,Grade (numeric),integer,assessment,none,Numeric quality grade,no,2025-09-08,positive_integer
-NHDRA,nhdra.csv,nhdra_vns grade desc,Grade Description,string,assessment,none,Quality grade description,no,2025-09-08,text
-NHDRA,nhdra.csv,nhdra_vns roof cover desc,Roof Cover,string,construction,none,Roof covering material,no,2025-09-08,text
-NHDRA,nhdra.csv,nhdra_cns area effective,Effective Area,integer,physical,format_number,Effective area square footage,no,2025-09-08,positive_integer
-NHDRA,nhdra.csv,nhdra_vns tot rooms,Total Rooms,integer,physical,format_number,Total number of rooms,no,2025-09-08,positive_integer
-NHDRA,nhdra.csv,nhdra_vns num bedrm,Bedrooms,integer,physical,format_number,Number of bedrooms,no,2025-09-08,positive_integer
-NHDRA,nhdra.csv,nhdra_vns num baths,Bathrooms,integer,physical,format_number,Number of full bathrooms,no,2025-09-08,positive_integer
-NHDRA,nhdra.csv,nhdra_vns num hbaths,Half Bathrooms,integer,physical,format_number,Number of half bathrooms,no,2025-09-08,positive_integer
-NHDRA,nhdra.csv,nhdra_vns heat type desc,Heating Type,string,systems,none,Primary heating system type,no,2025-09-08,text
-NHDRA,nhdra.csv,nhdra_vns heat fuel desc,Heating Fuel,string,systems,none,Primary heating fuel source,no,2025-09-08,text
-NHDRA,nhdra.csv,nhdra_cns pct good,Percent Good,decimal,assessment,format_percentage,Construction condition percentage,no,2025-09-08,percentage_0_100
-NHDRA,nhdra.csv,nhdra_cns eyb code,Eff Yr Built Code,string,construction,none,Effective year built code,no,2025-09-08,alphanumeric
-NHDRA,nhdra.csv,nhdra_lnd nbhd,Land Neighborhood,string,location,none,Neighborhood designation code,no,2025-09-08,alphanumeric
-NHDRA,nhdra.csv,nhdra_vns stories,Stories,decimal,physical,format_number,Number of building stories,no,2025-09-08,positive_number
+Source,Raw_File_Name,Source_Column_Header,Mapped_Display_Header,Data_Type,Field_Category,Processing_Notes,Description,Required,Last_Updated,Validation_Rules,Source_Contact,Import_Priority,Business_Rules,Legacy_Mappings
+City of Lebanon,parcels.csv,parcel_id,Parcel ID,string,identifier,none,Unique property identifier,yes,2025-09-08,alphanumeric,City Assessor,HIGH,primary_key,pid|prop_id|parcel_number
+City of Lebanon,parcels.csv,situs_address,Situs Address,string,location,excluded_privacy,Physical property address,no,2025-09-08,text,City Assessor,LOW,exclude_from_display,property_address|site_address|physical_address
+City of Lebanon,parcels.csv,owner_name,Owner,string,ownership,none,Property owner name,yes,2025-09-08,text,City Assessor,HIGH,display_required,owner|property_owner|taxpayer_name
+City of Lebanon,parcels.csv,mailing_address1,Mailing Address,string,ownership,excluded_privacy,Owner mailing address,no,2025-09-08,text,City Assessor,LOW,exclude_from_display,mail_addr|billing_address|correspondence_address
+City of Lebanon,parcels.csv,class_code,Property Class,string,assessment,none,Property classification code,yes,2025-09-08,alphanumeric,City Assessor,HIGH,filter_enabled,use_code|property_type|land_use
+City of Lebanon,parcels.csv,lot_size_acres,Lot Size (acres),decimal,physical,format_number,Property lot size in acres,no,2025-09-08,positive_number,City Assessor,MED,display_with_units,lot_size|acreage|land_area_acres
+City of Lebanon,parcels.csv,land_value,Land Value,currency,assessment,format_currency,Assessed land value,yes,2025-09-08,positive_currency,City Assessor,HIGH,currency_display|statistics_enabled,land_val|assessed_land|land_assessment
+City of Lebanon,parcels.csv,building_value,Building Value,currency,assessment,format_currency,Assessed building value,yes,2025-09-08,positive_currency,City Assessor,HIGH,currency_display|statistics_enabled,bldg_val|building_assessment|improvement_value
+City of Lebanon,parcels.csv,total_value,Total Value,currency,assessment,format_currency,Total assessed property value,yes,2025-09-08,positive_currency,City Assessor,HIGH,currency_display|statistics_enabled|filter_enabled,total_val|assessed_value|total_assessment
+NHDRA,nhdra.csv,nhdra_rem prcl locn street,NHDRA Street,string,location,excluded_privacy,Street address from state records,no,2025-09-08,text,NHDRA Data Unit,LOW,exclude_from_display,location_street|parcel_street|property_street
+NHDRA,nhdra.csv,nhdra_own name,NHDRA Owner,string,ownership,excluded_privacy,Owner name from state records,no,2025-09-08,text,NHDRA Data Unit,LOW,exclude_from_display,state_owner|nhdra_owner_name|dra_owner
+NHDRA,nhdra.csv,nhdra_co own name,NHDRA Co-Owner,string,ownership,excluded_privacy,Co-owner name from state records,no,2025-09-08,text,NHDRA Data Unit,LOW,exclude_from_display,co_owner|joint_owner|additional_owner
+NHDRA,nhdra.csv,nhdra_saleprice,Sale Price,currency,sales,format_currency,Most recent sale price,no,2025-09-08,positive_currency,NHDRA Data Unit,MED,currency_display|filter_enabled,sale_amount|transaction_price|consideration
+NHDRA,nhdra.csv,nhdra_saledate,Sale Date,date,sales,format_date_only,Most recent sale date,no,2025-09-08,valid_date,NHDRA Data Unit,MED,date_display|filter_enabled,sale_dt|transaction_date|deed_date
+NHDRA,nhdra.csv,nhdra_qualified,Arm's Length,string,sales,map_Q_to_Y_U_to_N,Sale qualification status,no,2025-09-08,single_character,NHDRA Data Unit,MED,custom_mapping|filter_enabled,qualified_sale|valid_sale|arms_length_ind
+NHDRA,nhdra.csv,nhdra_rem use code,Property Class,string,assessment,none,Property use classification,no,2025-09-08,alphanumeric,NHDRA Data Unit,HIGH,filter_enabled,use_class|property_use|land_use_code
+NHDRA,nhdra.csv,nhdra_lnd zone,Zoning District,string,zoning,none,Municipal zoning designation,no,2025-09-08,alphanumeric,Lebanon Planning Dept,MED,filter_enabled,zone|zoning_code|land_zone
+NHDRA,nhdra.csv,nhdra_prc ttl lnd area acres,Land Area (acres),decimal,physical,format_number,Total parcel land area,no,2025-09-08,positive_number,NHDRA Data Unit,MED,display_with_units,total_land_acres|parcel_acres|land_size_acres
+NHDRA,nhdra.csv,nhdra_prc ttl assess bldg,Building Assessed,currency,assessment,format_currency,Total assessed building value,no,2025-09-08,positive_currency,NHDRA Data Unit,HIGH,currency_display|statistics_enabled,total_bldg_val|building_total_assessed|improvement_total
+NHDRA,nhdra.csv,nhdra_prc ttl assess xf,Exempt Assessed,currency,assessment,format_currency,Exempt assessed value,no,2025-09-08,positive_currency,NHDRA Data Unit,LOW,currency_display,exempt_value|exemption_amount|tax_exempt_value
+NHDRA,nhdra.csv,nhdra_prc ttl assess lnd,Land Assessed,currency,assessment,format_currency,Total assessed land value,no,2025-09-08,positive_currency,NHDRA Data Unit,HIGH,currency_display|statistics_enabled,total_land_val|land_total_assessed|land_assessment_total
+NHDRA,nhdra.csv,nhdra_prc ttl assess ob,Outbuilding Assessed,currency,assessment,format_currency,Assessed outbuilding value,no,2025-09-08,positive_currency,NHDRA Data Unit,MED,currency_display,outbldg_val|outbuilding_total|other_improvements
+NHDRA,nhdra.csv,nhdra_prc ttl assess,Total Assessment,currency,assessment,format_currency,Total property assessment,no,2025-09-08,positive_currency,NHDRA Data Unit,HIGH,currency_display|statistics_enabled,total_assessed|grand_total|assessment_total
+NHDRA,nhdra.csv,nhdra_cns area living,Living Area,integer,physical,format_number,Living area square footage,no,2025-09-08,positive_integer,NHDRA Data Unit,HIGH,display_with_units|filter_enabled,liv_area|finished_area|heated_area
+NHDRA,nhdra.csv,nhdra_vns ayb,Year Built,integer,construction,format_year,Actual year built,no,2025-09-08,year_range_1800_current,NHDRA Data Unit,HIGH,filter_enabled|statistics_enabled,actual_year_built|construction_year|built_year
+NHDRA,nhdra.csv,nhdra_vns style desc,Building Style,string,construction,none,Architectural building style,no,2025-09-08,text,NHDRA Data Unit,MED,filter_enabled,architectural_style|house_style|building_type
+NHDRA,nhdra.csv,nhdra_vns grade,Grade (numeric),integer,assessment,none,Numeric quality grade,no,2025-09-08,positive_integer,NHDRA Data Unit,MED,filter_enabled,quality_grade|construction_grade|grade_numeric
+NHDRA,nhdra.csv,nhdra_vns grade desc,Grade Description,string,assessment,none,Quality grade description,no,2025-09-08,text,NHDRA Data Unit,MED,filter_enabled,quality_desc|grade_description|construction_quality
+NHDRA,nhdra.csv,nhdra_vns roof cover desc,Roof Cover,string,construction,none,Roof covering material,no,2025-09-08,text,NHDRA Data Unit,LOW,none,roof_material|roofing_type|roof_covering
+NHDRA,nhdra.csv,nhdra_cns area effective,Effective Area,integer,physical,format_number,Effective area square footage,no,2025-09-08,positive_integer,NHDRA Data Unit,MED,display_with_units,eff_area|adjusted_area|effective_sq_ft
+NHDRA,nhdra.csv,nhdra_vns tot rooms,Total Rooms,integer,physical,format_number,Total number of rooms,no,2025-09-08,positive_integer,NHDRA Data Unit,LOW,none,room_count|total_rooms|number_rooms
+NHDRA,nhdra.csv,nhdra_vns num bedrm,Bedrooms,integer,physical,format_number,Number of bedrooms,no,2025-09-08,positive_integer,NHDRA Data Unit,HIGH,filter_enabled,bedroom_count|num_bedrooms|br
+NHDRA,nhdra.csv,nhdra_vns num baths,Bathrooms,integer,physical,format_number,Number of full bathrooms,no,2025-09-08,positive_integer,NHDRA Data Unit,HIGH,filter_enabled,full_baths|bathroom_count|ba
+NHDRA,nhdra.csv,nhdra_vns num hbaths,Half Bathrooms,integer,physical,format_number,Number of half bathrooms,no,2025-09-08,positive_integer,NHDRA Data Unit,MED,filter_enabled,half_baths|powder_rooms|hba
+NHDRA,nhdra.csv,nhdra_vns heat type desc,Heating Type,string,systems,none,Primary heating system type,no,2025-09-08,text,NHDRA Data Unit,MED,filter_enabled,heat_system|heating_system|hvac_type
+NHDRA,nhdra.csv,nhdra_vns heat fuel desc,Heating Fuel,string,systems,none,Primary heating fuel source,no,2025-09-08,text,NHDRA Data Unit,MED,filter_enabled,fuel_type|energy_source|heat_fuel
+NHDRA,nhdra.csv,nhdra_cns pct good,Percent Good,decimal,assessment,format_percentage,Construction condition percentage,no,2025-09-08,percentage_0_100,NHDRA Data Unit,MED,display_as_percentage,condition_pct|depreciation_factor|good_percent
+NHDRA,nhdra.csv,nhdra_cns eyb code,Eff Yr Built Code,string,construction,none,Effective year built code,no,2025-09-08,alphanumeric,NHDRA Data Unit,LOW,none,effective_year_code|eyb_code|adj_year_code
+NHDRA,nhdra.csv,nhdra_lnd nbhd,Land Neighborhood,string,location,none,Neighborhood designation code,no,2025-09-08,alphanumeric,NHDRA Data Unit,MED,filter_enabled,neighborhood_code|nbhd_code|area_code
+NHDRA,nhdra.csv,nhdra_vns stories,Stories,decimal,physical,format_number,Number of building stories,no,2025-09-08,positive_number,NHDRA Data Unit,MED,filter_enabled,story_count|floors|levels
