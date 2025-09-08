@@ -194,6 +194,10 @@
             </div>
             
             <div class="filter-group">
+                <div id="zoning-filter"></div>
+            </div>
+            
+            <div class="filter-group">
                 <label>Min Value ($):</label>
                 <input type="number" id="min-value" placeholder="0">
             </div>
@@ -681,6 +685,7 @@
                 console.log('Initializing map filters with', properties.length, 'properties');
                 if (typeof workingFilters !== 'undefined') {
                     workingFilters.createPropertyClassFilter('class-filter', propertyData);
+                    workingFilters.createZoningFilter('zoning-filter', propertyData);
                 }
                 
                 // Load spatial data
@@ -1000,12 +1005,25 @@
         // Check if property passes current filters
         function passesFilters(property) {
             const selectedClasses = getSelectedValues('class-filter');
+            const selectedZones = getSelectedValues('zoning-filter');
             const minValue = parseFloat(document.getElementById('min-value').value) || 0;
             const maxValue = parseFloat(document.getElementById('max-value').value) || Infinity;
             
             // Checkbox class filtering
             if (selectedClasses.length > 0 && property?.class_code) {
                 if (!selectedClasses.includes(property.class_code)) {
+                    return false;
+                }
+            }
+            
+            // Zoning filter
+            if (selectedZones.length > 0) {
+                const zoneValue = property['nhdra_lnd zone'];
+                if (!zoneValue || zoneValue === '0' || zoneValue === '') {
+                    if (!selectedZones.includes('unknown')) {
+                        return false;
+                    }
+                } else if (!selectedZones.includes(zoneValue.trim())) {
                     return false;
                 }
             }
