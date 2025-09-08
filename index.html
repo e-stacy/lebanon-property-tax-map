@@ -1012,20 +1012,7 @@
             updateStats();
         };
         
-        // Initialize filter after data loads using existing updateStats hook
-        const originalUpdateStats = updateStats;
-        updateStats = function() {
-            originalUpdateStats();
-            
-            // Initialize checkbox filter after data is loaded
-            if (allParcels && allParcels.length > 0 && !window.indexFiltersInitialized) {
-                console.log('Initializing index filters with', allParcels.length, 'parcels');
-                setTimeout(() => {
-                    workingFilters.createPropertyClassFilter('class-filter', allParcels);
-                    window.indexFiltersInitialized = true;
-                }, 10);
-            }
-        };
+        // Note: Filter initialization now happens in loadParcels() function
     </script>
     
 </body>

@@ -66,7 +66,11 @@ class WorkingCheckboxFilters {
     // Create checkbox filter UI
     createPropertyClassFilter(containerId, propertyData) {
         const container = document.getElementById(containerId);
-        if (!container) return;
+        if (!container) {
+            console.error('FILTER ERROR: Container element not found:', containerId);
+            return;
+        }
+        console.log('FILTER DEBUG: Container found, creating filter for', containerId);
 
         // Count occurrences of each property class
         const classCounts = {};
@@ -109,6 +113,7 @@ class WorkingCheckboxFilters {
         `;
 
         container.innerHTML = filterHtml;
+        console.log('FILTER DEBUG: HTML inserted into container', containerId);
         
         // Force alignment after DOM insertion
         setTimeout(() => {
@@ -118,7 +123,9 @@ class WorkingCheckboxFilters {
                 // Nuclear option: Force styles that cannot be overridden
                 dropdownButton.style.cssText = 'display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 8px 12px !important; border: 1px solid #ddd !important; background: white !important; cursor: pointer !important; border-radius: 4px !important; width: 100% !important; box-sizing: border-box !important;';
                 dropdownText.style.cssText = 'text-align: left !important; flex-grow: 1 !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; margin: 0 !important; padding: 0 !important;';
-                console.log('NUCLEAR: Forced dropdown alignment');
+                console.log('NUCLEAR: Forced dropdown alignment for', containerId);
+            } else {
+                console.error('FILTER ERROR: Dropdown elements not found after insertion');
             }
         }, 100);
     }

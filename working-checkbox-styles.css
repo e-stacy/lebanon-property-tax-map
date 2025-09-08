@@ -70,6 +70,9 @@ body .control-row .working-checkbox-filter .dropdown-text {
 .controls-grid .working-checkbox-filter {
     width: 100% !important;
     display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
 }
 
 .controls-grid .working-checkbox-filter .dropdown-button {
@@ -77,6 +80,16 @@ body .control-row .working-checkbox-filter .dropdown-text {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
+    visibility: visible !important;
+}
+
+/* Ensure the #class-filter container is visible */
+#class-filter {
+    display: block !important;
+    width: 100% !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-height: 40px !important;
 }
 
 /* Simplified dropdown styles - inline styles handle alignment */
