@@ -1387,9 +1387,12 @@
             
             // Check if any filters are applied
             const selectedClasses = getSelectedValues('class-filter');
+            const selectedYears = getSelectedValues('year-filter');
+            const selectedZones = getSelectedValues('zoning-filter');  
+            const selectedHeating = getSelectedValues('heating-filter');
             const minValue = document.getElementById('min-value').value;
             const maxValue = document.getElementById('max-value').value;
-            const hasFilters = selectedClasses.length > 0 || minValue || maxValue;
+            const hasFilters = selectedClasses.length > 0 || selectedYears.length > 0 || selectedZones.length > 0 || selectedHeating.length > 0 || minValue || maxValue;
             
             if (!hasFilters) {
                 // No filters applied - show total statistics
