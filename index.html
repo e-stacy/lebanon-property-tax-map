@@ -150,6 +150,14 @@
             margin-bottom: 16px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.07);
             position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        
+        .header-left {
+            flex: 1;
         }
 
         h1 { 
@@ -159,10 +167,18 @@
             font-weight: 700;
         }
 
-        .subtitle { 
-            color: #666; 
-            font-size: 1em;
-            margin-bottom: 12px;
+        .subtitle-box {
+            background: rgba(116, 185, 255, 0.1);
+            color: #2c3e50;
+            font-size: 0.8em;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #3498db;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            width: 200px;
+            line-height: 1.3;
+            font-weight: 500;
+            flex-shrink: 0;
         }
 
         .data-access {
@@ -685,11 +701,16 @@
 <body>
     <div class="container">
         <header class="header">
-            <h1>Lebanon Property Info Repository</h1>
-            <div class="subtitle">Comprehensive property assessment data for the City of Lebanon, NH</div>
+            <div class="header-left">
+                <h1>Lebanon Property Info Repository</h1>
+                
+                <div class="disclaimer">
+                    <strong>Unofficial data portal.</strong> This site is not affiliated with or endorsed by the City of Lebanon. Data is derived from City-provided files with minimal reformatting and may contain errors or omissions. Do not rely on this site for legal, financial, or property decisions—verify with the City of Lebanon Assessing Office.
+                </div>
+            </div>
             
-            <div class="disclaimer">
-                <strong>Unofficial data portal.</strong> This site is not affiliated with or endorsed by the City of Lebanon. Data is derived from City-provided files with minimal reformatting and may contain errors or omissions. Do not rely on this site for legal, financial, or property decisions—verify with the City of Lebanon Assessing Office.
+            <div class="subtitle-box">
+                Comprehensive property assessment data for the City of Lebanon, NH
             </div>
             
             <a href="map.html" class="map-button">🗺️ View Map Interface</a>
