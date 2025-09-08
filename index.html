@@ -331,15 +331,40 @@
 
         .controls-row {
             display: flex;
-            gap: 16px;
+            gap: 12px;
             margin-bottom: 16px;
-            align-items: flex-start;
-            flex-wrap: wrap;
+            align-items: flex-end;
+            flex-wrap: nowrap;
         }
 
         .control-item {
-            flex: 1;
-            min-width: 200px;
+            flex: 0 0 auto;
+        }
+        
+        .control-item.search {
+            flex: 1 1 200px;
+            min-width: 180px;
+        }
+        
+        .control-item.filter {
+            width: 130px;
+        }
+        
+        .control-item.value-input {
+            width: 90px;
+        }
+        
+        .control-item.value-input.max {
+            width: 70px;
+        }
+        
+        .control-item.buttons {
+            flex: 0 0 auto;
+        }
+        
+        .btn.compact {
+            padding: 6px 8px;
+            font-size: 11px;
         }
 
         .control-item label {
@@ -652,34 +677,34 @@
 
         <div class="controls">
             <div class="controls-row">
-                <div class="control-item">
+                <div class="control-item search">
                     <label>Search Properties</label>
-                    <input id="search" type="search" placeholder="Search by address, owner, or parcel ID...">
+                    <input id="search" type="search" placeholder="Search by address, owner, parcel...">
                 </div>
-                <div class="control-item">
+                <div class="control-item filter">
                     <div id="class-filter"></div>
                 </div>
-                <div class="control-item">
+                <div class="control-item filter">
                     <div id="year-filter"></div>
                 </div>
-                <div class="control-item">
+                <div class="control-item filter">
                     <div id="zoning-filter"></div>
                 </div>
-                <div class="control-item">
+                <div class="control-item filter">
                     <div id="heating-filter"></div>
                 </div>
-                <div class="control-item">
-                    <label>Min Value ($)</label>
+                <div class="control-item value-input">
+                    <label>Min ($)</label>
                     <input id="min-value" type="number" placeholder="0">
                 </div>
-                <div class="control-item">
-                    <label>Max Value ($)</label>
+                <div class="control-item value-input max">
+                    <label>Max ($)</label>
                     <input id="max-value" type="number" placeholder="Any">
                 </div>
-                <div class="control-item">
+                <div class="control-item buttons">
                     <div class="actions">
-                        <button class="btn" onclick="clearFilters()">🔄 Reset Filters</button>
-                        <button class="btn" onclick="resetColumnWidths()">📏 Reset Column Widths</button>
+                        <button class="btn compact" onclick="clearFilters()">🔄 Reset</button>
+                        <button class="btn compact" onclick="resetColumnWidths()">📏 Columns</button>
                     </div>
                 </div>
             </div>
