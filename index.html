@@ -468,17 +468,34 @@
                 updateStats();
                 populateFilters();
                 
-                // Initialize working checkbox filters - FORCE EXECUTION
+                // Initialize working checkbox filters - IMMEDIATE EXECUTION
                 console.log('INDEX: About to initialize filters with', allParcels.length, 'parcels');
-                setTimeout(() => {
-                    console.log('INDEX: Executing filter initialization');
-                    if (typeof workingFilters !== 'undefined' && workingFilters.createPropertyClassFilter) {
-                        workingFilters.createPropertyClassFilter('class-filter', allParcels);
-                        console.log('INDEX: Filter initialization completed');
-                    } else {
-                        console.error('INDEX: workingFilters not available');
-                    }
-                }, 200);
+                console.log('INDEX: workingFilters type:', typeof workingFilters);
+                
+                // Try immediate execution first
+                if (typeof workingFilters !== 'undefined' && workingFilters.createPropertyClassFilter) {
+                    console.log('INDEX: Immediate initialization');
+                    workingFilters.createPropertyClassFilter('class-filter', allParcels);
+                } else {
+                    // Fallback with multiple attempts
+                    console.log('INDEX: Delayed initialization attempts');
+                    let attempts = 0;
+                    const tryInit = () => {
+                        attempts++;
+                        console.log('INDEX: Attempt', attempts, 'workingFilters:', typeof workingFilters);
+                        if (typeof workingFilters !== 'undefined' && workingFilters.createPropertyClassFilter) {
+                            console.log('INDEX: Success on attempt', attempts);
+                            workingFilters.createPropertyClassFilter('class-filter', allParcels);
+                            return true;
+                        } else if (attempts < 5) {
+                            setTimeout(tryInit, 100 * attempts);
+                        } else {
+                            console.error('INDEX: Failed after 5 attempts');
+                        }
+                        return false;
+                    };
+                    tryInit();
+                }
                 
                 applyFilters();
             } catch (error) {
@@ -968,6 +985,12 @@
     
     <!-- Working Checkbox Filter System -->
     <script src="working-checkbox-filters.js"></script>
+    <script>
+        // Ensure workingFilters is available immediately
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, workingFilters available:', typeof workingFilters);
+        });
+    </script>
     <script>
         // Override applyFilters for index page
         const originalIndexApplyFilters = applyFilters;
