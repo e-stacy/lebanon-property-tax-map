@@ -1,0 +1,31 @@
+LEBANON PROPERTY TAX DATABASE - DEBUG CONSOLE LOG
+=================================================
+
+Current Issues:
+- Index page dropdown button is not clickable (arrow unresponsive)
+- CSS styling appears correct but functionality broken
+- Likely caused by CSS !important declarations interfering with JavaScript
+
+Expected Behavior:
+- Clicking dropdown button should show/hide checkbox list
+- Hierarchical checkboxes should work with parent-child relationships
+- Both index.html and map.html should have identical functionality
+
+Files Modified:
+- working-checkbox-filters.js (hierarchical logic)
+- working-checkbox-styles.css (CSS specificity fixes)
+
+Console Messages to Watch For:
+- "Dropdown clicked:" - indicates button click detected
+- "DEBUG: Parent checked, auto-checking children for [code]"
+- "DEBUG: Child unchecked, so unchecked parent [code]"
+- "Selected classes: [array]"
+
+Troubleshooting Steps:
+1. Check if JavaScript click handlers are working
+2. Verify CSS display properties aren't conflicting
+3. Test hierarchical behavior after click functionality restored
+
+Last Working State:
+- Map page: Fully functional hierarchical dropdowns
+- Index page: Styled but unclickable
