@@ -1,0 +1,2 @@
+Source,Raw_File_Name,Source_Column_Header,Mapped_Display_Header,Data_Type,Field_Category,Processing_Notes,Description,Required,Last_Updated,Validation_Rules,Source_Contact,Import_Priority,Business_Rules,Legacy_Mappings
+[NEW_SOURCE],[FILE_NAME],[ORIGINAL_HEADER],[CLEAN_HEADER],[TYPE],[CATEGORY],[PROCESSING],[DESCRIPTION],[Y/N],[DATE],[RULES],[CONTACT],[HIGH/MED/LOW],[RULES],[OLD_NAMES]
