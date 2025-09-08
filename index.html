@@ -452,16 +452,19 @@
                             <th>Class</th>
                             <th>Year Built</th>
                             <th>Living Area (sqft)</th>
-                            <th>Bedrooms</th>
+                            <th>Bed/Bath</th>
+                            <th>Building Style</th>
+                            <th>Heating</th>
                             <th>Lot Size (acres)</th>
                             <th class="currency">Land Value</th>
                             <th class="currency">Building Value</th>
                             <th class="currency">Total Value</th>
+                            <th class="currency">Last Sale</th>
                         </tr>
                     </thead>
                     <tbody id="parcels-table">
                         <tr>
-                            <td colspan="10" class="loading">Loading property data...</td>
+                            <td colspan="13" class="loading">Loading property data...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -544,7 +547,7 @@
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('parcels-table').innerHTML = 
-                    '<tr><td colspan="10" class="no-results">Error loading data</td></tr>';
+                    '<tr><td colspan="13" class="no-results">Error loading data</td></tr>';
             }
         }
 
@@ -612,27 +615,45 @@
             const tbody = document.getElementById('parcels-table');
             
             if (filteredParcels.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" class="no-results">No properties match your criteria</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="13" class="no-results">No properties match your criteria</td></tr>';
                 updatePagination();
                 return;
             }
 
             const startIndex = (currentPage - 1) * rowsPerPage;
             const endIndex = startIndex + rowsPerPage;
-            const rows = filteredParcels.slice(startIndex, endIndex).map(parcel => `
+            const rows = filteredParcels.slice(startIndex, endIndex).map(parcel => {
+                const bedrooms = parcel.bedrooms || '0';
+                const fullBaths = parcel.full_baths || '0';
+                const halfBaths = parcel.half_baths || '0';
+                const bedBathText = `${bedrooms}br/${fullBaths}${halfBaths > 0 ? '.5' : ''}ba`;
+                
+                const buildingStyle = (parcel.building_style || '').replace(/\s+/g, ' ').trim();
+                const heatingType = (parcel.heating_type || '').replace(/\s+/g, ' ').trim();
+                
+                const lastSalePrice = parseNumber(parcel.last_sale_price);
+                const lastSaleDate = parcel.last_sale_date || '';
+                const saleYear = lastSaleDate ? new Date(lastSaleDate).getFullYear() : '';
+                const saleDisplay = lastSalePrice > 0 ? `${formatCurrency(lastSalePrice)} (${saleYear})` : '—';
+                
+                return `
                 <tr>
                     <td>${parcel.parcel_id || ''}</td>
                     <td>${parcel.owner_name || ''}</td>
                     <td>${parcel.class_code || ''}</td>
                     <td>${parcel.year_built || '—'}</td>
                     <td>${formatNumber(parcel.living_area_sqft) || '—'}</td>
-                    <td>${parcel.bedrooms || '—'}</td>
+                    <td>${bedBathText}</td>
+                    <td>${buildingStyle || '—'}</td>
+                    <td>${heatingType || '—'}</td>
                     <td>${parcel.lot_size_acres || ''}</td>
                     <td class="currency">${formatCurrency(parcel.land_value)}</td>
                     <td class="currency">${formatCurrency(parcel.building_value)}</td>
                     <td class="currency">${formatCurrency(parcel.total_value)}</td>
+                    <td class="currency">${saleDisplay}</td>
                 </tr>
-            `).join('');
+                `;
+            }).join('');
 
             tbody.innerHTML = rows;
             updatePagination();
