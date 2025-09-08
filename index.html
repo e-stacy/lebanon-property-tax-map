@@ -574,6 +574,9 @@
                     <div id="year-filter"></div>
                 </div>
                 <div class="control-item">
+                    <div id="zoning-filter"></div>
+                </div>
+                <div class="control-item">
                     <label>Min Value ($)</label>
                     <input id="min-value" type="number" placeholder="0">
                 </div>
@@ -796,6 +799,7 @@
                 console.log('Initializing filter with', allParcels.length, 'parcels');
                 workingFilters.createPropertyClassFilter('class-filter', allParcels);
                 workingFilters.createYearBuiltFilter('year-filter', allParcels);
+                workingFilters.createZoningFilter('zoning-filter', allParcels);
             }
         }
 
@@ -822,9 +826,11 @@
             // Get selected classes and years from working filters
             let selectedClasses = [];
             let selectedYears = [];
+            let selectedZones = [];
             if (typeof workingFilters !== 'undefined') {
                 selectedClasses = workingFilters.getSelectedClasses('class-filter');
                 selectedYears = workingFilters.getSelectedYears('year-filter');
+                selectedZones = workingFilters.getSelectedZones('zoning-filter');
             }
 
             filteredParcels = allParcels.filter(parcel => {
@@ -854,6 +860,18 @@
                     } else {
                         // Invalid year data - treat as unknown
                         return selectedYears.includes('unknown');
+                    }
+                }
+
+                // Zoning District filter
+                if (selectedZones.length > 0) {
+                    const zoneValue = parcel['nhdra_lnd zone'];
+                    if (!zoneValue || zoneValue === '0' || zoneValue === '') {
+                        // Include unknown zone properties only if "unknown" is selected
+                        return selectedZones.includes('unknown');
+                    }
+                    if (!selectedZones.includes(zoneValue.trim())) {
+                        return false;
                     }
                 }
 
