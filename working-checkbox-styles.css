@@ -9,9 +9,9 @@ body .working-checkbox-filter {
 .filter-label,
 .working-checkbox-filter .filter-label {
     font-weight: bold !important;
-    margin-bottom: 5px !important;
+    margin-bottom: 4px !important;
     color: #2c3e50 !important;
-    font-size: 0.9em !important;
+    font-size: 0.75em !important;
 }
 
 .checkbox-dropdown,
@@ -27,14 +27,14 @@ body .working-checkbox-filter {
     background: white !important;
     border: 1px solid #ddd !important;
     border-radius: 4px !important;
-    padding: 8px 12px !important;
+    padding: 6px 10px !important;
     cursor: pointer !important;
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
     width: 100% !important;
     box-sizing: border-box !important;
-    font-size: 0.9em !important;
+    font-size: 0.75em !important;
     pointer-events: auto !important;
 }
 
@@ -129,7 +129,7 @@ body .control-row .working-checkbox-filter .dropdown-text {
     padding: 0 !important;
     border-bottom: 1px solid #f0f0f0 !important;
     margin: 0 !important;
-    font-size: 0.85em !important;
+    font-size: 0.7em !important;
     position: relative !important;
 }
 
@@ -138,7 +138,7 @@ body .control-row .working-checkbox-filter .dropdown-text {
 .checkbox-list .checkbox-item label {
     display: flex !important;
     align-items: center !important;
-    padding: 8px 12px !important;
+    padding: 6px 10px !important;
     cursor: pointer !important;
     width: 100% !important;
     box-sizing: border-box !important;
