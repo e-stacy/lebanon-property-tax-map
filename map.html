@@ -1572,11 +1572,16 @@
                 if (canShowMBL) {
                     // Get property data for complete identifier
                     let prop = propertyData.get(mapLot);
-                    // Use the parcel_id which contains the complete map-block-lot identifier
-                    const fullId = prop?.parcel_id || mapLot;
-                    // console.log(`Label for ${mapLot}: found prop with parcel_id = ${prop?.parcel_id}, using ${fullId}`);
-                    labelContent = fullId;
-                    showThisLabel = true;
+                    if (prop) {
+                        // Use the parcel_id which contains the complete map-block-lot identifier
+                        const fullId = prop.parcel_id || mapLot;
+                        labelContent = fullId;
+                        showThisLabel = true;
+                    } else {
+                        // Fallback: use the MAP_LOT from shapefile if no property data found
+                        labelContent = mapLot || 'N/A';
+                        showThisLabel = true;
+                    }
                 }
                 
                 // Add assessed value if requested and zoom allows
@@ -1589,12 +1594,16 @@
                         if (labelContent) {
                             // Both MBL and value - MBL on top, value on bottom
                             // Keep the complete parcel_id, not just mapLot
-                            const fullId = prop?.parcel_id || mapLot;
+                            const fullId = prop.parcel_id || mapLot;
                             labelContent = `${fullId}<br/>$${value}`;
                         } else {
                             // Only value
                             labelContent = `$${value}`;
                         }
+                        showThisLabel = true;
+                    } else if (!labelContent) {
+                        // No property data found and no MBL label - show placeholder
+                        labelContent = 'No Data';
                         showThisLabel = true;
                     }
                 }
