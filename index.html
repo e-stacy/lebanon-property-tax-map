@@ -17,62 +17,70 @@
         body { 
             font-family: system-ui, Arial, sans-serif; 
             margin: 0; 
-            padding: 20px; 
+            padding: 0;
             background: #f8f9fa;
             line-height: 1.5;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            min-height: calc(100vh - 32px);
+            height: 100vh;
             display: flex;
             flex-direction: column;
+            padding: 16px;
+            box-sizing: border-box;
         }
         
-        .footer {
-            margin-top: auto;
-            padding: 20px 0;
-            border-top: 2px solid #e1e5e9;
+        /* Pagination above footer */
+        .pagination-container {
+            padding: 8px 0;
+            text-align: center;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            border-radius: 6px;
+            margin: 4px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            flex-shrink: 0;
+        }
+        
+        /* Fixed footer */
+        .footer {
+            background: white;
+            border-top: 2px solid #e1e5e9;
+            padding: 10px 24px;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+            flex-shrink: 0;
         }
         
         .footer-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 24px;
-            gap: 24px;
-            flex-wrap: wrap;
+            gap: 16px;
         }
         
         .footer-left {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             align-items: center;
-            flex-wrap: wrap;
-        }
-        
-        .footer-right {
-            flex: 1;
-            max-width: 400px;
         }
         
         .footer-btn {
             background: #3498db;
             color: white;
             border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
+            padding: 6px 8px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 0.85em;
+            font-size: 0.75em;
             font-weight: 500;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 3px;
             transition: all 0.2s ease;
         }
         
@@ -89,6 +97,37 @@
         
         .footer-btn.info { background: #17a2b8; }
         .footer-btn.info:hover { background: #138496; }
+        
+        /* Compact inline data access */
+        .data-access {
+            background: linear-gradient(135deg, #e8f4fd 0%, #f0f8ff 100%);
+            padding: 6px 10px;
+            border-radius: 4px;
+            border-left: 3px solid #2196F3;
+            font-size: 0.7em;
+            flex: 1;
+            min-width: 280px;
+        }
+        
+        .data-access strong {
+            color: #1976D2;
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+        
+        .data-access a {
+            color: #1976D2;
+            text-decoration: none;
+            font-weight: 500;
+            margin: 0 3px;
+        }
+        
+        .data-access-note {
+            color: #666;
+            font-size: 0.8em;
+            margin-left: 6px;
+            display: inline;
+        }
 
         .header {
             background: white;
@@ -297,10 +336,11 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0,0,0,0.07);
-            margin-bottom: 16px;
-            height: 600px;
+            flex: 1;
             display: flex;
             flex-direction: column;
+            min-height: 0;
+            margin-bottom: 8px;
         }
 
         .table-wrapper {
@@ -342,9 +382,9 @@
         /* Pagination - Pure CSS */
         .pagination {
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 6px;
-            margin-left: 16px;
+            gap: 4px;
             flex-wrap: wrap;
         }
 
@@ -790,23 +830,25 @@
         document.addEventListener('DOMContentLoaded', loadData);
     </script>
     
+    <!-- Pagination above footer -->
+    <div class="pagination-container">
+        <div id="pagination" class="pagination"></div>
+    </div>
+    
     <!-- Utility Bar Footer -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-left">
-                <button class="footer-btn success" onclick="exportFilteredData()">📊 Export CSV</button>
+                <button class="footer-btn success" onclick="exportFilteredData()">📊 Export</button>
                 <button class="footer-btn warning" onclick="toggleAnalytics()">📈 Analytics</button>
                 <button class="footer-btn info" onclick="toggleComparison()">⚖️ Compare</button>
-                <div id="pagination" class="pagination"></div>
             </div>
-            <div class="footer-right">
-                <div class="data-access">
-                    <strong>🔗 Direct Data Access:</strong> 
-                    <a href="data/parcels.csv">Main Dataset (CSV)</a> |
-                    <a href="spatial/parcels_wgs84.geojson">Map Data (GeoJSON)</a> |
-                    <a href="sitemap.xml">All Files (Sitemap)</a>
-                    <div style="font-size: 0.85em; color: #666; margin-top: 4px;">Raw data files accessible to search engines, AI agents, and researchers</div>
-                </div>
+            <div class="data-access">
+                <strong>🔗 Data:</strong> 
+                <a href="data/parcels.csv">CSV</a> |
+                <a href="spatial/parcels_wgs84.geojson">GeoJSON</a> |
+                <a href="sitemap.xml">Sitemap</a>
+                <span class="data-access-note">Raw data accessible to search engines, AI agents, researchers</span>
             </div>
         </div>
     </footer>
