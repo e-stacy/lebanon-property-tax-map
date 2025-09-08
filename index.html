@@ -66,6 +66,20 @@
             display: flex;
             gap: 8px;
             align-items: center;
+            flex: 1;
+        }
+        
+        .footer-right {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+        }
+        
+        .footer-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
         }
         
         .footer-btn {
@@ -405,7 +419,7 @@
         /* Pagination - Pure CSS */
         .pagination {
             display: flex;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             gap: 4px;
             flex-wrap: wrap;
@@ -853,26 +867,25 @@
         document.addEventListener('DOMContentLoaded', loadData);
     </script>
     
-    <!-- Pagination above footer -->
-    <div class="pagination-container">
-        <div style="font-size: 0.8em; color: #666; text-align: center; margin-bottom: 8px;">↔ Scroll horizontally to view all columns</div>
-        <div id="pagination" class="pagination"></div>
-    </div>
-    
     <!-- Utility Bar Footer -->
     <footer class="footer">
+        <div style="font-size: 0.8em; color: #666; text-align: center; margin-bottom: 8px; padding: 4px 0; background: #f8f9fa; border-radius: 4px;">↔ Scroll horizontally to view all columns</div>
         <div class="footer-content">
             <div class="footer-left">
-                <button class="footer-btn success" onclick="exportFilteredData()">📊 Export</button>
-                <button class="footer-btn warning" onclick="toggleAnalytics()">📈 Analytics</button>
-                <button class="footer-btn info" onclick="toggleComparison()">⚖️ Compare</button>
+                <div id="pagination" class="pagination"></div>
             </div>
-            <div class="data-access">
-                <strong>🔗 Data:</strong> 
-                <a href="data/parcels.csv">CSV</a> |
-                <a href="spatial/parcels_wgs84.geojson">GeoJSON</a> |
-                <a href="sitemap.xml">Sitemap</a>
-                <span class="data-access-note">Raw data accessible to search engines, AI agents, researchers</span>
+            <div class="footer-right">
+                <div class="data-access">
+                    <strong>🔗 Data:</strong> 
+                    <a href="data/parcels.csv">CSV</a> |
+                    <a href="spatial/parcels_wgs84.geojson">GeoJSON</a> |
+                    <a href="sitemap.xml">Sitemap</a>
+                </div>
+                <div class="footer-buttons">
+                    <button class="footer-btn success" onclick="exportFilteredData()">📊 Export</button>
+                    <button class="footer-btn warning" onclick="toggleAnalytics()">📈 Analytics</button>
+                    <button class="footer-btn info" onclick="toggleComparison()">⚖️ Compare</button>
+                </div>
             </div>
         </div>
     </footer>
