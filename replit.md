@@ -13,6 +13,13 @@ This is a property tax database and data explorer for Lebanon, New Hampshire. Th
 - ✅ **CONSISTENT**: Identical behavior on both index.html and map.html pages
 - ✅ **VISUAL DESIGN**: Clear parent-child relationships with styling and indentation
 
+**✅ COMPLETED - Interactive Column Resizing**
+- ✅ **RESIZE HANDLES**: Blue hover indicators on column borders with cursor change
+- ✅ **DRAG FUNCTIONALITY**: Smooth column width adjustment with 80px-400px constraints
+- ✅ **RESET BUTTON**: One-click restoration to default 140px column widths
+- ✅ **USER EXPERIENCE**: Session-only storage, no persistence required
+- ✅ **PRACTICAL**: Addresses wide table navigation by allowing custom column sizing
+
 **NEW FILES CREATED THIS SESSION:**
 - `working-checkbox-filters.js` - Mobile-friendly filter system with readable property names
 - `working-checkbox-styles.css` - Touch-friendly dropdown styling
