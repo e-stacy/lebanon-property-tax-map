@@ -37,7 +37,35 @@ This is a property tax database and data explorer for Lebanon, New Hampshire. Th
 - ✅ Automatic deployment workflow configured for future updates
 - ✅ Comprehensive README created for Right-to-Know law support
 
-**STATUS NOTE**: Lebanon Property Tax Database is now publicly accessible with enhanced NHDRA integration (5,622 properties, 25 columns). Mobile-friendly filters are code-complete but awaiting browser cache resolution.
+**STATUS NOTE**: Lebanon Property Tax Database is now publicly accessible with enhanced NHDRA integration (5,622 properties, 25 columns). Mobile-friendly hierarchical filtering is 95% complete with one remaining CSS alignment issue.
+
+**✅ COMPLETED - Hierarchical Checkbox Functionality**
+- ✅ Touch-friendly checkboxes work without Ctrl+click requirement  
+- ✅ Hierarchical behavior: parent selection auto-checks children, child deselection unchecks parent
+- ✅ Consistent behavior across both index.html and map.html pages
+- ✅ Proper visual hierarchy with 50px subclass indentation
+- ✅ Fully functional filtering with accurate property counts
+
+**❌ REMAINING ISSUE - Text Alignment on Index Page Only**
+- **Problem**: Dropdown button text "All Classes" appears centered instead of left-aligned on index page
+- **Scope**: Issue is specific to index.html only - map.html works correctly
+- **Root Cause**: Parent container CSS on index page (.control-row with flex layout) overrides text alignment
+- **Impact**: Cosmetic only - all functionality works perfectly
+
+**ATTEMPTED SOLUTIONS (All Failed)**:
+1. CSS specificity overrides with !important declarations
+2. Inline styles in JavaScript template  
+3. Absolute positioning approach
+4. Parent container targeting (.controls .control-row)
+5. JavaScript force-styling with setProperty('important')
+
+**FILES MODIFIED THIS SESSION**:
+- `working-checkbox-filters.js` - Complete hierarchical checkbox system
+- `working-checkbox-styles.css` - Touch-friendly dropdown styling  
+- `index.html` and `map.html` - Updated to use new filter system
+
+**FOR NEXT AGENT**: 
+The dropdown text alignment issue appears to be caused by deeply nested CSS inheritance on the index page that's proving resistant to standard override methods. Consider investigating the exact computed style cascade or implementing an entirely different layout approach for the index page dropdown.
 
 ## User Preferences
 
