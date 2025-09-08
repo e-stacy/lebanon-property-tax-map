@@ -198,6 +198,10 @@
             </div>
             
             <div class="filter-group">
+                <div id="heating-filter"></div>
+            </div>
+            
+            <div class="filter-group">
                 <label>Min Value ($):</label>
                 <input type="number" id="min-value" placeholder="0">
             </div>
@@ -686,6 +690,7 @@
                 if (typeof workingFilters !== 'undefined') {
                     workingFilters.createPropertyClassFilter('class-filter', propertyData);
                     workingFilters.createZoningFilter('zoning-filter', propertyData);
+                    workingFilters.createHeatingFilter('heating-filter', propertyData);
                 }
                 
                 // Load spatial data
@@ -1006,6 +1011,7 @@
         function passesFilters(property) {
             const selectedClasses = getSelectedValues('class-filter');
             const selectedZones = getSelectedValues('zoning-filter');
+            const selectedHeating = getSelectedValues('heating-filter');
             const minValue = parseFloat(document.getElementById('min-value').value) || 0;
             const maxValue = parseFloat(document.getElementById('max-value').value) || Infinity;
             
@@ -1025,6 +1031,24 @@
                     }
                 } else if (!selectedZones.includes(zoneValue.trim())) {
                     return false;
+                }
+            }
+            
+            // Heating System filter
+            if (selectedHeating.length > 0) {
+                const heatFuel = property['nhdra_vns heat fuel desc'];
+                const heatType = property['nhdra_vns heat type desc'];
+                
+                if (!heatFuel || heatFuel === '0' || heatFuel === '' ||
+                    !heatType || heatType === '0' || heatType === '') {
+                    if (!selectedHeating.includes('unknown')) {
+                        return false;
+                    }
+                } else {
+                    const heatingCombination = `${heatFuel.trim()}|${heatType.trim()}`;
+                    if (!selectedHeating.includes(heatingCombination)) {
+                        return false;
+                    }
                 }
             }
             

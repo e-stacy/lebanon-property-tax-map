@@ -577,6 +577,9 @@
                     <div id="zoning-filter"></div>
                 </div>
                 <div class="control-item">
+                    <div id="heating-filter"></div>
+                </div>
+                <div class="control-item">
                     <label>Min Value ($)</label>
                     <input id="min-value" type="number" placeholder="0">
                 </div>
@@ -800,6 +803,7 @@
                 workingFilters.createPropertyClassFilter('class-filter', allParcels);
                 workingFilters.createYearBuiltFilter('year-filter', allParcels);
                 workingFilters.createZoningFilter('zoning-filter', allParcels);
+                workingFilters.createHeatingFilter('heating-filter', allParcels);
             }
         }
 
@@ -827,10 +831,12 @@
             let selectedClasses = [];
             let selectedYears = [];
             let selectedZones = [];
+            let selectedHeating = [];
             if (typeof workingFilters !== 'undefined') {
                 selectedClasses = workingFilters.getSelectedClasses('class-filter');
                 selectedYears = workingFilters.getSelectedYears('year-filter');
                 selectedZones = workingFilters.getSelectedZones('zoning-filter');
+                selectedHeating = workingFilters.getSelectedHeating('heating-filter');
             }
 
             filteredParcels = allParcels.filter(parcel => {
@@ -871,6 +877,23 @@
                         return selectedZones.includes('unknown');
                     }
                     if (!selectedZones.includes(zoneValue.trim())) {
+                        return false;
+                    }
+                }
+
+                // Heating System filter
+                if (selectedHeating.length > 0) {
+                    const heatFuel = parcel['nhdra_vns heat fuel desc'];
+                    const heatType = parcel['nhdra_vns heat type desc'];
+                    
+                    if (!heatFuel || heatFuel === '0' || heatFuel === '' ||
+                        !heatType || heatType === '0' || heatType === '') {
+                        // Include unknown heating properties only if "unknown" is selected
+                        return selectedHeating.includes('unknown');
+                    }
+                    
+                    const heatingCombination = `${heatFuel.trim()}|${heatType.trim()}`;
+                    if (!selectedHeating.includes(heatingCombination)) {
                         return false;
                     }
                 }
