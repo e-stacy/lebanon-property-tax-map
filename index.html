@@ -32,9 +32,63 @@
         
         .footer {
             margin-top: auto;
-            padding-top: 24px;
-            border-top: 1px solid #e1e5e9;
+            padding: 20px 0;
+            border-top: 2px solid #e1e5e9;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
         }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .footer-left {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .footer-right {
+            flex: 1;
+            max-width: 400px;
+        }
+        
+        .footer-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .footer-btn:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+        
+        .footer-btn.success { background: #27ae60; }
+        .footer-btn.success:hover { background: #219a52; }
+        
+        .footer-btn.warning { background: #f39c12; }
+        .footer-btn.warning:hover { background: #d68910; }
+        
+        .footer-btn.info { background: #17a2b8; }
+        .footer-btn.info:hover { background: #138496; }
 
         .header {
             background: white;
@@ -243,11 +297,15 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0,0,0,0.07);
-            margin-bottom: 24px;
+            margin-bottom: 16px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
         }
 
         .table-wrapper {
-            overflow-x: auto;
+            overflow: auto;
+            flex: 1;
         }
 
         table {
@@ -284,26 +342,23 @@
         /* Pagination - Pure CSS */
         .pagination {
             display: flex;
-            justify-content: center;
             align-items: center;
-            gap: 8px;
-            padding: 20px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            gap: 6px;
+            margin-left: 16px;
+            flex-wrap: wrap;
         }
 
         .page-btn {
-            padding: 10px 16px;
-            border: 2px solid #e1e5e9;
-            background: white;
-            border-radius: 8px;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            background: #f8f9fa;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 0.9em;
+            font-size: 0.8em;
             font-weight: 500;
             transition: all 0.2s ease;
             text-decoration: none;
-            color: #2c3e50;
+            color: #555;
         }
 
         .page-btn:hover {
@@ -438,9 +493,6 @@
             </div>
             
             <div class="actions">
-                <button class="btn btn-success" onclick="exportFilteredData()">📊 Export CSV</button>
-                <button class="btn btn-warning" onclick="toggleAnalytics()">📈 Analytics</button>
-                <button class="btn btn-info" onclick="toggleComparison()">⚖️ Compare</button>
                 <button class="btn" onclick="clearFilters()">🔄 Reset Filters</button>
             </div>
             
@@ -478,7 +530,6 @@
             </div>
         </div>
 
-        <div id="pagination" class="pagination"></div>
     </div>
 
     <!-- Working Checkbox Filter System -->
@@ -739,14 +790,24 @@
         document.addEventListener('DOMContentLoaded', loadData);
     </script>
     
-    <!-- Footer with Data Access -->
+    <!-- Utility Bar Footer -->
     <footer class="footer">
-        <div class="data-access">
-            <strong>🔗 Direct Data Access:</strong> 
-            <a href="data/parcels.csv">Main Dataset (CSV)</a> |
-            <a href="spatial/parcels_wgs84.geojson">Map Data (GeoJSON)</a> |
-            <a href="sitemap.xml">All Files (Sitemap)</a>
-            <div style="font-size: 0.9em; color: #666; margin-top: 6px;">Raw data files accessible to search engines, AI agents, and researchers</div>
+        <div class="footer-content">
+            <div class="footer-left">
+                <button class="footer-btn success" onclick="exportFilteredData()">📊 Export CSV</button>
+                <button class="footer-btn warning" onclick="toggleAnalytics()">📈 Analytics</button>
+                <button class="footer-btn info" onclick="toggleComparison()">⚖️ Compare</button>
+                <div id="pagination" class="pagination"></div>
+            </div>
+            <div class="footer-right">
+                <div class="data-access">
+                    <strong>🔗 Direct Data Access:</strong> 
+                    <a href="data/parcels.csv">Main Dataset (CSV)</a> |
+                    <a href="spatial/parcels_wgs84.geojson">Map Data (GeoJSON)</a> |
+                    <a href="sitemap.xml">All Files (Sitemap)</a>
+                    <div style="font-size: 0.85em; color: #666; margin-top: 4px;">Raw data files accessible to search engines, AI agents, and researchers</div>
+                </div>
+            </div>
         </div>
     </footer>
 </body>
