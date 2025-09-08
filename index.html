@@ -159,6 +159,13 @@
         .header-left {
             flex: 1;
         }
+        
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
 
         h1 { 
             margin: 0 0 8px 0; 
@@ -175,10 +182,9 @@
             border-radius: 6px;
             border-left: 3px solid #27ae60;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            width: 300px;
+            width: 250px;
             line-height: 1.3;
             font-weight: 500;
-            margin-bottom: 12px;
             text-align: center;
         }
 
@@ -710,12 +716,13 @@
                 </div>
             </div>
             
-            <a href="map.html" class="map-button">🗺️ View Map Interface</a>
+            <div class="header-right">
+                <a href="map.html" class="map-button">🗺️ View Map Interface</a>
+                <div class="subtitle-box">
+                    Comprehensive property assessment data for the City of Lebanon, NH
+                </div>
+            </div>
         </header>
-        
-        <div class="subtitle-box">
-            Comprehensive property assessment data for the City of Lebanon, NH
-        </div>
 
         <div class="controls">
             <div class="controls-row">
