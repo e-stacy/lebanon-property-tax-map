@@ -62,24 +62,23 @@
             margin-bottom: 20px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .control-row { 
-            display: flex; 
-            gap: 12px; 
-            margin-bottom: 8px; 
-            align-items: flex-end;
-            flex-wrap: nowrap;
+        .controls-grid { 
+            display: grid; 
+            grid-template-columns: 2fr 1fr 1fr 1fr; 
+            gap: 16px; 
+            margin-bottom: 16px; 
+            align-items: start;
         }
         .control-group {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            min-width: 120px;
+            display: block;
+            width: 100%;
         }
         .control-label {
             font-size: 0.85em;
             color: #666;
             margin-bottom: 4px;
             font-weight: 500;
+            display: block;
         }
         input, select { 
             padding: 8px 10px; 
@@ -280,9 +279,9 @@
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-            .control-row {
-                flex-direction: column;
-                align-items: stretch;
+            .controls-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
             }
             .action-buttons {
                 justify-content: center;
@@ -331,20 +330,25 @@
     </div>
 
     <div class="controls">
-        <div class="control-row">
-            <div class="search-suggestions">
-                <input id="search" type="search" placeholder="Search by address, owner, or parcel ID...">
-                <div id="suggestions-dropdown" class="suggestions-dropdown"></div>
+        <div class="controls-grid">
+            <div class="control-group">
+                <label class="control-label">Search Properties</label>
+                <div class="search-suggestions">
+                    <input id="search" type="search" placeholder="Search by address, owner, or parcel ID...">
+                    <div id="suggestions-dropdown" class="suggestions-dropdown"></div>
+                </div>
             </div>
-            <div id="class-filter"></div>
-            <label>
-                Min Value: $
-                <input id="min-value" type="number" placeholder="0" style="width: 120px;">
-            </label>
-            <label>
-                Max Value: $
-                <input id="max-value" type="number" placeholder="Any" style="width: 120px;">
-            </label>
+            <div class="control-group">
+                <div id="class-filter"></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">Min Value ($)</label>
+                <input id="min-value" type="number" placeholder="0">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Max Value ($)</label>
+                <input id="max-value" type="number" placeholder="Any">
+            </div>
         </div>
     </div>
         
