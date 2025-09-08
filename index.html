@@ -209,12 +209,76 @@
             background: #219a52;
         }
 
-        /* Stats Grid - CSS Grid Layout */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
+        /* Enhanced Stats Table Layout */
+        .stats-table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             margin-bottom: 16px;
+            overflow: hidden;
+        }
+        
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+        
+        .stats-table th {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            border: none;
+        }
+        
+        .category-header {
+            width: 35%;
+        }
+        
+        .data-header {
+            width: 21.7%;
+            text-align: center;
+        }
+        
+        .stats-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
+        }
+        
+        .stats-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .stats-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .category-label {
+            font-weight: 600;
+            color: #2c3e50;
+            background: #f8f9fa;
+        }
+        
+        .percent-data {
+            text-align: center;
+            font-weight: 700;
+            color: #e74c3c;
+            font-size: 1.1em;
+        }
+        
+        .selected-data {
+            text-align: center;
+            font-weight: 600;
+            color: #27ae60;
+        }
+        
+        .total-data {
+            text-align: center;
+            font-weight: 500;
+            color: #7f8c8d;
         }
 
         .stat-card {
@@ -513,9 +577,16 @@
             
             h1 { font-size: 1.8em; }
             
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
+            .stats-table-container {
+                margin-bottom: 12px;
+            }
+            
+            .stats-table {
+                font-size: 0.8em;
+            }
+            
+            .stats-table th, .stats-table td {
+                padding: 8px 12px;
             }
             
             .controls-row {
@@ -541,8 +612,20 @@
         }
 
         @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
+            .stats-table {
+                font-size: 0.75em;
+            }
+            
+            .stats-table th, .stats-table td {
+                padding: 6px 8px;
+            }
+            
+            .category-header {
+                width: 30%;
+            }
+            
+            .data-header {
+                width: 23.3%;
             }
             
             .stat-number {
@@ -599,23 +682,49 @@
             </div>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span class="stat-number" id="total-parcels">—</span>
-                <div class="stat-label">Total Parcels</div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number" id="total-value">—</span>
-                <div class="stat-label">Total Assessed Value</div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number" id="median-value">—</span>
-                <div class="stat-label">Median Property Value</div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number" id="property-classes">—</span>
-                <div class="stat-label">Property Classes</div>
-            </div>
+        <div class="stats-table-container">
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th class="category-header">Category</th>
+                        <th class="data-header">Percent Selected</th>
+                        <th class="data-header">Selected</th>
+                        <th class="data-header">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="category-label">Total Parcels</td>
+                        <td class="percent-data" id="parcels-percent">—</td>
+                        <td class="selected-data" id="parcels-selected">—</td>
+                        <td class="total-data" id="parcels-total">—</td>
+                    </tr>
+                    <tr>
+                        <td class="category-label">Assessed Value</td>
+                        <td class="percent-data" id="value-percent">—</td>
+                        <td class="selected-data" id="value-selected">—</td>
+                        <td class="total-data" id="value-total">—</td>
+                    </tr>
+                    <tr>
+                        <td class="category-label">Median Value</td>
+                        <td class="percent-data" id="median-percent">—</td>
+                        <td class="selected-data" id="median-selected">—</td>
+                        <td class="total-data" id="median-total">—</td>
+                    </tr>
+                    <tr>
+                        <td class="category-label">Median Age</td>
+                        <td class="percent-data" id="age-percent">—</td>
+                        <td class="selected-data" id="age-selected">—</td>
+                        <td class="total-data" id="age-total">—</td>
+                    </tr>
+                    <tr>
+                        <td class="category-label">Land Area</td>
+                        <td class="percent-data" id="land-percent">—</td>
+                        <td class="selected-data" id="land-selected">—</td>
+                        <td class="total-data" id="land-total">—</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
         <div class="table-container">
@@ -807,18 +916,65 @@
             }
         }
 
-        // Update statistics
+        // Enhanced Statistics with Percentage Analysis
         function updateStats() {
+            // Calculate totals from all parcels (city-wide baseline)
             const totalParcels = allParcels.length;
             const totalValue = allParcels.reduce((sum, p) => sum + parseNumber(p.total_value), 0);
-            const values = allParcels.map(p => parseNumber(p.total_value)).filter(v => v > 0).sort((a, b) => a - b);
-            const medianValue = values.length > 0 ? values[Math.floor(values.length / 2)] : 0;
-            const validClasses = new Set(allParcels.map(p => p.class_code).filter(c => c));
-
-            document.getElementById('total-parcels').textContent = formatNumber(totalParcels);
-            document.getElementById('total-value').textContent = formatCurrency(totalValue);
-            document.getElementById('median-value').textContent = formatCurrency(medianValue);
-            document.getElementById('property-classes').textContent = formatNumber(validClasses.size);
+            const totalValues = allParcels.map(p => parseNumber(p.total_value)).filter(v => v > 0).sort((a, b) => a - b);
+            const totalMedianValue = totalValues.length > 0 ? totalValues[Math.floor(totalValues.length / 2)] : 0;
+            
+            // Calculate total median age
+            const totalAges = allParcels.map(p => {
+                const year = parseNumber(p['nhdra_vns ayb']);
+                return year > 1800 && year <= 2025 ? 2025 - year : null;
+            }).filter(age => age !== null).sort((a, b) => a - b);
+            const totalMedianAge = totalAges.length > 0 ? totalAges[Math.floor(totalAges.length / 2)] : 0;
+            
+            // Calculate total land area
+            const totalLandArea = allParcels.reduce((sum, p) => sum + parseNumber(p.lot_size_acres), 0);
+            
+            // Calculate selected (filtered) values
+            const selectedParcels = filteredParcels.length;
+            const selectedValue = filteredParcels.reduce((sum, p) => sum + parseNumber(p.total_value), 0);
+            const selectedValues = filteredParcels.map(p => parseNumber(p.total_value)).filter(v => v > 0).sort((a, b) => a - b);
+            const selectedMedianValue = selectedValues.length > 0 ? selectedValues[Math.floor(selectedValues.length / 2)] : 0;
+            
+            // Calculate selected median age
+            const selectedAges = filteredParcels.map(p => {
+                const year = parseNumber(p['nhdra_vns ayb']);
+                return year > 1800 && year <= 2025 ? 2025 - year : null;
+            }).filter(age => age !== null).sort((a, b) => a - b);
+            const selectedMedianAge = selectedAges.length > 0 ? selectedAges[Math.floor(selectedAges.length / 2)] : 0;
+            
+            // Calculate selected land area
+            const selectedLandArea = filteredParcels.reduce((sum, p) => sum + parseNumber(p.lot_size_acres), 0);
+            
+            // Calculate percentages
+            const parcelPercent = totalParcels > 0 ? (selectedParcels / totalParcels * 100).toFixed(1) : 0;
+            const valuePercent = totalValue > 0 ? (selectedValue / totalValue * 100).toFixed(1) : 0;
+            const landPercent = totalLandArea > 0 ? (selectedLandArea / totalLandArea * 100).toFixed(1) : 0;
+            
+            // Update the table
+            document.getElementById('parcels-percent').textContent = parcelPercent + '%';
+            document.getElementById('parcels-selected').textContent = formatNumber(selectedParcels);
+            document.getElementById('parcels-total').textContent = formatNumber(totalParcels);
+            
+            document.getElementById('value-percent').textContent = valuePercent + '%';
+            document.getElementById('value-selected').textContent = formatCurrency(selectedValue);
+            document.getElementById('value-total').textContent = formatCurrency(totalValue);
+            
+            document.getElementById('median-percent').textContent = '—';
+            document.getElementById('median-selected').textContent = formatCurrency(selectedMedianValue);
+            document.getElementById('median-total').textContent = formatCurrency(totalMedianValue);
+            
+            document.getElementById('age-percent').textContent = '—';
+            document.getElementById('age-selected').textContent = selectedMedianAge + ' years';
+            document.getElementById('age-total').textContent = totalMedianAge + ' years';
+            
+            document.getElementById('land-percent').textContent = landPercent + '%';
+            document.getElementById('land-selected').textContent = selectedLandArea.toFixed(1) + ' acres';
+            document.getElementById('land-total').textContent = totalLandArea.toFixed(1) + ' acres';
         }
 
         // Apply filters
@@ -907,6 +1063,7 @@
             });
 
             currentPage = 1;
+            updateStats();
             renderTable();
             updateFilteredCount();
         }
