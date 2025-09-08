@@ -59,6 +59,14 @@ body .control-row .working-checkbox-filter .dropdown-text {
     padding: 0 !important;
 }
 
+/* FIX INDEX PAGE: Override parent container centering */
+.controls .control-row,
+.controls .control-row *,
+.control-row .working-checkbox-filter,
+.control-row .working-checkbox-filter * {
+    text-align: left !important;
+}
+
 /* Simplified dropdown styles - inline styles handle alignment */
 .dropdown-button:hover {
     border-color: #2196F3 !important;
