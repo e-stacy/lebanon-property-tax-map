@@ -367,7 +367,7 @@
 
         table {
             width: 100%;
-            min-width: 5000px;
+            min-width: 3000px;
             border-collapse: collapse;
             font-size: 0.8em;
             white-space: nowrap;
@@ -589,7 +589,7 @@
                     </thead>
                     <tbody id="parcels-table">
                         <tr>
-                            <td colspan="70" class="loading">Loading property data...</td>
+                            <td colspan="50" class="loading">Loading property data...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -674,19 +674,92 @@
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('parcels-table').innerHTML = 
-                    '<tr><td colspan="70" class="no-results">Error loading data</td></tr>';
+                    '<tr><td colspan="50" class="no-results">Error loading data</td></tr>';
             }
         }
         
-        // Generate table headers dynamically for all columns
-        function generateTableHeaders(headers) {
+        // Generate table headers dynamically for filtered columns
+        function generateTableHeaders(allHeaders) {
+            // Remove unwanted columns
+            const excludeColumns = [
+                'situs_address', 'mailing_address1', 'mailing_city', 'mailing_state', 'mailing_zip',
+                'nhdra_rem prcl locn street', 'nhdra_rem prcl locn', 'nhdra_address1', 'nhdra_city', 
+                'nhdra_state', 'nhdra_zip', 'nhdra_grantor', 'nhdra_book pg',
+                'nhdra_ID1 Prior Sale Price', 'nhdra_ID1 Prior Sale Date', 'nhdra_ID1 Prior Book Page',
+                'nhdra_ID2 Prior Sale Price', 'nhdra_ID2 Prior Sale Date', 'nhdra_ID2 Prior Book Page', 
+                'nhdra_ID3 Prior Sale Price', 'nhdra_ID3 Prior Sale Date', 'nhdra_ID3 Prior Book Page'
+            ];
+            
+            const filteredHeaders = allHeaders.filter(h => !excludeColumns.includes(h));
+            
             const headerRow = document.getElementById('table-headers');
-            const headerHtml = headers.map(header => {
-                const displayName = header.replace('nhdra_', '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            const headerHtml = filteredHeaders.map(header => {
+                let displayName = translateColumnName(header);
                 const className = header.includes('value') || header.includes('price') || header.includes('Price') ? 'currency' : '';
                 return `<th class="${className}">${displayName}</th>`;
             }).join('');
             headerRow.innerHTML = headerHtml;
+            
+            // Store filtered headers for table rendering
+            window.displayColumns = filteredHeaders;
+        }
+        
+        // Translate column names with proper meanings for abbreviations
+        function translateColumnName(header) {
+            const translations = {
+                'parcel_id': 'Parcel ID',
+                'owner_name': 'Owner',
+                'co_own_name': 'Co-Owner',
+                'class_code': 'Property Class',
+                'lot_size_acres': 'Lot Size (acres)',
+                'land_value': 'Land Value',
+                'building_value': 'Building Value', 
+                'total_value': 'Total Value',
+                'nhdra_own name': 'NHDRA Owner',
+                'nhdra_co own name': 'NHDRA Co-Owner',
+                'nhdra_saleprice': 'Sale Price',
+                'nhdra_saledate': 'Sale Date',
+                'nhdra_qualified': 'Sale Qualified',
+                'nhdra_rem use code': 'Use Code',
+                'nhdra_lnd zone': 'Land Zone',
+                'nhdra_prc ttl lnd area acres': 'Parcel Total Land Area (acres)',
+                'nhdra_prc ttl assess bldg': 'Parcel Total Assessed Building',
+                'nhdra_prc ttl assess xf': 'Parcel Total Assessed Exempt',
+                'nhdra_prc ttl assess lnd': 'Parcel Total Assessed Land',
+                'nhdra_prc ttl assess ob': 'Parcel Total Assessed Outbuilding',
+                'nhdra_prc ttl assess': 'Parcel Total Assessment',
+                'nhdra_cns area living': 'Construction Living Area',
+                'nhdra_vns ayb': 'Year Built',
+                'nhdra_vns style desc': 'Building Style',
+                'nhdra_rem pid': 'Property ID',
+                'nhdra_vns grade': 'Grade (numeric)',
+                'nhdra_vns grade desc': 'Grade Description',
+                'nhdra_vns roof struct desc': 'Roof Structure',
+                'nhdra_vns roof cover desc': 'Roof Cover',
+                'nhdra_vns int flr1 desc': 'Interior Floor',
+                'nhdra_vns int wall1 desc': 'Interior Wall',
+                'nhdra_vns ext wall1 desc': 'Exterior Wall',
+                'nhdra_cns area effective': 'Construction Effective Area',
+                'nhdra_vns tot rooms': 'Total Rooms',
+                'nhdra_vns num bedrm': 'Bedrooms',
+                'nhdra_vns num baths': 'Bathrooms',
+                'nhdra_vns num hbaths': 'Half Bathrooms',
+                'nhdra_vns bathrm style desc': 'Bathroom Style',
+                'nhdra_vns kitchen style desc': 'Kitchen Style',
+                'nhdra_vns heat type desc': 'Heating Type',
+                'nhdra_vns heat fuel desc': 'Heating Fuel',
+                'nhdra_cns pct good': 'Construction Percent Good',
+                'nhdra_cns eyb code': 'Construction Effective Year Built Code',
+                'nhdra_lnd nbhd': 'Land Neighborhood',
+                'nhdra_vns stories': 'Stories',
+                'nhdra_ahd ttl assess bldg': 'Alternative Assessed Building',
+                'nhdra_ahd ttl assess xf': 'Alternative Assessed Exempt',
+                'nhdra_ahd ttl assess lnd': 'Alternative Assessed Land',
+                'nhdra_ahd ttl assess ob': 'Alternative Assessed Outbuilding',
+                'nhdra_ahd ttl assess': 'Alternative Total Assessment'
+            };
+            
+            return translations[header] || header.replace('nhdra_', '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         }
 
         // Initialize filter - Simple, reliable approach
@@ -753,19 +826,18 @@
             const tbody = document.getElementById('parcels-table');
             
             if (filteredParcels.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="70" class="no-results">No properties match your criteria</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="50" class="no-results">No properties match your criteria</td></tr>';
                 updatePagination();
                 return;
             }
 
             const startIndex = (currentPage - 1) * rowsPerPage;
             const endIndex = startIndex + rowsPerPage;
-            // Get all available column headers from the first parcel
-            const sampleParcel = allParcels[0] || {};
-            const allColumns = Object.keys(sampleParcel);
+            // Use filtered columns for display
+            const displayColumns = window.displayColumns || Object.keys(allParcels[0] || {});
             
             const rows = filteredParcels.slice(startIndex, endIndex).map(parcel => {
-                const cells = allColumns.map(column => {
+                const cells = displayColumns.map(column => {
                     let value = parcel[column] || '';
                     
                     // Format specific column types
@@ -781,6 +853,16 @@
                         // Areas - format as numbers
                         const num = parseNumber(value);
                         value = num > 0 ? formatNumber(num) : '—';
+                    } else if (column.includes('saledate') && value) {
+                        // Remove timestamp from sale dates - keep only date part
+                        try {
+                            const date = new Date(value);
+                            if (!isNaN(date.getTime())) {
+                                value = date.toLocaleDateString('en-US');
+                            }
+                        } catch (e) {
+                            // Keep original value if date parsing fails
+                        }
                     }
                     
                     return `<td>${value}</td>`;
