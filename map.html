@@ -1590,81 +1590,38 @@
     <script src="working-checkbox-filters.js"></script>
     <script>
         // Override applyFilters for map page
-        const originalMapApplyFilters = applyFilters;
         applyFilters = function() {
             console.log('Map applyFilters called');
             
-            // Get selected property classes
-            const selectedClasses = workingFilters.getSelectedClasses('class-filter');
-            console.log('Selected classes:', selectedClasses);
+            // Call the fixed updateStats function to handle statistics
+            updateStats();
             
-            // Apply filters to map layers
-            let visibleCount = 0;
-            let totalValue = 0;
-            let visibleValues = [];
+            // Update the map layer display
+            updateParcelLayer();
             
-            parcelsLayer.eachLayer(function(layer) {
-                const parcelId = layer.feature.properties.MBL || layer.feature.properties.mapLot;
-                const prop = propertyData.get(parcelId);
-                
-                let isVisible = true;
-                
-                if (prop) {
-                    // Property class filter
-                    if (selectedClasses.length > 0) {
-                        if (!selectedClasses.includes(prop.class_code)) {
-                            isVisible = false;
-                        }
-                    }
-                    
-                    // Value range filter
-                    if (isVisible) {
-                        const minValue = parseFloat(document.getElementById('min-value').value);
-                        const maxValue = parseFloat(document.getElementById('max-value').value);
-                        const totalVal = parseFloat(prop.total_value) || 0;
-                        
-                        if (!isNaN(minValue) && totalVal < minValue) isVisible = false;
-                        if (!isNaN(maxValue) && totalVal > maxValue) isVisible = false;
-                    }
-                    
-                    if (isVisible) {
-                        visibleCount++;
-                        const value = parseFloat(prop.total_value) || 0;
-                        totalValue += value;
-                        visibleValues.push(value);
-                    }
-                }
-                
-                // Show/hide the layer
-                if (isVisible) {
-                    layer.addTo(map);
-                } else {
-                    map.removeLayer(layer);
-                }
-            });
-            
-            // Update statistics
-            document.getElementById('visible-count').textContent = visibleCount.toLocaleString();
-            document.getElementById('total-value').textContent = (totalValue / 1000000).toFixed(1) + 'M';
-            
-            // Calculate median
-            if (visibleValues.length > 0) {
-                visibleValues.sort((a, b) => a - b);
-                const median = visibleValues[Math.floor(visibleValues.length / 2)];
-                document.getElementById('median-value').textContent = (median / 1000).toFixed(0) + 'K';
-            } else {
-                document.getElementById('median-value').textContent = '0';
-            }
-            
-            // Calculate percentages
-            const totalParcels = propertyData.size;
-            const allTotalValue = Array.from(propertyData.values()).reduce((sum, prop) => sum + (parseFloat(prop.total_value) || 0), 0);
-            
-            document.getElementById('parcel-percentage').textContent = totalParcels > 0 ? ((visibleCount / totalParcels) * 100).toFixed(1) + '%' : '0%';
-            document.getElementById('value-percentage').textContent = allTotalValue > 0 ? ((totalValue / allTotalValue) * 100).toFixed(1) + '%' : '0%';
+            // Update legend
+            updateLegend();
         };
         
-        // Note: Filter initialization now happens in loadPropertyData() function
+        // Call initial statistics update when page loads
+        function initializeMapStats() {
+            // Wait for property data to be loaded
+            if (typeof propertyData !== 'undefined' && propertyData.size > 0) {
+                console.log('Initializing map statistics with', propertyData.size, 'properties');
+                updateStats();
+                updateLegend();
+            } else {
+                // Try again in 500ms if data isn't loaded yet
+                setTimeout(initializeMapStats, 500);
+            }
+        }
+        
+        // Initialize stats when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initializeMapStats, 1000); // Give time for data to load
+        });
+        
+        // Note: Filter and statistics initialization happens automatically
     </script>
     
 </body>
