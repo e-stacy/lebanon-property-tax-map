@@ -109,6 +109,22 @@ class WorkingCheckboxFilters {
         `;
 
         container.innerHTML = filterHtml;
+        
+        // NUCLEAR OPTION: Force text alignment with JavaScript (bypass all CSS)
+        setTimeout(() => {
+            const dropdownText = container.querySelector('.dropdown-text');
+            const dropdownButton = container.querySelector('.dropdown-button');
+            if (dropdownText && dropdownButton) {
+                // Force styles directly via JavaScript - overrides everything
+                dropdownButton.style.setProperty('display', 'flex', 'important');
+                dropdownButton.style.setProperty('justify-content', 'flex-start', 'important');
+                dropdownButton.style.setProperty('text-align', 'left', 'important');
+                dropdownText.style.setProperty('text-align', 'left', 'important');
+                dropdownText.style.setProperty('margin-left', '0px', 'important');
+                dropdownText.style.setProperty('padding-left', '0px', 'important');
+                console.log('FORCED dropdown alignment via JavaScript');
+            }
+        }, 50);
     }
 
     generateClassCheckboxes(classCounts, containerId) {
