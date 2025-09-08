@@ -1030,42 +1030,45 @@
         }
 
         function getOptimalColumnWidth(columnKey, displayName) {
-            // Define optimal widths based on content type
+            // Define optimal widths based on actual data content (data-dense approach)
             const widthMap = {
-                // Short numeric columns
-                'stories': 70,
-                'grade': 60,
-                'year_built': 85,
-                'bedrooms': 80,
-                'full_baths': 85,
-                'half_baths': 85,
-                'fireplaces': 90,
+                // Very short numeric columns
+                'stories': 60,
+                'grade': 50,
+                'year_built': 75,
+                'bedrooms': 70,
+                'full_baths': 75,
+                'half_baths': 75,
+                'fireplaces': 80,
                 
-                // Currency columns need more space
-                'total_value': 120,
-                'building_value': 120,
-                'land_value': 110,
-                'assessed_value': 120,
-                'price': 110,
+                // Currency columns - compact but readable
+                'total_value': 105,
+                'building_value': 105,
+                'land_value': 95,
+                'assessed_value': 105,
+                'price': 95,
                 
-                // Text columns vary by content
-                'zoning_district': 110,
-                'property_class': 180,
-                'neighborhood': 130,
-                'construction': 120,
-                'style': 100,
-                'heating': 100,
-                'fuel': 80,
-                'condition': 90,
+                // Text columns - much tighter
+                'owner': 140,           // Names don't need huge space
+                'zoning_district': 90,  // Usually short codes
+                'property_class': 130,  // Reduced from 180
+                'neighborhood': 110,    // Reduced from 130
+                'construction': 100,    // Reduced from 120
+                'style': 85,           // Reduced from 100
+                'heating': 85,         // Reduced from 100
+                'fuel': 65,            // Reduced from 80
+                'condition': 80,       // Reduced from 90
                 
-                // Map-block-lot and IDs
-                'map_block_lot': 130,
-                'parcel': 80,
-                'account': 90,
+                // IDs and codes - very compact
+                'map_block_lot': 110,  // Reduced from 130
+                'parcel': 65,          // Reduced from 80
+                'account': 75,         // Reduced from 90
+                'lot_size_acres': 80,  // Decimal numbers don't need much space
                 
-                // Boolean/short text
-                'arms_length': 90,
-                'multi_parcels': 100
+                // Boolean/short text - minimal
+                'arms_length': 75,     // Just Y/N values
+                'multi_parcels': 85,   // Reduced from 100
+                'sale_date': 85        // Date format is consistent
             };
             
             // Check if we have a specific width for this column
@@ -1073,13 +1076,13 @@
                 return widthMap[columnKey];
             }
             
-            // Fall back to header text length estimation
+            // More aggressive fallback for unknown columns
             const textLength = displayName.length;
-            if (textLength <= 8) return 80;
-            if (textLength <= 12) return 100;
-            if (textLength <= 16) return 120;
-            if (textLength <= 20) return 140;
-            return 160;
+            if (textLength <= 6) return 60;
+            if (textLength <= 10) return 85;
+            if (textLength <= 14) return 100;
+            if (textLength <= 18) return 115;
+            return 130;
         }
 
         function resetColumnWidths() {
