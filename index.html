@@ -721,16 +721,16 @@
             const startIndex = (currentPage - 1) * rowsPerPage;
             const endIndex = startIndex + rowsPerPage;
             const rows = filteredParcels.slice(startIndex, endIndex).map(parcel => {
-                const bedrooms = parcel.bedrooms || '0';
-                const fullBaths = parcel.full_baths || '0';
-                const halfBaths = parcel.half_baths || '0';
+                const bedrooms = parcel['nhdra_vns num bedrm'] || '0';
+                const fullBaths = parcel['nhdra_vns num baths'] || '0';
+                const halfBaths = parcel['nhdra_vns num hbaths'] || '0';
                 const bedBathText = `${bedrooms}br/${fullBaths}${halfBaths > 0 ? '.5' : ''}ba`;
                 
-                const buildingStyle = (parcel.building_style || '').replace(/\s+/g, ' ').trim();
-                const heatingType = (parcel.heating_type || '').replace(/\s+/g, ' ').trim();
+                const buildingStyle = (parcel['nhdra_vns style desc'] || '').replace(/\s+/g, ' ').trim();
+                const heatingType = (parcel['nhdra_vns heat type desc'] || '').replace(/\s+/g, ' ').trim();
                 
-                const lastSalePrice = parseNumber(parcel.last_sale_price);
-                const lastSaleDate = parcel.last_sale_date || '';
+                const lastSalePrice = parseNumber(parcel['nhdra_saleprice']);
+                const lastSaleDate = parcel['nhdra_saledate'] || '';
                 const saleYear = lastSaleDate ? new Date(lastSaleDate).getFullYear() : '';
                 const saleDisplay = lastSalePrice > 0 ? `${formatCurrency(lastSalePrice)} (${saleYear})` : '—';
                 
@@ -739,8 +739,8 @@
                     <td>${parcel.parcel_id || ''}</td>
                     <td>${parcel.owner_name || ''}</td>
                     <td>${parcel.class_code || ''}</td>
-                    <td>${parcel.year_built || '—'}</td>
-                    <td>${formatNumber(parcel.living_area_sqft) || '—'}</td>
+                    <td>${parcel['nhdra_vns ayb'] || '—'}</td>
+                    <td>${formatNumber(parcel['nhdra_cns area living']) || '—'}</td>
                     <td>${bedBathText}</td>
                     <td>${buildingStyle || '—'}</td>
                     <td>${heatingType || '—'}</td>
