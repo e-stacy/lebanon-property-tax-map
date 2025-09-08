@@ -122,12 +122,14 @@
         /* Compact inline data access */
         .data-access {
             background: #f0f8ff;
-            padding: 1px 3px;
-            border-radius: 1px;
+            padding: 3px 5px;
+            border-radius: 2px;
             border-left: 1px solid #2196F3;
             font-size: 0.65em;
             text-align: right;
             line-height: 1;
+            min-width: 180px;
+            white-space: nowrap;
         }
         
         .data-access strong {
@@ -529,8 +531,8 @@
         }
 
         th {
-            height: 50px;
-            line-height: 1.2;
+            height: 35px;
+            line-height: 1.1;
             white-space: normal;
             background: #f8f9fa;
             font-weight: 600;
@@ -538,6 +540,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            padding: 2px 12px;
             border-right: 1px solid #ddd;
             border-bottom: 2px solid #dee2e6;
         }
@@ -670,7 +673,7 @@
             }
             
             .stats-table th, .stats-table td {
-                padding: 8px 12px;
+                padding: 4px 8px;
             }
             
             .controls-row {
@@ -822,7 +825,7 @@
         let allParcels = [];
         let filteredParcels = [];
         let currentPage = 1;
-        const rowsPerPage = 50;
+        const rowsPerPage = 8;
 
         // Utility functions
         const formatCurrency = (value) => {
