@@ -1,4 +1,4 @@
-/* Working Checkbox Filter Styles - High Specificity for Index Page */
+/* Working Checkbox Filter Styles - High Specificity for Index Page - Updated v1.2 */
 .working-checkbox-filter,
 .controls .working-checkbox-filter,
 body .working-checkbox-filter {
@@ -190,11 +190,11 @@ body .control-row .working-checkbox-filter .dropdown-text {
 }
 
 .checkbox-item.sub-class label {
-    font-size: 0.8em;
-    background-color: #fdfdfd;
-    padding-left: 36px;
-    border-left: 3px solid #dee2e6;
-    margin-left: 0;
+    font-size: 0.8em !important;
+    background-color: #fdfdfd !important;
+    padding-left: 36px !important;
+    border-left: 3px solid #dee2e6 !important;
+    margin-left: 0 !important;
 }
 
 .checkbox-item.sub-class:hover label,
