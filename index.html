@@ -385,13 +385,33 @@
             line-height: 1.2;
             white-space: normal;
             min-width: 140px;
-            max-width: 180px;
             background: #f8f9fa;
             font-weight: 600;
             color: #2c3e50;
             position: sticky;
             top: 0;
             z-index: 10;
+            position: relative;
+            border-right: 1px solid #ddd;
+        }
+
+        .resize-handle {
+            position: absolute;
+            right: -2px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            cursor: col-resize;
+            background: transparent;
+            z-index: 20;
+        }
+
+        .resize-handle:hover {
+            background: #007bff;
+        }
+
+        .resize-handle.resizing {
+            background: #007bff;
         }
 
         td {
@@ -563,6 +583,7 @@
             
             <div class="actions">
                 <button class="btn" onclick="clearFilters()">🔄 Reset Filters</button>
+                <button class="btn" onclick="resetColumnWidths()">📏 Reset Column Widths</button>
             </div>
             
             <div class="property-count">
@@ -711,9 +732,12 @@
             const headerHtml = filteredHeaders.map(header => {
                 let displayName = translateColumnName(header);
                 const className = header.includes('value') || header.includes('price') || header.includes('Price') ? 'currency' : '';
-                return `<th class="${className}">${displayName}</th>`;
+                return `<th class="${className}">${displayName}<div class="resize-handle"></div></th>`;
             }).join('');
             headerRow.innerHTML = headerHtml;
+            
+            // Initialize column resizing after headers are created
+            initializeColumnResizing();
             
             // Store filtered headers for table rendering
             window.displayColumns = filteredHeaders;
@@ -952,6 +976,66 @@
         document.getElementById('search').addEventListener('input', applyFilters);
         document.getElementById('min-value').addEventListener('input', applyFilters);
         document.getElementById('max-value').addEventListener('input', applyFilters);
+
+        // Column resizing functionality
+        let isResizing = false;
+        let currentColumn = null;
+        let startX = 0;
+        let startWidth = 0;
+
+        function initializeColumnResizing() {
+            const resizeHandles = document.querySelectorAll('.resize-handle');
+            
+            resizeHandles.forEach(handle => {
+                handle.addEventListener('mousedown', (e) => {
+                    isResizing = true;
+                    currentColumn = handle.parentElement;
+                    startX = e.clientX;
+                    startWidth = parseInt(window.getComputedStyle(currentColumn).width, 10);
+                    
+                    handle.classList.add('resizing');
+                    document.body.style.cursor = 'col-resize';
+                    document.body.style.userSelect = 'none';
+                    
+                    e.preventDefault();
+                });
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                
+                const width = startWidth + e.clientX - startX;
+                const minWidth = 80; // Minimum column width
+                const maxWidth = 400; // Maximum column width
+                
+                if (width > minWidth && width < maxWidth) {
+                    currentColumn.style.width = width + 'px';
+                    currentColumn.style.minWidth = width + 'px';
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                if (isResizing) {
+                    isResizing = false;
+                    currentColumn = null;
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                    
+                    // Remove resizing class from all handles
+                    document.querySelectorAll('.resize-handle').forEach(h => {
+                        h.classList.remove('resizing');
+                    });
+                }
+            });
+        }
+
+        function resetColumnWidths() {
+            const headers = document.querySelectorAll('th');
+            headers.forEach(header => {
+                header.style.width = '';
+                header.style.minWidth = '140px';
+            });
+        }
 
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', loadData);
