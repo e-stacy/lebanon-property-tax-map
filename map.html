@@ -999,14 +999,13 @@
         
         // Check if property passes current filters
         function passesFilters(property) {
-            const classFilter = document.getElementById('class-filter').value;
+            const selectedClasses = getSelectedValues('class-filter');
             const minValue = parseFloat(document.getElementById('min-value').value) || 0;
             const maxValue = parseFloat(document.getElementById('max-value').value) || Infinity;
             
-            // Hierarchical class filtering
-            if (classFilter && property?.class_code) {
-                const allowedClasses = getClassesForFilter(classFilter);
-                if (!allowedClasses.includes(property.class_code)) {
+            // Checkbox class filtering
+            if (selectedClasses.length > 0 && property?.class_code) {
+                if (!selectedClasses.includes(property.class_code)) {
                     return false;
                 }
             }
@@ -1345,10 +1344,10 @@
             let totalValue = 0;
             
             // Check if any filters are applied
-            const classFilter = document.getElementById('class-filter').value;
+            const selectedClasses = getSelectedValues('class-filter');
             const minValue = document.getElementById('min-value').value;
             const maxValue = document.getElementById('max-value').value;
-            const hasFilters = classFilter || minValue || maxValue;
+            const hasFilters = selectedClasses.length > 0 || minValue || maxValue;
             
             if (!hasFilters) {
                 // No filters applied - show total statistics
@@ -1390,18 +1389,22 @@
             const percentage = allPropertiesTotal > 0 ? (totalValue / allPropertiesTotal * 100) : 0;
             
             // Update filter description
-            
-            let filterDesc = 'All Properties';
-            if (classFilter) {
-                const description = classDescriptions[classFilter] || classFilter;
-                filterDesc = `${classFilter} - ${description}`;
+            let filterDesc = hasFilters ? 'Filtered Properties' : 'All Properties';
+            if (selectedClasses.length > 0) {
+                if (selectedClasses.length === 1) {
+                    const classCode = selectedClasses[0];
+                    const description = classDescriptions[classCode] || propertyClassHierarchy[classCode]?.name || classCode;
+                    filterDesc = `${classCode} - ${description}`;
+                } else {
+                    filterDesc = `${selectedClasses.length} Property Classes Selected`;
+                }
             }
             if (minValue || maxValue) {
                 const valueRange = minValue && maxValue ? 
                     `$${formatLargeNumber(minValue)} - $${formatLargeNumber(maxValue)}` :
                     minValue ? `≥ $${formatLargeNumber(minValue)}` :
                     `≤ $${formatLargeNumber(maxValue)}`;
-                filterDesc += classFilter ? `, ${valueRange}` : valueRange;
+                filterDesc += selectedClasses.length > 0 ? `, ${valueRange}` : valueRange;
             }
             
             document.getElementById('filter-description').textContent = filterDesc;
@@ -1428,14 +1431,28 @@
         // Apply filters
         function applyFilters() {
             updateParcelLayer();
+            updateStats();
+            updateLegend();
         }
         
         // Clear filters
         function clearFilters() {
-            document.getElementById('class-filter').value = '';
+            // Reset checkbox filter to "All Classes"
+            const allCheckbox = document.querySelector('#class-filter-checkboxes input[value="all"]');
+            if (allCheckbox) {
+                allCheckbox.checked = true;
+                // Uncheck all other checkboxes
+                const otherCheckboxes = document.querySelectorAll('#class-filter-checkboxes input[type="checkbox"]:not([value="all"])');
+                otherCheckboxes.forEach(cb => cb.checked = false);
+                // Update dropdown text
+                const dropdownText = document.querySelector('#class-filter-checkboxes').parentNode.querySelector('.dropdown-text');
+                if (dropdownText) dropdownText.textContent = 'All Classes';
+            }
             document.getElementById('min-value').value = '';
             document.getElementById('max-value').value = '';
             updateParcelLayer();
+            updateStats();
+            updateLegend();
         }
         
         // Format number with commas
