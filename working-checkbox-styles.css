@@ -43,14 +43,27 @@ body .working-checkbox-filter {
     background-color: #f8f9fa;
 }
 
+/* Force left alignment with maximum specificity */
 .dropdown-text,
 .working-checkbox-filter .dropdown-text,
-.checkbox-dropdown .dropdown-text {
+.checkbox-dropdown .dropdown-text,
+body .controls .working-checkbox-filter .dropdown-text,
+body .control-row .working-checkbox-filter .dropdown-text {
     flex-grow: 1 !important;
     text-align: left !important;
+    justify-content: flex-start !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
+}
+
+/* Override any flex centering */
+.dropdown-button,
+.working-checkbox-filter .dropdown-button,
+.checkbox-dropdown .dropdown-button,
+body .controls .working-checkbox-filter .dropdown-button {
+    justify-content: space-between !important;
+    text-align: left !important;
 }
 
 .dropdown-arrow {
