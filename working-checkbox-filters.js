@@ -633,6 +633,220 @@ class WorkingCheckboxFilters {
         return Array.from(expandedZones);
     }
 
+    // Create Heating System filter (hierarchical by fuel and type)
+    createHeatingFilter(containerId, propertyData) {
+        const container = document.getElementById(containerId);
+        if (!container) {
+            console.error('FILTER ERROR: Container element not found:', containerId);
+            return;
+        }
+        console.log('FILTER DEBUG: Creating Heating filter for', containerId);
+
+        // Extract heating data
+        const heatingSystems = [];
+        if (Array.isArray(propertyData)) {
+            propertyData.forEach(property => {
+                const fuelValue = property['nhdra_vns heat fuel desc'];
+                const typeValue = property['nhdra_vns heat type desc'];
+                if (fuelValue && fuelValue !== '0' && fuelValue !== '' && 
+                    typeValue && typeValue !== '0' && typeValue !== '') {
+                    heatingSystems.push({
+                        fuel: fuelValue.trim(),
+                        type: typeValue.trim()
+                    });
+                }
+            });
+        } else {
+            propertyData.forEach(property => {
+                const fuelValue = property['nhdra_vns heat fuel desc'];
+                const typeValue = property['nhdra_vns heat type desc'];
+                if (fuelValue && fuelValue !== '0' && fuelValue !== '' && 
+                    typeValue && typeValue !== '0' && typeValue !== '') {
+                    heatingSystems.push({
+                        fuel: fuelValue.trim(),
+                        type: typeValue.trim()
+                    });
+                }
+            });
+        }
+
+        if (heatingSystems.length === 0) {
+            container.innerHTML = '<div>No heating data available</div>';
+            return;
+        }
+
+        // Count fuel-type combinations
+        const fuelTypeCounts = {};
+        const fuelCounts = {};
+        
+        heatingSystems.forEach(system => {
+            const key = `${system.fuel}|${system.type}`;
+            fuelTypeCounts[key] = (fuelTypeCounts[key] || 0) + 1;
+            fuelCounts[system.fuel] = (fuelCounts[system.fuel] || 0) + 1;
+        });
+
+        // Build hierarchical structure organized by environmental impact
+        const heatingHierarchy = [];
+        
+        // Sort fuels by environmental preference and count
+        const fuelOrder = ['SOLAR', 'WOOD', 'WOOD/COMBO', 'GAS', 'ELECTRIC', 'OIL', 'COAL', 'NONE'];
+        const presentFuels = Object.keys(fuelCounts).sort((a, b) => {
+            const aIndex = fuelOrder.indexOf(a);
+            const bIndex = fuelOrder.indexOf(b);
+            if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+            if (aIndex !== -1) return -1;
+            if (bIndex !== -1) return 1;
+            return fuelCounts[b] - fuelCounts[a]; // Sort by count if not in preferred order
+        });
+
+        presentFuels.forEach(fuel => {
+            const fuelTypes = [];
+            
+            // Get all heating types for this fuel
+            Object.keys(fuelTypeCounts).forEach(key => {
+                const [keyFuel, keyType] = key.split('|');
+                if (keyFuel === fuel) {
+                    fuelTypes.push({
+                        type: keyType,
+                        count: fuelTypeCounts[key]
+                    });
+                }
+            });
+            
+            // Sort types by count (most common first)
+            fuelTypes.sort((a, b) => b.count - a.count);
+            
+            if (fuelTypes.length > 0) {
+                heatingHierarchy.push({
+                    id: fuel.toLowerCase().replace(/[^a-z]/g, ''),
+                    label: fuel,
+                    count: fuelCounts[fuel],
+                    children: fuelTypes
+                });
+            }
+        });
+
+        // Add Unknown bucket for properties with no heating data
+        const totalProperties = propertyData.length || propertyData.size || 0;
+        const unknownCount = totalProperties - heatingSystems.length;
+        if (unknownCount > 0) {
+            heatingHierarchy.push({
+                id: 'unknown',
+                label: 'Unknown',
+                count: unknownCount,
+                children: []
+            });
+        }
+
+        // Generate HTML
+        const allSystemsCount = heatingSystems.length;
+        const filterHtml = `
+            <div class="working-checkbox-filter">
+                <div class="filter-label">Heating System:</div>
+                <div class="checkbox-dropdown">
+                    <div class="dropdown-button" onclick="toggleWorkingDropdown('${containerId}')" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 4px; width: 100%; box-sizing: border-box;">
+                        <span class="dropdown-text" style="text-align: left; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0; padding: 0;">All Methods</span>
+                        <span class="dropdown-arrow" style="font-size: 0.8em; margin-left: 8px; flex-shrink: 0;">▼</span>
+                    </div>
+                    <div class="checkbox-list" id="${containerId}-checkboxes">
+                        <label class="checkbox-item">
+                            <input type="checkbox" value="all" checked onchange="updateWorkingHeatingFilter('${containerId}', this)">
+                            <span>All Methods (${allSystemsCount})</span>
+                        </label>
+                        ${this.generateHeatingCheckboxes(heatingHierarchy, containerId)}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        container.innerHTML = filterHtml;
+        console.log('FILTER DEBUG: Heating filter HTML inserted');
+        
+        // Store hierarchy for filtering logic
+        this.heatingHierarchy = heatingHierarchy;
+        
+        // Force alignment
+        setTimeout(() => {
+            const dropdownButton = container.querySelector('.dropdown-button');
+            const dropdownText = container.querySelector('.dropdown-text');
+            if (dropdownButton && dropdownText) {
+                dropdownButton.style.cssText = 'display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 8px 12px !important; border: 1px solid #ddd !important; background: white !important; cursor: pointer !important; border-radius: 4px !important; width: 100% !important; box-sizing: border-box !important;';
+                dropdownText.style.cssText = 'text-align: left !important; flex-grow: 1 !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; margin: 0 !important; padding: 0 !important;';
+                console.log('NUCLEAR: Forced dropdown alignment for', containerId);
+            }
+        }, 100);
+    }
+
+    generateHeatingCheckboxes(hierarchy, containerId) {
+        let html = '';
+        
+        hierarchy.forEach(fuel => {
+            // Add fuel category (e.g., Solar, Wood, Gas, Oil, etc.)
+            html += `
+                <div class="checkbox-item primary-class">
+                    <label>
+                        <input type="checkbox" value="${fuel.id}" onchange="updateWorkingHeatingFilter('${containerId}', this)">
+                        <span><strong>${fuel.label} (${fuel.count})</strong></span>
+                    </label>
+                </div>
+            `;
+            
+            // Add heating types for this fuel
+            fuel.children.forEach(heatingType => {
+                const combinedValue = `${fuel.label}|${heatingType.type}`;
+                html += `
+                    <div class="checkbox-item sub-class">
+                        <label>
+                            <input type="checkbox" value="${combinedValue}" onchange="updateWorkingHeatingFilter('${containerId}', this)">
+                            <span>${heatingType.type} (${heatingType.count})</span>
+                        </label>
+                    </div>
+                `;
+            });
+        });
+
+        return html;
+    }
+
+    getSelectedHeating(containerId) {
+        const checkboxes = document.querySelectorAll(`#${containerId}-checkboxes input[type="checkbox"]:checked`);
+        const selected = Array.from(checkboxes).map(cb => cb.value);
+        
+        console.log('DEBUG: All checked heating boxes:', selected);
+        
+        if (selected.includes('all')) {
+            console.log('DEBUG: All heating methods selected, returning empty array');
+            return []; // Empty array means "all"
+        }
+        
+        // Expand fuel selections to individual fuel-type combinations
+        const expandedSystems = new Set();
+        
+        selected.forEach(value => {
+            if (this.heatingHierarchy) {
+                // Check if this is a fuel category
+                const fuelCategory = this.heatingHierarchy.find(fuel => fuel.id === value);
+                if (fuelCategory) {
+                    // Add all heating types for this fuel
+                    fuelCategory.children.forEach(heatingType => {
+                        expandedSystems.add(`${fuelCategory.label}|${heatingType.type}`);
+                    });
+                } else if (value.includes('|')) {
+                    // It's already a fuel|type combination
+                    expandedSystems.add(value);
+                } else {
+                    // Unknown or other special case
+                    expandedSystems.add(value);
+                }
+            } else {
+                expandedSystems.add(value);
+            }
+        });
+        
+        console.log('DEBUG: Expanded selected heating systems:', Array.from(expandedSystems));
+        return Array.from(expandedSystems);
+    }
+
     getSelectedClasses(containerId) {
         const checkboxes = document.querySelectorAll(`#${containerId}-checkboxes input[type="checkbox"]:checked`);
         const selected = Array.from(checkboxes).map(cb => cb.value);
@@ -854,6 +1068,87 @@ function updateWorkingYearFilter(containerId, clickedElement = null) {
     }
 }
 
+// Heating filter update function with hierarchical behavior
+function updateWorkingHeatingFilter(containerId, clickedElement = null) {
+    const allCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="all"]`);
+    const otherCheckboxes = document.querySelectorAll(`#${containerId}-checkboxes input[type="checkbox"]:not([value="all"])`);
+    const dropdownText = document.querySelector(`#${containerId}-checkboxes`).parentNode.querySelector('.dropdown-text');
+    
+    console.log('updateWorkingHeatingFilter called for:', containerId);
+    
+    // HIERARCHICAL BEHAVIOR: Handle fuel-type relationships
+    if (clickedElement && clickedElement !== allCheckbox && workingFilters.heatingHierarchy) {
+        const clickedValue = clickedElement.value;
+        
+        // Check if clicked value is a fuel category
+        const fuelCategory = workingFilters.heatingHierarchy.find(fuel => fuel.id === clickedValue);
+        if (fuelCategory) {
+            if (clickedElement.checked) {
+                // Fuel category checked - check all its heating types
+                console.log('DEBUG: Fuel category checked, auto-checking types for', clickedValue);
+                fuelCategory.children.forEach(heatingType => {
+                    const combinedValue = `${fuelCategory.label}|${heatingType.type}`;
+                    const typeCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="${combinedValue}"]`);
+                    if (typeCheckbox) typeCheckbox.checked = true;
+                });
+            } else {
+                // Fuel category unchecked - uncheck all its heating types
+                console.log('DEBUG: Fuel category unchecked, clearing types for', clickedValue);
+                fuelCategory.children.forEach(heatingType => {
+                    const combinedValue = `${fuelCategory.label}|${heatingType.type}`;
+                    const typeCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="${combinedValue}"]`);
+                    if (typeCheckbox) typeCheckbox.checked = false;
+                });
+            }
+        } else if (clickedValue.includes('|')) {
+            // This is a specific heating type - handle parent unchecking
+            if (!clickedElement.checked) {
+                const [fuelName, typeName] = clickedValue.split('|');
+                // Find the fuel category and uncheck it
+                const parentFuel = workingFilters.heatingHierarchy.find(fuel => fuel.label === fuelName);
+                if (parentFuel) {
+                    const fuelCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="${parentFuel.id}"]`);
+                    if (fuelCheckbox) fuelCheckbox.checked = false;
+                }
+            }
+        }
+    }
+    
+    // Check how many specific checkboxes are checked (after hierarchical changes)
+    const checkedOthers = Array.from(otherCheckboxes).filter(cb => cb.checked);
+    console.log('DEBUG: Found', checkedOthers.length, 'specific heating checkboxes checked');
+    
+    if (checkedOthers.length > 0) {
+        // If any specific boxes are checked, uncheck "All"
+        if (allCheckbox) {
+            allCheckbox.checked = false;
+            console.log('DEBUG: Unchecked All heating methods checkbox');
+        }
+        
+        // Update text to show selection
+        if (checkedOthers.length === 1) {
+            const selectedText = checkedOthers[0].nextElementSibling.textContent;
+            dropdownText.textContent = selectedText.length > 30 
+                ? selectedText.substring(0, 27) + '...' 
+                : selectedText;
+        } else {
+            dropdownText.textContent = `${checkedOthers.length} methods selected`;
+        }
+    } else {
+        // If no specific boxes are checked, check "All"
+        if (allCheckbox) {
+            allCheckbox.checked = true;
+            console.log('DEBUG: Checked All heating methods checkbox');
+        }
+        dropdownText.textContent = 'All Methods';
+    }
+    
+    // Apply filters
+    if (typeof applyFilters === 'function') {
+        applyFilters();
+    }
+}
+
 // Zoning filter update function with hierarchical behavior
 function updateWorkingZoningFilter(containerId, clickedElement = null) {
     const allCheckbox = document.querySelector(`#${containerId}-checkboxes input[value="all"]`);
@@ -1001,6 +1296,7 @@ function initializeWorkingFilters() {
         workingFilters.createPropertyClassFilter('class-filter', allParcels);
         workingFilters.createYearBuiltFilter('year-filter', allParcels);
         workingFilters.createZoningFilter('zoning-filter', allParcels);
+        workingFilters.createHeatingFilter('heating-filter', allParcels);
     }
     
     // For map page  
@@ -1008,6 +1304,7 @@ function initializeWorkingFilters() {
         workingFilters.createPropertyClassFilter('class-filter', propertyData);
         workingFilters.createYearBuiltFilter('year-filter', propertyData);
         workingFilters.createZoningFilter('zoning-filter', propertyData);
+        workingFilters.createHeatingFilter('heating-filter', propertyData);
     }
 }
 
@@ -1017,6 +1314,8 @@ function getSelectedValues(containerId) {
         return workingFilters.getSelectedYears(containerId);
     } else if (containerId === 'zoning-filter') {
         return workingFilters.getSelectedZones(containerId);
+    } else if (containerId === 'heating-filter') {
+        return workingFilters.getSelectedHeating(containerId);
     }
     return workingFilters.getSelectedClasses(containerId);
 }
