@@ -20,21 +20,31 @@ This is a property tax database and data explorer for Lebanon, New Hampshire. Th
 - ✅ **USER EXPERIENCE**: Session-only storage, no persistence required
 - ✅ **PRACTICAL**: Addresses wide table navigation by allowing custom column sizing
 
+**✅ COMPLETED - Heating System Hierarchical Filter**
+- ✅ **ENVIRONMENTAL FOCUS**: 3-tier hierarchy organized by environmental impact (Solar → Wood → Gas → Electric → Oil → Coal)
+- ✅ **COMPREHENSIVE DATA**: 4,805 properties with complete heating information across 8 fuel types and 15+ heating types
+- ✅ **HIERARCHICAL STRUCTURE**: All Methods → Heating Fuel → Heating Type combinations
+- ✅ **TREE HUGGER FRIENDLY**: Prioritizes renewable fuels (Solar, Wood) and efficient systems (Forced H/W, Radiant)
+- ✅ **DUAL INTERFACE**: Consistent behavior across both data table and interactive map views
+- ✅ **SMART FILTERING**: Handles fuel-type combinations with parent-child checkbox relationships
+
 **✅ COMPLETED - Zoning District Hierarchical Filter**
 - ✅ **COMPREHENSIVE STRUCTURE**: Three-tier hierarchy with Residential (1,380), Commercial (252), and Industrial (182) categories
 - ✅ **COMPLETE COVERAGE**: All major Lebanon, NH zoning districts included (R1-R3, RL1-RL3, RO variants, commercial CBD/GC/NC/PBD/MC, industrial INDL/INDH/INDR)
 - ✅ **HIERARCHICAL BEHAVIOR**: Parent selection auto-checks children, child deselection unchecks parents
 - ✅ **DUAL INTERFACE**: Identical functionality on both index.html (data table) and map.html (interactive map)
-- ✅ **INTEGRATION**: Works seamlessly with existing Property Class and Year Built filters
+- ✅ **VISUAL HIERARCHY**: 4-tier indentation with proper styling for clear structure display
 
 **NEW FILES ENHANCED THIS SESSION:**
-- `working-checkbox-filters.js` - Added comprehensive zoning filter with 3-tier hierarchy and smart parent-child relationships
-- Updated `index.html` and `map.html` to include zoning filter in controls and filtering logic
+- `working-checkbox-filters.js` - Added comprehensive heating system filter with environmental prioritization and zoning filter with 4-tier hierarchy
+- Updated `index.html` and `map.html` to include both heating and zoning filters in controls and filtering logic
+- Enhanced `working-checkbox-styles.css` with improved 4-tier indentation styling
 
-**FILTER SYSTEM STATUS**: Complete three-filter system deployed
+**FILTER SYSTEM STATUS**: Complete four-filter system deployed
 1. ✅ Property Class (hierarchical residential/commercial/exempt/etc.)
 2. ✅ Year Built (decade groupings with unknown handling)  
 3. ✅ Zoning District (land use hierarchy: residential/commercial/industrial)
+4. ✅ Heating System (environmental hierarchy: fuel types and heating methods)
 
 **✅ COMPLETED - Enhanced Database Integration**
 - Successfully integrated comprehensive NHDRA data from city_data into main parcels dataset
