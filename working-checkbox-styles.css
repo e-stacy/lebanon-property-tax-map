@@ -18,7 +18,7 @@ body .working-checkbox-filter {
 .working-checkbox-filter .checkbox-dropdown {
     position: relative !important;
     display: inline-block !important;
-    min-width: 200px !important;
+    min-width: 320px !important;
 }
 
 .dropdown-button,
@@ -192,7 +192,7 @@ body .control-row .working-checkbox-filter .dropdown-text {
 .checkbox-item.sub-class label {
     font-size: 0.8em;
     background-color: #fdfdfd;
-    padding-left: 50px;
+    padding-left: 80px;
     border-left: 3px solid #dee2e6;
     margin-left: 0;
 }
@@ -213,7 +213,7 @@ body .control-row .working-checkbox-filter .dropdown-text {
 }
 
 .map-controls .dropdown-button {
-    min-width: 180px;
+    min-width: 280px;
 }
 
 .map-controls .checkbox-list {
@@ -237,7 +237,7 @@ body .control-row .working-checkbox-filter .dropdown-text {
 /* Responsive design */
 @media (max-width: 768px) {
     .checkbox-dropdown {
-        min-width: 180px;
+        min-width: 280px;
     }
     
     .dropdown-button {
