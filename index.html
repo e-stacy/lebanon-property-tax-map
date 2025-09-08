@@ -344,21 +344,44 @@
         }
 
         .table-wrapper {
-            overflow: auto;
+            overflow-x: auto;
+            overflow-y: auto;
             flex: 1;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
         }
 
         table {
             width: 100%;
+            min-width: 1400px;
             border-collapse: collapse;
             font-size: 0.9em;
+            white-space: nowrap;
         }
 
         th, td {
-            padding: 16px 12px;
+            padding: 12px 16px;
             text-align: left;
             border-bottom: 1px solid #f0f0f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
+        
+        /* Column widths to prevent wrapping */
+        th:nth-child(1), td:nth-child(1) { min-width: 80px; }  /* Parcel ID */
+        th:nth-child(2), td:nth-child(2) { min-width: 200px; } /* Owner */
+        th:nth-child(3), td:nth-child(3) { min-width: 60px; }  /* Class */
+        th:nth-child(4), td:nth-child(4) { min-width: 80px; }  /* Year Built */
+        th:nth-child(5), td:nth-child(5) { min-width: 100px; } /* Living Area */
+        th:nth-child(6), td:nth-child(6) { min-width: 80px; }  /* Bed/Bath */
+        th:nth-child(7), td:nth-child(7) { min-width: 140px; } /* Building Style */
+        th:nth-child(8), td:nth-child(8) { min-width: 120px; } /* Heating */
+        th:nth-child(9), td:nth-child(9) { min-width: 80px; }  /* Lot Size */
+        th:nth-child(10), td:nth-child(10) { min-width: 120px; } /* Land Value */
+        th:nth-child(11), td:nth-child(11) { min-width: 120px; } /* Building Value */
+        th:nth-child(12), td:nth-child(12) { min-width: 120px; } /* Total Value */
+        th:nth-child(13), td:nth-child(13) { min-width: 140px; } /* Last Sale */
 
         th {
             background: #f8f9fa;
@@ -739,7 +762,7 @@
                     <td>${parcel.parcel_id || ''}</td>
                     <td>${parcel.owner_name || ''}</td>
                     <td>${parcel.class_code || ''}</td>
-                    <td>${parcel['nhdra_vns ayb'] || '—'}</td>
+                    <td>${parcel['nhdra_vns ayb'] ? parseInt(parcel['nhdra_vns ayb']) : '—'}</td>
                     <td>${formatNumber(parcel['nhdra_cns area living']) || '—'}</td>
                     <td>${bedBathText}</td>
                     <td>${buildingStyle || '—'}</td>
@@ -832,6 +855,7 @@
     
     <!-- Pagination above footer -->
     <div class="pagination-container">
+        <div style="font-size: 0.8em; color: #666; text-align: center; margin-bottom: 8px;">↔ Scroll horizontally to view all columns</div>
         <div id="pagination" class="pagination"></div>
     </div>
     
