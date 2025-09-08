@@ -93,9 +93,9 @@ class WorkingCheckboxFilters {
             <div class="working-checkbox-filter">
                 <div class="filter-label">Property Class:</div>
                 <div class="checkbox-dropdown">
-                    <div class="dropdown-button" onclick="toggleWorkingDropdown('${containerId}')">
-                        <span class="dropdown-text">All Classes</span>
-                        <span class="dropdown-arrow">▼</span>
+                    <div class="dropdown-button" onclick="toggleWorkingDropdown('${containerId}')" style="display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 8px 12px !important; border: 1px solid #ddd !important; background: white !important; cursor: pointer !important; border-radius: 4px;">
+                        <span class="dropdown-text" style="text-align: left !important; flex-grow: 1 !important; margin-right: 8px !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">All Classes</span>
+                        <span class="dropdown-arrow" style="font-size: 0.8em !important; flex-shrink: 0;">▼</span>
                     </div>
                     <div class="checkbox-list" id="${containerId}-checkboxes">
                         <label class="checkbox-item">
