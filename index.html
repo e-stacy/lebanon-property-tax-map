@@ -571,6 +571,9 @@
                     <div id="class-filter"></div>
                 </div>
                 <div class="control-item">
+                    <div id="year-filter"></div>
+                </div>
+                <div class="control-item">
                     <label>Min Value ($)</label>
                     <input id="min-value" type="number" placeholder="0">
                 </div>
@@ -792,6 +795,7 @@
             if (typeof workingFilters !== 'undefined') {
                 console.log('Initializing filter with', allParcels.length, 'parcels');
                 workingFilters.createPropertyClassFilter('class-filter', allParcels);
+                workingFilters.createYearBuiltFilter('year-filter', allParcels);
             }
         }
 
@@ -815,10 +819,12 @@
             const minValue = parseNumber(document.getElementById('min-value').value);
             const maxValue = parseNumber(document.getElementById('max-value').value);
             
-            // Get selected classes from working filter
+            // Get selected classes and years from working filters
             let selectedClasses = [];
+            let selectedYears = [];
             if (typeof workingFilters !== 'undefined') {
                 selectedClasses = workingFilters.getSelectedClasses('class-filter');
+                selectedYears = workingFilters.getSelectedYears('year-filter');
             }
 
             filteredParcels = allParcels.filter(parcel => {
@@ -831,6 +837,18 @@
                 // Class filter
                 if (selectedClasses.length > 0 && !selectedClasses.includes(parcel.class_code)) {
                     return false;
+                }
+
+                // Year Built filter
+                if (selectedYears.length > 0) {
+                    const yearValue = parcel['nhdra_vns ayb'];
+                    if (!yearValue || yearValue === '0' || yearValue === '') {
+                        return false; // Exclude properties with no year data when filtering by year
+                    }
+                    const year = Math.floor(parseFloat(yearValue));
+                    if (!selectedYears.includes(year.toString())) {
+                        return false;
+                    }
                 }
 
                 // Value filters
