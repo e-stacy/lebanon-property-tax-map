@@ -59,12 +59,22 @@ body .control-row .working-checkbox-filter .dropdown-text {
     padding: 0 !important;
 }
 
-/* FIX INDEX PAGE: Override parent container centering */
+/* FIX INDEX PAGE: Override parent container centering and flex alignment */
 .controls .control-row,
 .controls .control-row *,
 .control-row .working-checkbox-filter,
 .control-row .working-checkbox-filter * {
     text-align: left !important;
+}
+
+/* CRITICAL FIX: Override flex alignment from .control-row */
+.control-row .working-checkbox-filter {
+    align-self: stretch !important;
+}
+
+.control-row .working-checkbox-filter .dropdown-button {
+    align-items: center !important;
+    justify-content: flex-start !important;
 }
 
 /* Simplified dropdown styles - inline styles handle alignment */
