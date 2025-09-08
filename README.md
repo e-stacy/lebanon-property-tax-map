@@ -235,6 +235,27 @@ This project operates under **New Hampshire Right-to-Know Law (RSA 91-A)** and s
 
 For questions about data processing methods, technical specifications, or integration requirements, please refer to the project documentation at the repository listed above.
 
+## Current Features & Functionality
+
+### **Advanced 4-Filter Hierarchical System**
+- **Property Class Filter**: 4-tier hierarchy covering residential, commercial, exempt, and agricultural properties
+- **Year Built Filter**: Decade-based groupings (1800s-2020s) with comprehensive age analysis
+- **Zoning District Filter**: Complete Lebanon zoning coverage (R1-R3, RL1-RL3, CBD, GC, NC, PBD, MC, Industrial)
+- **Heating System Filter**: Environmental hierarchy prioritizing renewables (Solar → Wood → Gas → Electric → Oil → Coal)
+- **Touch-Friendly**: Mobile-optimized interface works without Ctrl+click requirement
+
+### **Dual Interface System**
+- **Data Table Interface**: Ultra-compact layout with 9-row display and interactive column resizing
+- **Interactive Map**: Leaflet-based visualization with parcel boundaries and property overlays
+- **Statistics Dashboard**: 4-card percentage-based system with real-time filter updates
+- **Consistent Experience**: Identical filtering behavior across both interfaces
+
+### **Professional User Experience**
+- **Maximum Screen Efficiency**: Aggressive layout optimization for data density
+- **Interactive Elements**: Column resizing, filter statistics, map layer controls
+- **Data Export**: CSV, GeoJSON, and sitemap generation capabilities
+- **Mobile Responsive**: Optimized for desktop, tablet, and mobile viewing
+
 ---
 
 *This README serves as supporting documentation for Right-to-Know requests and demonstrates the legitimate public interest, technical capability, and professional standards that underpin this public transparency initiative.*
