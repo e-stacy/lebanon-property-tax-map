@@ -384,7 +384,6 @@
             height: 50px;
             line-height: 1.2;
             white-space: normal;
-            min-width: 140px;
             background: #f8f9fa;
             font-weight: 600;
             color: #2c3e50;
@@ -732,7 +731,8 @@
             const headerHtml = filteredHeaders.map(header => {
                 let displayName = translateColumnName(header);
                 const className = header.includes('value') || header.includes('price') || header.includes('Price') ? 'currency' : '';
-                return `<th class="${className}">${displayName}<div class="resize-handle"></div></th>`;
+                const width = getOptimalColumnWidth(header, displayName);
+                return `<th class="${className}" style="width: ${width}px; min-width: ${width}px;">${displayName}<div class="resize-handle"></div></th>`;
             }).join('');
             headerRow.innerHTML = headerHtml;
             
@@ -1029,11 +1029,74 @@
             });
         }
 
+        function getOptimalColumnWidth(columnKey, displayName) {
+            // Define optimal widths based on content type
+            const widthMap = {
+                // Short numeric columns
+                'stories': 70,
+                'grade': 60,
+                'year_built': 85,
+                'bedrooms': 80,
+                'full_baths': 85,
+                'half_baths': 85,
+                'fireplaces': 90,
+                
+                // Currency columns need more space
+                'total_value': 120,
+                'building_value': 120,
+                'land_value': 110,
+                'assessed_value': 120,
+                'price': 110,
+                
+                // Text columns vary by content
+                'zoning_district': 110,
+                'property_class': 180,
+                'neighborhood': 130,
+                'construction': 120,
+                'style': 100,
+                'heating': 100,
+                'fuel': 80,
+                'condition': 90,
+                
+                // Map-block-lot and IDs
+                'map_block_lot': 130,
+                'parcel': 80,
+                'account': 90,
+                
+                // Boolean/short text
+                'arms_length': 90,
+                'multi_parcels': 100
+            };
+            
+            // Check if we have a specific width for this column
+            if (widthMap[columnKey]) {
+                return widthMap[columnKey];
+            }
+            
+            // Fall back to header text length estimation
+            const textLength = displayName.length;
+            if (textLength <= 8) return 80;
+            if (textLength <= 12) return 100;
+            if (textLength <= 16) return 120;
+            if (textLength <= 20) return 140;
+            return 160;
+        }
+
         function resetColumnWidths() {
             const headers = document.querySelectorAll('th');
-            headers.forEach(header => {
-                header.style.width = '';
-                header.style.minWidth = '140px';
+            headers.forEach((header, index) => {
+                // Get the original column key to determine optimal width
+                const columnKey = window.displayColumns ? window.displayColumns[index] : null;
+                const displayName = header.textContent.replace(/\s+/g, ' ').trim();
+                
+                if (columnKey) {
+                    const optimalWidth = getOptimalColumnWidth(columnKey, displayName);
+                    header.style.width = optimalWidth + 'px';
+                    header.style.minWidth = optimalWidth + 'px';
+                } else {
+                    header.style.width = '';
+                    header.style.minWidth = '100px';
+                }
             });
         }
 
