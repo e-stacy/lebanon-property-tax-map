@@ -231,9 +231,11 @@ class WorkingCheckboxFilters {
             { label: '1970s', range: [1970, 1979], id: '1970s' },
             { label: '1960s', range: [1960, 1969], id: '1960s' },
             { label: '1950s', range: [1950, 1959], id: '1950s' },
-            { label: '1900-1940s', range: [1900, 1949], id: '1900-1940s' },
-            { label: '1850-1890s', range: [1850, 1899], id: '1850-1890s' },
-            { label: '1800-1840s', range: [1800, 1849], id: '1800-1840s' }
+            { label: '1940-1920', range: [1920, 1949], id: '1940-1920' },
+            { label: '1919-1900', range: [1900, 1919], id: '1919-1900' },
+            { label: '1890-1866', range: [1866, 1899], id: '1890-1866' },
+            { label: '1865-1850', range: [1850, 1865], id: '1865-1850' },
+            { label: '1800-1849', range: [1800, 1849], id: '1800-1849' }
         ];
 
         // Build hierarchy structure
@@ -259,6 +261,18 @@ class WorkingCheckboxFilters {
                 });
             }
         });
+
+        // Add Unknown bucket for properties with no year data
+        const totalProperties = propertyData.length || propertyData.size || 0;
+        const unknownCount = totalProperties - years.length;
+        if (unknownCount > 0) {
+            hierarchy.push({
+                id: 'unknown',
+                label: 'Unknown',
+                count: unknownCount,
+                children: []
+            });
+        }
 
         // Generate HTML
         const allYearsCount = years.length;

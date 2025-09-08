@@ -843,11 +843,17 @@
                 if (selectedYears.length > 0) {
                     const yearValue = parcel['nhdra_vns ayb'];
                     if (!yearValue || yearValue === '0' || yearValue === '') {
-                        return false; // Exclude properties with no year data when filtering by year
+                        // Include unknown year properties only if "unknown" is selected
+                        return selectedYears.includes('unknown');
                     }
                     const year = Math.floor(parseFloat(yearValue));
-                    if (!selectedYears.includes(year.toString())) {
-                        return false;
+                    if (year >= 1800 && year <= 2029) {
+                        if (!selectedYears.includes(year.toString())) {
+                            return false;
+                        }
+                    } else {
+                        // Invalid year data - treat as unknown
+                        return selectedYears.includes('unknown');
                     }
                 }
 
