@@ -49,17 +49,18 @@
         .footer {
             background: white;
             border-top: 1px solid #e1e5e9;
-            padding: 2px 12px;
-            border-radius: 4px 4px 0 0;
-            box-shadow: 0 -1px 3px rgba(0,0,0,0.05);
+            padding: 1px 8px;
+            border-radius: 2px 2px 0 0;
+            box-shadow: none;
             flex-shrink: 0;
+            margin-top: 1px;
         }
         
         .footer-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
         }
         
         .footer-left {
@@ -87,15 +88,15 @@
             background: #3498db;
             color: white;
             border: none;
-            padding: 6px 8px;
-            border-radius: 4px;
+            padding: 4px 6px;
+            border-radius: 3px;
             cursor: pointer;
-            font-size: 0.75em;
+            font-size: 0.7em;
             font-weight: 500;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 3px;
+            gap: 2px;
             transition: all 0.2s ease;
         }
         
@@ -116,9 +117,9 @@
         /* Compact inline data access */
         .data-access {
             background: #f0f8ff;
-            padding: 4px 6px;
-            border-radius: 3px;
-            border-left: 2px solid #2196F3;
+            padding: 2px 4px;
+            border-radius: 2px;
+            border-left: 1px solid #2196F3;
             font-size: 0.7em;
             text-align: right;
         }
@@ -164,7 +165,8 @@
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            gap: 16px;
+            gap: 4px;
+            clear: both;
         }
 
         h1 { 
@@ -214,9 +216,6 @@
         }
 
         .map-button {
-            position: absolute;
-            top: 16px;
-            right: 24px;
             background: #27ae60;
             color: white;
             padding: 8px 16px;
@@ -226,6 +225,7 @@
             font-size: 0.9em;
             transition: background 0.2s ease;
             z-index: 10;
+            margin-bottom: 8px;
         }
 
         .map-button:hover {
