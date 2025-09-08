@@ -263,6 +263,54 @@
             color: #7f8c8d;
         }
 
+        /* Override with Stats Grid - 4 Card Layout */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e1e5e9;
+        }
+        
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+        
+        .stat-number:first-child {
+            color: #e74c3c;
+            font-size: 1.2em;
+        }
+        
+        .stat-number:nth-child(2) {
+            color: #27ae60;
+            font-size: 1.4em;
+        }
+        
+        .stat-number:nth-child(3) {
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
         .stat-card {
             background: white;
             border-radius: 8px;
@@ -661,29 +709,31 @@
             </div>
         </div>
 
-        <div class="stats-table-container">
-            <table class="stats-table">
-                <tbody>
-                    <tr>
-                        <td class="percent-data" id="parcels-percent">—</td>
-                        <td class="percent-data" id="value-percent">—</td>
-                        <td class="percent-data" id="age-ratio">—</td>
-                        <td class="percent-data" id="land-percent">—</td>
-                    </tr>
-                    <tr>
-                        <td class="selected-data" id="parcels-selected">—</td>
-                        <td class="selected-data" id="value-selected">—</td>
-                        <td class="selected-data" id="age-selected">—</td>
-                        <td class="selected-data" id="land-selected">—</td>
-                    </tr>
-                    <tr>
-                        <td class="total-data" id="parcels-total">—</td>
-                        <td class="total-data" id="value-total">—</td>
-                        <td class="total-data" id="age-total">—</td>
-                        <td class="total-data" id="land-total">—</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="parcels-percent">—</div>
+                <div class="stat-number" id="parcels-selected">—</div>
+                <div class="stat-number" id="parcels-total">—</div>
+                <div class="stat-label">Parcels</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="value-percent">—</div>
+                <div class="stat-number" id="value-selected">—</div>
+                <div class="stat-number" id="value-total">—</div>
+                <div class="stat-label">Assessed Value</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="age-ratio">—</div>
+                <div class="stat-number" id="age-selected">—</div>
+                <div class="stat-number" id="age-total">—</div>
+                <div class="stat-label">Median Age</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="land-percent">—</div>
+                <div class="stat-number" id="land-selected">—</div>
+                <div class="stat-number" id="land-total">—</div>
+                <div class="stat-label">Land Area</div>
+            </div>
         </div>
 
         <div class="table-container">
