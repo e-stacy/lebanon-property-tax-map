@@ -88,14 +88,14 @@ class WorkingCheckboxFilters {
             });
         }
 
-        // Create the filter HTML
+        // Create the filter HTML - Force left alignment with aggressive inline styles
         const filterHtml = `
             <div class="working-checkbox-filter">
                 <div class="filter-label">Property Class:</div>
                 <div class="checkbox-dropdown">
-                    <div class="dropdown-button" onclick="toggleWorkingDropdown('${containerId}')" style="display: flex !important; justify-content: flex-start !important; align-items: stretch !important; padding: 8px 12px !important; border: 1px solid #ddd !important; background: white !important; cursor: pointer !important; border-radius: 4px;">
-                        <span class="dropdown-text" style="text-align: left !important; flex-grow: 1 !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">All Classes</span>
-                        <span class="dropdown-arrow" style="font-size: 0.8em !important; margin-left: auto !important;">▼</span>
+                    <div class="dropdown-button" onclick="toggleWorkingDropdown('${containerId}')" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 4px; width: 100%; box-sizing: border-box;">
+                        <span class="dropdown-text" style="text-align: left; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0; padding: 0;">All Classes</span>
+                        <span class="dropdown-arrow" style="font-size: 0.8em; margin-left: 8px; flex-shrink: 0;">▼</span>
                     </div>
                     <div class="checkbox-list" id="${containerId}-checkboxes">
                         <label class="checkbox-item">
@@ -109,6 +109,18 @@ class WorkingCheckboxFilters {
         `;
 
         container.innerHTML = filterHtml;
+        
+        // Force alignment after DOM insertion
+        setTimeout(() => {
+            const dropdownButton = container.querySelector('.dropdown-button');
+            const dropdownText = container.querySelector('.dropdown-text');
+            if (dropdownButton && dropdownText) {
+                // Nuclear option: Force styles that cannot be overridden
+                dropdownButton.style.cssText = 'display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 8px 12px !important; border: 1px solid #ddd !important; background: white !important; cursor: pointer !important; border-radius: 4px !important; width: 100% !important; box-sizing: border-box !important;';
+                dropdownText.style.cssText = 'text-align: left !important; flex-grow: 1 !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; margin: 0 !important; padding: 0 !important;';
+                console.log('NUCLEAR: Forced dropdown alignment');
+            }
+        }, 100);
     }
 
     generateClassCheckboxes(classCounts, containerId) {
