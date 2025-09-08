@@ -675,8 +675,11 @@
                     console.log('Sample property:', properties[0]);
                 }
                 
-                // Populate class filter
-                populateClassFilter(properties);
+                // Initialize working checkbox filters
+                console.log('Initializing map filters with', properties.length, 'properties');
+                if (typeof workingFilters !== 'undefined') {
+                    workingFilters.createPropertyClassFilter('class-filter', propertyData);
+                }
                 
                 // Load spatial data
                 loadActualSpatialData(properties);
@@ -1642,20 +1645,7 @@
             document.getElementById('value-percentage').textContent = allTotalValue > 0 ? ((totalValue / allTotalValue) * 100).toFixed(1) + '%' : '0%';
         };
         
-        // Initialize filter after data loads using existing updateStats hook
-        const originalUpdateStats = updateStats;
-        updateStats = function() {
-            originalUpdateStats();
-            
-            // Initialize checkbox filter after data is loaded
-            if (propertyData && propertyData.size > 0 && !window.mapFiltersInitialized) {
-                console.log('Initializing map filters with', propertyData.size, 'properties');
-                setTimeout(() => {
-                    workingFilters.createPropertyClassFilter('class-filter', propertyData);
-                    window.mapFiltersInitialized = true;
-                }, 10);
-            }
-        };
+        // Note: Filter initialization now happens in loadPropertyData() function
     </script>
     
 </body>

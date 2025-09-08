@@ -468,11 +468,17 @@
                 updateStats();
                 populateFilters();
                 
-                // Initialize working checkbox filters
-                console.log('Initializing index filters with', allParcels.length, 'parcels');
-                if (typeof workingFilters !== 'undefined') {
-                    workingFilters.createPropertyClassFilter('class-filter', allParcels);
-                }
+                // Initialize working checkbox filters - FORCE EXECUTION
+                console.log('INDEX: About to initialize filters with', allParcels.length, 'parcels');
+                setTimeout(() => {
+                    console.log('INDEX: Executing filter initialization');
+                    if (typeof workingFilters !== 'undefined' && workingFilters.createPropertyClassFilter) {
+                        workingFilters.createPropertyClassFilter('class-filter', allParcels);
+                        console.log('INDEX: Filter initialization completed');
+                    } else {
+                        console.error('INDEX: workingFilters not available');
+                    }
+                }, 200);
                 
                 applyFilters();
             } catch (error) {
