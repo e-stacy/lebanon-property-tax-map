@@ -59,47 +59,10 @@ body .control-row .working-checkbox-filter .dropdown-text {
     padding: 0 !important;
 }
 
-/* NUCLEAR OPTION - Override everything with absolute positioning */
-.dropdown-button,
-.working-checkbox-filter .dropdown-button,
-.checkbox-dropdown .dropdown-button,
-body .controls .working-checkbox-filter .dropdown-button,
-body .control-row .working-checkbox-filter .dropdown-button {
-    position: relative !important;
-    display: block !important;
-    text-align: left !important;
-    padding: 8px 12px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-/* Position text absolutely to left */
-.dropdown-text,
-.working-checkbox-filter .dropdown-text,
-.checkbox-dropdown .dropdown-text,
-body .controls .working-checkbox-filter .dropdown-text,
-body .control-row .working-checkbox-filter .dropdown-text {
-    position: absolute !important;
-    left: 12px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    width: calc(100% - 40px) !important;
-    text-align: left !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-}
-
-/* Position arrow absolutely to right */
-.dropdown-arrow,
-.working-checkbox-filter .dropdown-arrow {
-    position: absolute !important;
-    right: 12px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    margin: 0 !important;
+/* Simplified dropdown styles - inline styles handle alignment */
+.dropdown-button:hover {
+    border-color: #2196F3 !important;
+    background-color: #f8f9fa !important;
 }
 
 .dropdown-arrow {
