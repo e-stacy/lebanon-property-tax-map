@@ -367,7 +367,7 @@
 
         table {
             width: 100%;
-            min-width: 4000px;
+            min-width: 5000px;
             border-collapse: collapse;
             font-size: 0.8em;
             white-space: nowrap;
@@ -381,10 +381,11 @@
         }
 
         th {
-            height: 40px;
+            height: 50px;
             line-height: 1.2;
-            white-space: nowrap;
-            min-width: 120px;
+            white-space: normal;
+            min-width: 140px;
+            max-width: 180px;
             background: #f8f9fa;
             font-weight: 600;
             color: #2c3e50;
@@ -721,41 +722,41 @@
         // Translate column names with proper meanings for abbreviations
         function translateColumnName(header) {
             const translations = {
-                'parcel_id': 'Parcel ID',
+                'parcel_id': 'Parcel<br>ID',
                 'owner_name': 'Owner',
                 'co_own_name': 'Co-Owner',
-                'class_code': 'Property Class',
-                'lot_size_acres': 'Lot Size (acres)',
-                'land_value': 'Land Value',
-                'building_value': 'Building Value', 
-                'total_value': 'Total Value',
-                'nhdra_saleprice': 'Sale Price',
-                'nhdra_saledate': 'Sale Date',
-                'nhdra_qualified': "Arm's Length",
-                'nhdra_rem use code': 'Property Class',
-                'nhdra_lnd zone': 'Zoning District',
-                'nhdra_prc ttl lnd area acres': 'Land Area (acres)',
-                'nhdra_prc ttl assess bldg': 'Building Assessed',
-                'nhdra_prc ttl assess xf': 'Exempt Assessed',
-                'nhdra_prc ttl assess lnd': 'Land Assessed',
-                'nhdra_prc ttl assess ob': 'Outbuilding Assessed',
-                'nhdra_prc ttl assess': 'Total Assessment',
-                'nhdra_cns area living': 'Living Area',
-                'nhdra_vns ayb': 'Year Built',
-                'nhdra_vns style desc': 'Building Style',
-                'nhdra_vns grade': 'Grade (numeric)',
-                'nhdra_vns grade desc': 'Grade Description',
-                'nhdra_vns roof cover desc': 'Roof Cover',
-                'nhdra_cns area effective': 'Effective Area',
-                'nhdra_vns tot rooms': 'Total Rooms',
+                'class_code': 'Property<br>Class',
+                'lot_size_acres': 'Lot Size<br>(acres)',
+                'land_value': 'Land<br>Value',
+                'building_value': 'Building<br>Value', 
+                'total_value': 'Total<br>Value',
+                'nhdra_saleprice': 'Sale<br>Price',
+                'nhdra_saledate': 'Sale<br>Date',
+                'nhdra_qualified': "Arm's<br>Length",
+                'nhdra_rem use code': 'Property<br>Class',
+                'nhdra_lnd zone': 'Zoning<br>District',
+                'nhdra_prc ttl lnd area acres': 'Land Area<br>(acres)',
+                'nhdra_prc ttl assess bldg': 'Building<br>Assessed',
+                'nhdra_prc ttl assess xf': 'Exempt<br>Assessed',
+                'nhdra_prc ttl assess lnd': 'Land<br>Assessed',
+                'nhdra_prc ttl assess ob': 'Outbuilding<br>Assessed',
+                'nhdra_prc ttl assess': 'Total<br>Assessment',
+                'nhdra_cns area living': 'Living<br>Area',
+                'nhdra_vns ayb': 'Year<br>Built',
+                'nhdra_vns style desc': 'Building<br>Style',
+                'nhdra_vns grade': 'Grade<br>(numeric)',
+                'nhdra_vns grade desc': 'Grade<br>Description',
+                'nhdra_vns roof cover desc': 'Roof<br>Cover',
+                'nhdra_cns area effective': 'Effective<br>Area',
+                'nhdra_vns tot rooms': 'Total<br>Rooms',
                 'nhdra_vns num bedrm': 'Bedrooms',
                 'nhdra_vns num baths': 'Bathrooms',
-                'nhdra_vns num hbaths': 'Half Bathrooms',
-                'nhdra_vns heat type desc': 'Heating Type',
-                'nhdra_vns heat fuel desc': 'Heating Fuel',
-                'nhdra_cns pct good': 'Percent Good',
-                'nhdra_cns eyb code': 'Eff Yr Built Code',
-                'nhdra_lnd nbhd': 'Land Neighborhood',
+                'nhdra_vns num hbaths': 'Half<br>Bathrooms',
+                'nhdra_vns heat type desc': 'Heating<br>Type',
+                'nhdra_vns heat fuel desc': 'Heating<br>Fuel',
+                'nhdra_cns pct good': 'Percent<br>Good',
+                'nhdra_cns eyb code': 'Eff Yr Built<br>Code',
+                'nhdra_lnd nbhd': 'Land<br>Neighborhood',
                 'nhdra_vns stories': 'Stories'
             };
             
