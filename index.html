@@ -120,8 +120,7 @@
             border-radius: 4px;
             border-left: 3px solid #2196F3;
             font-size: 0.7em;
-            flex: 1;
-            min-width: 280px;
+            text-align: right;
         }
         
         .data-access strong {
@@ -375,12 +374,13 @@
         }
 
         th, td {
-            padding: 12px 16px;
+            padding: 8px 16px;
             text-align: left;
             border-bottom: 1px solid #f0f0f0;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            line-height: 1.2;
         }
         
         /* Column widths to prevent wrapping */
@@ -870,7 +870,6 @@
     
     <!-- Utility Bar Footer -->
     <footer class="footer">
-        <div style="font-size: 0.8em; color: #666; text-align: center; margin-bottom: 8px; padding: 4px 0; background: #f8f9fa; border-radius: 4px;">↔ Scroll horizontally to view all columns</div>
         <div class="footer-content">
             <div class="footer-left">
                 <button class="footer-btn warning" onclick="toggleAnalytics()">📈 Analytics</button>
