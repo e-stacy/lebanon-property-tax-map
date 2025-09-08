@@ -367,9 +367,9 @@
 
         table {
             width: 100%;
-            min-width: 1400px;
+            min-width: 5000px;
             border-collapse: collapse;
-            font-size: 0.9em;
+            font-size: 0.8em;
             white-space: nowrap;
         }
 
@@ -583,25 +583,13 @@
             <div class="table-wrapper">
                 <table>
                     <thead>
-                        <tr>
-                            <th>Parcel ID</th>
-                            <th>Owner</th>
-                            <th>Class</th>
-                            <th>Year Built</th>
-                            <th>Living Area (sqft)</th>
-                            <th>Bed/Bath</th>
-                            <th>Building Style</th>
-                            <th>Heating</th>
-                            <th>Lot Size (acres)</th>
-                            <th class="currency">Land Value</th>
-                            <th class="currency">Building Value</th>
-                            <th class="currency">Total Value</th>
-                            <th class="currency">Last Sale</th>
+                        <tr id="table-headers">
+                            <!-- Headers will be dynamically generated -->
                         </tr>
                     </thead>
                     <tbody id="parcels-table">
                         <tr>
-                            <td colspan="13" class="loading">Loading property data...</td>
+                            <td colspan="70" class="loading">Loading property data...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -665,6 +653,9 @@
                 const lines = text.trim().split('\n');
                 const headers = parseCSVLine(lines[0]);
                 
+                // Generate dynamic table headers for all columns
+                generateTableHeaders(headers);
+                
                 allParcels = lines.slice(1).map(line => {
                     const values = parseCSVLine(line);
                     const parcel = {};
@@ -674,7 +665,7 @@
                     return parcel;
                 }).filter(p => p.parcel_id && p.parcel_id.trim());
 
-                console.log(`Loaded ${allParcels.length} parcels`);
+                console.log(`Loaded ${allParcels.length} parcels with ${headers.length} columns`);
                 
                 updateStats();
                 initializeFilter();
@@ -683,8 +674,19 @@
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('parcels-table').innerHTML = 
-                    '<tr><td colspan="13" class="no-results">Error loading data</td></tr>';
+                    '<tr><td colspan="70" class="no-results">Error loading data</td></tr>';
             }
+        }
+        
+        // Generate table headers dynamically for all columns
+        function generateTableHeaders(headers) {
+            const headerRow = document.getElementById('table-headers');
+            const headerHtml = headers.map(header => {
+                const displayName = header.replace('nhdra_', '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                const className = header.includes('value') || header.includes('price') || header.includes('Price') ? 'currency' : '';
+                return `<th class="${className}">${displayName}</th>`;
+            }).join('');
+            headerRow.innerHTML = headerHtml;
         }
 
         // Initialize filter - Simple, reliable approach
@@ -751,44 +753,40 @@
             const tbody = document.getElementById('parcels-table');
             
             if (filteredParcels.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="13" class="no-results">No properties match your criteria</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="70" class="no-results">No properties match your criteria</td></tr>';
                 updatePagination();
                 return;
             }
 
             const startIndex = (currentPage - 1) * rowsPerPage;
             const endIndex = startIndex + rowsPerPage;
+            // Get all available column headers from the first parcel
+            const sampleParcel = allParcels[0] || {};
+            const allColumns = Object.keys(sampleParcel);
+            
             const rows = filteredParcels.slice(startIndex, endIndex).map(parcel => {
-                const bedrooms = parcel['nhdra_vns num bedrm'] || '0';
-                const fullBaths = parcel['nhdra_vns num baths'] || '0';
-                const halfBaths = parcel['nhdra_vns num hbaths'] || '0';
-                const bedBathText = `${bedrooms}br/${fullBaths}${halfBaths > 0 ? '.5' : ''}ba`;
+                const cells = allColumns.map(column => {
+                    let value = parcel[column] || '';
+                    
+                    // Format specific column types
+                    if (column.includes('value') || column.includes('price') || column.includes('Price')) {
+                        const numValue = parseNumber(value);
+                        value = numValue > 0 ? formatCurrency(numValue) : '—';
+                        return `<td class="currency">${value}</td>`;
+                    } else if (column.includes('ayb') && value) {
+                        // Year built - convert to integer
+                        const year = parseInt(value);
+                        value = year > 1000 ? year : '—';
+                    } else if (column.includes('area') && value) {
+                        // Areas - format as numbers
+                        const num = parseNumber(value);
+                        value = num > 0 ? formatNumber(num) : '—';
+                    }
+                    
+                    return `<td>${value}</td>`;
+                }).join('');
                 
-                const buildingStyle = (parcel['nhdra_vns style desc'] || '').replace(/\s+/g, ' ').trim();
-                const heatingType = (parcel['nhdra_vns heat type desc'] || '').replace(/\s+/g, ' ').trim();
-                
-                const lastSalePrice = parseNumber(parcel['nhdra_saleprice']);
-                const lastSaleDate = parcel['nhdra_saledate'] || '';
-                const saleYear = lastSaleDate ? new Date(lastSaleDate).getFullYear() : '';
-                const saleDisplay = lastSalePrice > 0 ? `${formatCurrency(lastSalePrice)} (${saleYear})` : '—';
-                
-                return `
-                <tr>
-                    <td>${parcel.parcel_id || ''}</td>
-                    <td>${parcel.owner_name || ''}</td>
-                    <td>${parcel.class_code || ''}</td>
-                    <td>${parcel['nhdra_vns ayb'] ? parseInt(parcel['nhdra_vns ayb']) : '—'}</td>
-                    <td>${formatNumber(parcel['nhdra_cns area living']) || '—'}</td>
-                    <td>${bedBathText}</td>
-                    <td>${buildingStyle || '—'}</td>
-                    <td>${heatingType || '—'}</td>
-                    <td>${parcel.lot_size_acres || ''}</td>
-                    <td class="currency">${formatCurrency(parcel.land_value)}</td>
-                    <td class="currency">${formatCurrency(parcel.building_value)}</td>
-                    <td class="currency">${formatCurrency(parcel.total_value)}</td>
-                    <td class="currency">${saleDisplay}</td>
-                </tr>
-                `;
+                return `<tr>${cells}</tr>`;
             }).join('');
 
             tbody.innerHTML = rows;
