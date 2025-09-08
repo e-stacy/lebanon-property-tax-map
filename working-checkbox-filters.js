@@ -566,8 +566,8 @@ class WorkingCheckboxFilters {
                 // Add individual zoning districts
                 subCategory.children.forEach(district => {
                     html += `
-                        <div class="checkbox-item child-option" style="padding-left: 60px;">
-                            <label>
+                        <div class="checkbox-item individual-district">
+                            <label style="padding-left: 70px !important; font-size: 0.85em !important; color: #666 !important; border-left: 2px solid #e9ecef !important;">
                                 <input type="checkbox" value="${district.code}" onchange="updateWorkingZoningFilter('${containerId}', this)">
                                 <span>${district.code} (${district.count})</span>
                             </label>

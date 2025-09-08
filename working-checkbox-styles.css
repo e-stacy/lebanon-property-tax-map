@@ -203,18 +203,20 @@ body .control-row .working-checkbox-filter .dropdown-text {
 }
 
 /* Fourth-level indentation for individual zoning districts */
-.checkbox-item.child-option label {
-    font-size: 0.8em !important;
-    background-color: #fdfdfd !important;
-    padding-left: 60px !important;
-    border-left: 3px solid #e9ecef !important;
+.checkbox-item.individual-district label {
+    font-size: 0.85em !important;
+    background-color: #fafafa !important;
+    padding-left: 70px !important;
+    border-left: 2px solid #e9ecef !important;
     margin-left: 0 !important;
     color: #666 !important;
+    display: block !important;
+    width: 100% !important;
 }
 
-.checkbox-item.child-option:hover label,
-.checkbox-item.child-option label:hover {
-    background-color: #f0f8ff;
+.checkbox-item.individual-district:hover label,
+.checkbox-item.individual-district label:hover {
+    background-color: #f0f8ff !important;
     color: #333 !important;
 }
 
