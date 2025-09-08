@@ -331,10 +331,14 @@
 
         .controls-row {
             display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 16px;
+            margin-bottom: 12px;
             align-items: flex-end;
             flex-wrap: nowrap;
+        }
+        
+        .controls-row.second {
+            margin-bottom: 16px;
         }
 
         .control-item {
@@ -342,20 +346,21 @@
         }
         
         .control-item.search {
-            flex: 1 1 200px;
-            min-width: 180px;
+            flex: 1 1 240px;
+            min-width: 200px;
         }
         
         .control-item.filter {
-            width: 130px;
+            flex: 1;
+            min-width: 160px;
         }
         
         .control-item.value-input {
-            width: 90px;
+            width: 100px;
         }
         
         .control-item.value-input.max {
-            width: 70px;
+            width: 80px;
         }
         
         .control-item.buttons {
@@ -677,10 +682,6 @@
 
         <div class="controls">
             <div class="controls-row">
-                <div class="control-item search">
-                    <label>Search Properties</label>
-                    <input id="search" type="search" placeholder="Search by address, owner, parcel...">
-                </div>
                 <div class="control-item filter">
                     <div id="class-filter"></div>
                 </div>
@@ -692,6 +693,13 @@
                 </div>
                 <div class="control-item filter">
                     <div id="heating-filter"></div>
+                </div>
+            </div>
+            
+            <div class="controls-row second">
+                <div class="control-item search">
+                    <label>Search Properties</label>
+                    <input id="search" type="search" placeholder="Search by address, owner, parcel...">
                 </div>
                 <div class="control-item value-input">
                     <label>Min ($)</label>
