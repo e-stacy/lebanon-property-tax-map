@@ -43,13 +43,14 @@ body .working-checkbox-filter {
     background-color: #f8f9fa;
 }
 
-.dropdown-text {
-    flex-grow: 1;
-    text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.dropdown-text,
+.working-checkbox-filter .dropdown-text,
+.checkbox-dropdown .dropdown-text {
+    flex-grow: 1 !important;
     text-align: left !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
 }
 
 .dropdown-arrow {
@@ -115,11 +116,13 @@ body .working-checkbox-filter {
     cursor: pointer;
 }
 
-.checkbox-item span {
-    flex-grow: 1;
-    line-height: 1.3;
+.checkbox-item span,
+.working-checkbox-filter .checkbox-item span,
+.checkbox-list .checkbox-item span {
+    flex-grow: 1 !important;
+    line-height: 1.3 !important;
     text-align: left !important;
-    pointer-events: none;
+    pointer-events: none !important;
 }
 
 /* Special styling for "All Classes" option */
@@ -144,7 +147,7 @@ body .working-checkbox-filter {
 .checkbox-item.sub-class label {
     font-size: 0.8em;
     background-color: #fdfdfd;
-    padding-left: 40px;
+    padding-left: 50px;
     border-left: 3px solid #dee2e6;
     margin-left: 0;
 }
