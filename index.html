@@ -233,12 +233,12 @@
             border: none;
         }
         
-        .category-header {
-            width: 35%;
+        .row-header {
+            width: 20%;
         }
         
         .data-header {
-            width: 21.7%;
+            width: 16%;
             text-align: center;
         }
         
@@ -256,10 +256,11 @@
             background: #f8f9fa;
         }
         
-        .category-label {
+        .row-label {
             font-weight: 600;
             color: #2c3e50;
             background: #f8f9fa;
+            text-align: left;
         }
         
         .percent-data {
@@ -620,12 +621,12 @@
                 padding: 6px 8px;
             }
             
-            .category-header {
-                width: 30%;
+            .row-header {
+                width: 25%;
             }
             
             .data-header {
-                width: 23.3%;
+                width: 15%;
             }
             
             .stat-number {
@@ -686,41 +687,37 @@
             <table class="stats-table">
                 <thead>
                     <tr>
-                        <th class="category-header">Category</th>
-                        <th class="data-header">Percent Selected</th>
-                        <th class="data-header">Selected</th>
-                        <th class="data-header">Total</th>
+                        <th class="row-header"></th>
+                        <th class="data-header">Total Parcels</th>
+                        <th class="data-header">Assessed Value</th>
+                        <th class="data-header">Median Value</th>
+                        <th class="data-header">Median Age</th>
+                        <th class="data-header">Land Area</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td class="category-label">Total Parcels</td>
+                        <td class="row-label">Percent Selected</td>
                         <td class="percent-data" id="parcels-percent">—</td>
-                        <td class="selected-data" id="parcels-selected">—</td>
-                        <td class="total-data" id="parcels-total">—</td>
-                    </tr>
-                    <tr>
-                        <td class="category-label">Assessed Value</td>
                         <td class="percent-data" id="value-percent">—</td>
-                        <td class="selected-data" id="value-selected">—</td>
-                        <td class="total-data" id="value-total">—</td>
-                    </tr>
-                    <tr>
-                        <td class="category-label">Median Value</td>
                         <td class="percent-data" id="median-percent">—</td>
-                        <td class="selected-data" id="median-selected">—</td>
-                        <td class="total-data" id="median-total">—</td>
-                    </tr>
-                    <tr>
-                        <td class="category-label">Median Age</td>
                         <td class="percent-data" id="age-percent">—</td>
-                        <td class="selected-data" id="age-selected">—</td>
-                        <td class="total-data" id="age-total">—</td>
+                        <td class="percent-data" id="land-percent">—</td>
                     </tr>
                     <tr>
-                        <td class="category-label">Land Area</td>
-                        <td class="percent-data" id="land-percent">—</td>
+                        <td class="row-label">Selected</td>
+                        <td class="selected-data" id="parcels-selected">—</td>
+                        <td class="selected-data" id="value-selected">—</td>
+                        <td class="selected-data" id="median-selected">—</td>
+                        <td class="selected-data" id="age-selected">—</td>
                         <td class="selected-data" id="land-selected">—</td>
+                    </tr>
+                    <tr>
+                        <td class="row-label">Total</td>
+                        <td class="total-data" id="parcels-total">—</td>
+                        <td class="total-data" id="value-total">—</td>
+                        <td class="total-data" id="median-total">—</td>
+                        <td class="total-data" id="age-total">—</td>
                         <td class="total-data" id="land-total">—</td>
                     </tr>
                 </tbody>
@@ -955,25 +952,26 @@
             const valuePercent = totalValue > 0 ? (selectedValue / totalValue * 100).toFixed(1) : 0;
             const landPercent = totalLandArea > 0 ? (selectedLandArea / totalLandArea * 100).toFixed(1) : 0;
             
-            // Update the table
+            // Update the table - new layout with 3 rows x 5 columns
+            // Row 1: Percent Selected
             document.getElementById('parcels-percent').textContent = parcelPercent + '%';
-            document.getElementById('parcels-selected').textContent = formatNumber(selectedParcels);
-            document.getElementById('parcels-total').textContent = formatNumber(totalParcels);
-            
             document.getElementById('value-percent').textContent = valuePercent + '%';
-            document.getElementById('value-selected').textContent = formatCurrency(selectedValue);
-            document.getElementById('value-total').textContent = formatCurrency(totalValue);
-            
             document.getElementById('median-percent').textContent = '—';
-            document.getElementById('median-selected').textContent = formatCurrency(selectedMedianValue);
-            document.getElementById('median-total').textContent = formatCurrency(totalMedianValue);
-            
             document.getElementById('age-percent').textContent = '—';
-            document.getElementById('age-selected').textContent = selectedMedianAge + ' years';
-            document.getElementById('age-total').textContent = totalMedianAge + ' years';
-            
             document.getElementById('land-percent').textContent = landPercent + '%';
+            
+            // Row 2: Selected (filtered data)
+            document.getElementById('parcels-selected').textContent = formatNumber(selectedParcels);
+            document.getElementById('value-selected').textContent = formatCurrency(selectedValue);
+            document.getElementById('median-selected').textContent = formatCurrency(selectedMedianValue);
+            document.getElementById('age-selected').textContent = selectedMedianAge + ' years';
             document.getElementById('land-selected').textContent = selectedLandArea.toFixed(1) + ' acres';
+            
+            // Row 3: Total (city-wide data)
+            document.getElementById('parcels-total').textContent = formatNumber(totalParcels);
+            document.getElementById('value-total').textContent = formatCurrency(totalValue);
+            document.getElementById('median-total').textContent = formatCurrency(totalMedianValue);
+            document.getElementById('age-total').textContent = totalMedianAge + ' years';
             document.getElementById('land-total').textContent = totalLandArea.toFixed(1) + ' acres';
         }
 
