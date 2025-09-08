@@ -915,24 +915,24 @@
             const landPercent = totalLandArea > 0 ? (selectedLandArea / totalLandArea * 100).toFixed(1) : 0;
             const ageRatio = totalMedianAge > 0 ? (selectedMedianAge / totalMedianAge * 100).toFixed(1) : 0;
             
-            // Update the table - new layout with 3 rows x 4 columns
-            // Row 1: Percentages and ratios
-            document.getElementById('parcels-percent').textContent = `Selected Parcels % | ${parcelPercent}%`;
-            document.getElementById('value-percent').textContent = `Selected Value % | ${valuePercent}%`;
-            document.getElementById('age-ratio').textContent = `Median Age Ratio | ${ageRatio}%`;
-            document.getElementById('land-percent').textContent = `Selected Land Area % | ${landPercent}%`;
+            // Update the table - 4 columns x 3 rows layout matching Book1.csv exactly
+            // Row 1: Percentages/Labels and values
+            document.getElementById('parcels-percent').textContent = `${parcelPercent}%`;
+            document.getElementById('value-percent').textContent = `${valuePercent}%`;
+            document.getElementById('age-ratio').textContent = `${ageRatio}%`;
+            document.getElementById('land-percent').textContent = `${landPercent}%`;
             
-            // Row 2: Selected (filtered data) - with descriptive labels
-            document.getElementById('parcels-selected').textContent = `Selected Parcels | ${formatNumber(selectedParcels)}`;
-            document.getElementById('value-selected').textContent = `Sel. Assessed Value | ${formatCurrency(selectedValue)}`;
-            document.getElementById('age-selected').textContent = `Selected Median Age | ${selectedMedianAge}`;
-            document.getElementById('land-selected').textContent = `Selected Land Area | ${selectedLandArea.toFixed(0)}`;
+            // Row 2: Selected data with values
+            document.getElementById('parcels-selected').textContent = `${formatNumber(selectedParcels)}`;
+            document.getElementById('value-selected').textContent = `${formatCurrency(selectedValue)}`;
+            document.getElementById('age-selected').textContent = `${selectedMedianAge}`;
+            document.getElementById('land-selected').textContent = `${selectedLandArea.toFixed(0)}`;
             
-            // Row 3: Total (city-wide data) - with descriptive labels
-            document.getElementById('parcels-total').textContent = `Total Parcels | ${formatNumber(totalParcels)}`;
-            document.getElementById('value-total').textContent = `Total Assessed Value | ${formatCurrency(totalValue)}`;
-            document.getElementById('age-total').textContent = `Median Age | ${totalMedianAge}`;
-            document.getElementById('land-total').textContent = `Total Land Area | ${totalLandArea.toFixed(0)}`;
+            // Row 3: Total data with values
+            document.getElementById('parcels-total').textContent = `${formatNumber(totalParcels)}`;
+            document.getElementById('value-total').textContent = `${formatCurrency(totalValue)}`;
+            document.getElementById('age-total').textContent = `${totalMedianAge}`;
+            document.getElementById('land-total').textContent = `${totalLandArea.toFixed(0)}`;
         }
 
         // Apply filters
