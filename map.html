@@ -1565,6 +1565,12 @@
                 
                 if (!mapLot) return;
                 
+                // Check if this parcel passes current filters before showing label
+                let prop = propertyData.get(mapLot);
+                if (prop && !passesFilters(prop)) {
+                    return; // Skip this parcel if it doesn't pass filters
+                }
+                
                 let labelContent = '';
                 let showThisLabel = false;
                 
