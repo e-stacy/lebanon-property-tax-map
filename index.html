@@ -280,34 +280,28 @@
             border: 1px solid #e1e5e9;
         }
         
-        .stat-number {
-            font-size: 1.5em;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 4px;
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
         }
         
-        .stat-number:first-child {
+        .stat-row:first-child {
             color: #e74c3c;
-            font-size: 1.2em;
+            font-weight: 700;
         }
         
-        .stat-number:nth-child(2) {
+        .stat-row:nth-child(2) {
             color: #27ae60;
-            font-size: 1.4em;
-        }
-        
-        .stat-number:nth-child(3) {
-            color: #7f8c8d;
+            font-weight: 700;
             font-size: 1.2em;
         }
         
-        .stat-label {
-            font-size: 0.9em;
-            color: #6c757d;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 8px;
+        .stat-row:nth-child(3) {
+            color: #7f8c8d;
             font-weight: 600;
         }
 
@@ -711,28 +705,24 @@
 
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-number" id="parcels-percent">—</div>
-                <div class="stat-number" id="parcels-selected">—</div>
-                <div class="stat-number" id="parcels-total">—</div>
-                <div class="stat-label">Parcels</div>
+                <div class="stat-row" id="parcels-percent">—</div>
+                <div class="stat-row" id="parcels-selected">—</div>
+                <div class="stat-row" id="parcels-total">—</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="value-percent">—</div>
-                <div class="stat-number" id="value-selected">—</div>
-                <div class="stat-number" id="value-total">—</div>
-                <div class="stat-label">Assessed Value</div>
+                <div class="stat-row" id="value-percent">—</div>
+                <div class="stat-row" id="value-selected">—</div>
+                <div class="stat-row" id="value-total">—</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="age-ratio">—</div>
-                <div class="stat-number" id="age-selected">—</div>
-                <div class="stat-number" id="age-total">—</div>
-                <div class="stat-label">Median Age</div>
+                <div class="stat-row" id="age-ratio">—</div>
+                <div class="stat-row" id="age-selected">—</div>
+                <div class="stat-row" id="age-total">—</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="land-percent">—</div>
-                <div class="stat-number" id="land-selected">—</div>
-                <div class="stat-number" id="land-total">—</div>
-                <div class="stat-label">Land Area</div>
+                <div class="stat-row" id="land-percent">—</div>
+                <div class="stat-row" id="land-selected">—</div>
+                <div class="stat-row" id="land-total">—</div>
             </div>
         </div>
 
@@ -965,24 +955,26 @@
             const landPercent = totalLandArea > 0 ? (selectedLandArea / totalLandArea * 100).toFixed(1) : 0;
             const ageRatio = totalMedianAge > 0 ? (selectedMedianAge / totalMedianAge * 100).toFixed(1) : 0;
             
-            // Update the table - 4 columns x 3 rows layout matching Book1.csv exactly
-            // Row 1: Percentages/Labels and values
-            document.getElementById('parcels-percent').textContent = `${parcelPercent}%`;
-            document.getElementById('value-percent').textContent = `${valuePercent}%`;
-            document.getElementById('age-ratio').textContent = `${ageRatio}%`;
-            document.getElementById('land-percent').textContent = `${landPercent}%`;
+            // Update cards with label | value format
+            // Card 1: Parcels
+            document.getElementById('parcels-percent').innerHTML = `<span>Parcels %</span><span>${parcelPercent}%</span>`;
+            document.getElementById('parcels-selected').innerHTML = `<span>Parcels</span><span>${formatNumber(selectedParcels)}</span>`;
+            document.getElementById('parcels-total').innerHTML = `<span>Total Parcels</span><span>${formatNumber(totalParcels)}</span>`;
             
-            // Row 2: Selected data with values
-            document.getElementById('parcels-selected').textContent = `${formatNumber(selectedParcels)}`;
-            document.getElementById('value-selected').textContent = `${formatCurrency(selectedValue)}`;
-            document.getElementById('age-selected').textContent = `${selectedMedianAge}`;
-            document.getElementById('land-selected').textContent = `${selectedLandArea.toFixed(0)}`;
+            // Card 2: Assessed Value
+            document.getElementById('value-percent').innerHTML = `<span>Assessed Value %</span><span>${valuePercent}%</span>`;
+            document.getElementById('value-selected').innerHTML = `<span>Assessed Value</span><span>${formatCurrency(selectedValue)}</span>`;
+            document.getElementById('value-total').innerHTML = `<span>Total Assessed Value</span><span>${formatCurrency(totalValue)}</span>`;
             
-            // Row 3: Total data with values
-            document.getElementById('parcels-total').textContent = `${formatNumber(totalParcels)}`;
-            document.getElementById('value-total').textContent = `${formatCurrency(totalValue)}`;
-            document.getElementById('age-total').textContent = `${totalMedianAge}`;
-            document.getElementById('land-total').textContent = `${totalLandArea.toFixed(0)}`;
+            // Card 3: Median Age
+            document.getElementById('age-ratio').innerHTML = `<span>Median Age %</span><span>${ageRatio}%</span>`;
+            document.getElementById('age-selected').innerHTML = `<span>Median Age</span><span>${selectedMedianAge}</span>`;
+            document.getElementById('age-total').innerHTML = `<span>Median Age</span><span>${totalMedianAge}</span>`;
+            
+            // Card 4: Land Area
+            document.getElementById('land-percent').innerHTML = `<span>Land Area %</span><span>${landPercent}%</span>`;
+            document.getElementById('land-selected').innerHTML = `<span>Land Area</span><span>${selectedLandArea.toFixed(0)}</span>`;
+            document.getElementById('land-total').innerHTML = `<span>Total Land Area</span><span>${totalLandArea.toFixed(0)}</span>`;
         }
 
         // Apply filters
