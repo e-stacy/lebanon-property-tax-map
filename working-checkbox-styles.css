@@ -59,15 +59,33 @@ body .control-row .working-checkbox-filter .dropdown-text {
     padding: 0 !important;
 }
 
-/* Override any flex centering */
+/* Override any flex centering - MAXIMUM SPECIFICITY */
 .dropdown-button,
 .working-checkbox-filter .dropdown-button,
 .checkbox-dropdown .dropdown-button,
-body .controls .working-checkbox-filter .dropdown-button {
-    justify-content: space-between !important;
+body .controls .working-checkbox-filter .dropdown-button,
+body .control-row .working-checkbox-filter .dropdown-button {
+    justify-content: flex-start !important;
     text-align: left !important;
     padding-left: 12px !important;
     padding-right: 12px !important;
+}
+
+/* Force dropdown text to left side of flex container */
+.dropdown-text,
+.working-checkbox-filter .dropdown-text,
+.checkbox-dropdown .dropdown-text,
+body .controls .working-checkbox-filter .dropdown-text,
+body .control-row .working-checkbox-filter .dropdown-text {
+    order: 1 !important;
+    align-self: flex-start !important;
+}
+
+/* Force arrow to right side */
+.dropdown-arrow,
+.working-checkbox-filter .dropdown-arrow {
+    order: 2 !important;
+    margin-left: auto !important;
 }
 
 .dropdown-arrow {
