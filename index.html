@@ -374,9 +374,28 @@
         }
 
         th, td {
-            padding: 8px 16px;
+            padding: 8px 12px;
             text-align: left;
             border-bottom: 1px solid #f0f0f0;
+            vertical-align: top;
+        }
+
+        th {
+            height: 60px;
+            line-height: 1.2;
+            white-space: normal;
+            word-wrap: break-word;
+            max-width: 80px;
+            overflow: visible;
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -398,14 +417,6 @@
         th:nth-child(12), td:nth-child(12) { min-width: 120px; } /* Total Value */
         th:nth-child(13), td:nth-child(13) { min-width: 140px; } /* Last Sale */
 
-        th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #2c3e50;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
 
         tbody tr:hover {
             background: #f8f9fa;
@@ -688,7 +699,11 @@
                 'nhdra_ID1 Prior Sale Price', 'nhdra_ID1 Prior Sale Date', 'nhdra_ID1 Prior Book Page',
                 'nhdra_ID2 Prior Sale Price', 'nhdra_ID2 Prior Sale Date', 'nhdra_ID2 Prior Book Page', 
                 'nhdra_ID3 Prior Sale Price', 'nhdra_ID3 Prior Sale Date', 'nhdra_ID3 Prior Book Page',
-                'nhdra_own name', 'nhdra_co own name', 'nhdra_rem pid'
+                'nhdra_own name', 'nhdra_co own name', 'nhdra_rem pid',
+                'nhdra_vns roof struct desc', 'nhdra_vns int wall1 desc', 'nhdra_vns int flr1 desc',
+                'nhdra_vns ext wall1 desc', 'nhdra_vns bathrm style desc', 'nhdra_vns kitchen style desc',
+                'nhdra_ahd ttl assess bldg', 'nhdra_ahd ttl assess xf', 'nhdra_ahd ttl assess lnd',
+                'nhdra_ahd ttl assess ob', 'nhdra_ahd ttl assess'
             ];
             
             const filteredHeaders = allHeaders.filter(h => !excludeColumns.includes(h));
@@ -708,53 +723,42 @@
         // Translate column names with proper meanings for abbreviations
         function translateColumnName(header) {
             const translations = {
-                'parcel_id': 'Parcel ID',
+                'parcel_id': 'Parcel<br>ID',
                 'owner_name': 'Owner',
                 'co_own_name': 'Co-Owner',
-                'class_code': 'Property Class',
-                'lot_size_acres': 'Lot Size (acres)',
-                'land_value': 'Land Value',
-                'building_value': 'Building Value', 
-                'total_value': 'Total Value',
-                'nhdra_saleprice': 'Sale Price',
-                'nhdra_saledate': 'Sale Date',
-                'nhdra_qualified': "Arm's Length",
-                'nhdra_rem use code': 'Property Class',
-                'nhdra_lnd zone': 'Land Zone',
-                'nhdra_prc ttl lnd area acres': 'Land Area (acres)',
-                'nhdra_prc ttl assess bldg': 'Assessed Building',
-                'nhdra_prc ttl assess xf': 'Assessed Exempt',
-                'nhdra_prc ttl assess lnd': 'Assessed Land',
-                'nhdra_prc ttl assess ob': 'Assessed Outbuilding',
-                'nhdra_prc ttl assess': 'Assessment',
-                'nhdra_cns area living': 'Construction Living Area',
-                'nhdra_vns ayb': 'Year Built',
-                'nhdra_vns style desc': 'Building Style',
-                'nhdra_vns grade': 'Grade (numeric)',
-                'nhdra_vns grade desc': 'Grade Description',
-                'nhdra_vns roof struct desc': 'Roof Structure',
-                'nhdra_vns roof cover desc': 'Roof Cover',
-                'nhdra_vns int flr1 desc': 'Interior Floor',
-                'nhdra_vns int wall1 desc': 'Interior Wall',
-                'nhdra_vns ext wall1 desc': 'Exterior Wall',
-                'nhdra_cns area effective': 'Construction Effective Area',
-                'nhdra_vns tot rooms': 'Total Rooms',
+                'class_code': 'Property<br>Class',
+                'lot_size_acres': 'Lot Size<br>(acres)',
+                'land_value': 'Land<br>Value',
+                'building_value': 'Building<br>Value', 
+                'total_value': 'Total<br>Value',
+                'nhdra_saleprice': 'Sale<br>Price',
+                'nhdra_saledate': 'Sale<br>Date',
+                'nhdra_qualified': "Arm's<br>Length",
+                'nhdra_rem use code': 'Property<br>Class',
+                'nhdra_lnd zone': 'Zoning<br>District',
+                'nhdra_prc ttl lnd area acres': 'Land Area<br>(acres)',
+                'nhdra_prc ttl assess bldg': 'Assessed<br>Building',
+                'nhdra_prc ttl assess xf': 'Assessed<br>Exempt',
+                'nhdra_prc ttl assess lnd': 'Assessed<br>Land',
+                'nhdra_prc ttl assess ob': 'Assessed<br>Outbuilding',
+                'nhdra_prc ttl assess': 'Total<br>Assessment',
+                'nhdra_cns area living': 'Living<br>Area',
+                'nhdra_vns ayb': 'Year<br>Built',
+                'nhdra_vns style desc': 'Building<br>Style',
+                'nhdra_vns grade': 'Grade<br>(numeric)',
+                'nhdra_vns grade desc': 'Grade<br>Description',
+                'nhdra_vns roof cover desc': 'Roof<br>Cover',
+                'nhdra_cns area effective': 'Effective<br>Area',
+                'nhdra_vns tot rooms': 'Total<br>Rooms',
                 'nhdra_vns num bedrm': 'Bedrooms',
                 'nhdra_vns num baths': 'Bathrooms',
-                'nhdra_vns num hbaths': 'Half Bathrooms',
-                'nhdra_vns bathrm style desc': 'Bathroom Style',
-                'nhdra_vns kitchen style desc': 'Kitchen Style',
-                'nhdra_vns heat type desc': 'Heating Type',
-                'nhdra_vns heat fuel desc': 'Heating Fuel',
-                'nhdra_cns pct good': 'Construction Percent Good',
-                'nhdra_cns eyb code': 'Construction Effective Year Built Code',
-                'nhdra_lnd nbhd': 'Land Neighborhood',
-                'nhdra_vns stories': 'Stories',
-                'nhdra_ahd ttl assess bldg': 'Alternative Assessed Building',
-                'nhdra_ahd ttl assess xf': 'Alternative Assessed Exempt',
-                'nhdra_ahd ttl assess lnd': 'Alternative Assessed Land',
-                'nhdra_ahd ttl assess ob': 'Alternative Assessed Outbuilding',
-                'nhdra_ahd ttl assess': 'Alternative Assessment'
+                'nhdra_vns num hbaths': 'Half<br>Bathrooms',
+                'nhdra_vns heat type desc': 'Heating<br>Type',
+                'nhdra_vns heat fuel desc': 'Heating<br>Fuel',
+                'nhdra_cns pct good': 'Percent<br>Good',
+                'nhdra_cns eyb code': 'Effective Year<br>Built Code',
+                'nhdra_lnd nbhd': 'Land<br>Neighborhood',
+                'nhdra_vns stories': 'Stories'
             };
             
             return translations[header] || header.replace('nhdra_', '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -862,8 +866,13 @@
                             // Keep original value if date parsing fails
                         }
                     } else if (column === 'nhdra_qualified' && value) {
-                        // Map Q to Y for arm's length display, but keep original data in file
-                        value = value.toString().trim().toUpperCase() === 'Q' ? 'Y' : value;
+                        // Map Q to Y and U to N for arm's length display, but keep original data in file
+                        const upperValue = value.toString().trim().toUpperCase();
+                        if (upperValue === 'Q') {
+                            value = 'Y';
+                        } else if (upperValue === 'U') {
+                            value = 'N';
+                        }
                     }
                     
                     return `<td>${value}</td>`;
