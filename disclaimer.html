@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disclaimer & Terms of Use – Lebanon Property Tax Database</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        /* Reset and base styles matching index page */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f6fa;
+            color: #2c3e50;
+            line-height: 1.6;
+            padding: 12px;
+            overflow-y: auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            height: auto;
+            min-height: 100vh;
+        }
+
+        /* Header styling matching index page */
+        .header {
+            background: white;
+            padding: 0px 24px 16px 24px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .header-left {
+            flex: 1;
+            font-weight: bold;
+        }
+
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .disclaimer {
+            background: #fff8e1;
+            border-left: 4px solid #f39c12;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .map-button {
+            background: #27ae60;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .map-button:hover {
+            background: #219a52;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .subtitle-box {
+            background: #e8f4fd;
+            border: 2px solid #2196F3;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            color: #1976D2;
+            font-weight: 500;
+            text-align: center;
+            max-width: 260px;
+            line-height: 1.3;
+        }
+
+        /* Content styling */
+        .content {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            flex: 1;
+        }
+
+        .content h2 {
+            color: #2c3e50;
+            font-size: 1.4em;
+            font-weight: 600;
+            margin: 24px 0 12px 0;
+            border-bottom: 2px solid #e1e5e9;
+            padding-bottom: 8px;
+        }
+
+        .content h2:first-of-type {
+            margin-top: 0;
+        }
+
+        .content p {
+            margin-bottom: 16px;
+            color: #34495e;
+            line-height: 1.6;
+        }
+
+        .warning-box {
+            background: #fff8e1;
+            border: 1px solid #f4e5b3;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+            border-left: 4px solid #f39c12;
+        }
+
+        .muted {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        a {
+            color: #2196F3;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: #1976D2;
+        }
+
+        /* Footer */
+        .footer {
+            background: #f8f9fa;
+            border: 2px solid #2196F3;
+            padding: 8px 12px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+            margin-top: 0;
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        .footer a {
+            color: #2196F3;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            
+            .header { padding-top: 0; padding-left: 16px; padding-right: 16px; padding-bottom: 16px; }
+            
+            h1 { font-size: 1.8em; }
+            
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            
+            .header-right {
+                align-items: stretch;
+            }
+            
+            .map-button {
+                text-align: center;
+            }
+            
+            .content {
+                padding: 16px;
+            }
+            
+            .content h2 {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-left">
+                <h1>Lebanon Property Info Repository</h1>
+                
+                <div class="disclaimer">
+                    <strong>UNOFFICIAL DATA PORTAL.</strong> This site is not affiliated with or endorsed by the City of Lebanon. Data is derived from City-provided files with minimal reformatting and may contain errors or omissions. Do not rely on this site for legal, financial, survey, or property decisions—verify with the City of Lebanon Assessing Office.
+                </div>
+            </div>
+
+            <div class="header-right">
+                <a href="index.html" class="map-button">🏠 Back to Database</a>
+                <div class="subtitle-box">
+                    Legal disclaimer and terms of use for this research tool
+                </div>
+            </div>
+        </header>
+
+        <div class="content">
+            <h1 style="font-size: 1.8em; margin-bottom: 8px;">Disclaimer & Terms of Use</h1>
+            <p class="muted">Last updated 2025-09-08 14:57:26</p>
+
+            <div class="warning-box">
+                <strong>Unofficial data portal.</strong> This site is <strong>not</strong> affiliated with or endorsed by the City of Lebanon.
+                Data is derived from City-provided files with minimal reformatting and may contain errors or omissions.
+                <strong>Do not rely on this site for legal, financial, survey, or property decisions—verify with the City of Lebanon Assessing Office.</strong>
+            </div>
+
+            <h2>Unofficial website</h2>
+            <p>This is an independent, third-party website and is <strong>not</strong> the official website of the City of Lebanon, New Hampshire, nor is it endorsed by the City. Logos, names, and references are used for identification only.</p>
+
+            <h2>Data source & processing</h2>
+            <p>The datasets shown here are derived from files provided by the City (and related public sources) with minimal reformatting for display and analysis. No values are intentionally altered, but formatting, conversions, and merges can introduce errors, omissions, or timing gaps. Updates are not real-time.</p>
+
+            <h2>Informational use only</h2>
+            <p>The content is provided for general information. It must not be relied upon for legal, financial, surveying, title, development, or permitting decisions. Before taking any action, obtain the official records from the City of Lebanon (e.g., Assessing Office, City Clerk) or other authoritative sources.</p>
+
+            <h2>No warranties</h2>
+            <p>To the fullest extent permitted by law, all data and content are provided "AS IS" and "AS AVAILABLE," without any warranties, express or implied, including accuracy, completeness, timeliness, merchantability, fitness for a particular purpose, and non-infringement.</p>
+
+            <h2>Not a survey & mapping limitations</h2>
+            <p>Maps, parcel lines, and locations are approximate and not a land survey. They may not align with deed descriptions or surveyed boundaries.</p>
+
+            <h2>No creation of new records</h2>
+            <p>The site displays data that already exists electronically. Excluded or redacted fields (e.g., privacy-protected data) are not displayed.</p>
+
+            <h2>Limitation of liability</h2>
+            <p>To the maximum extent permitted by law, the operator(s) of this site shall not be liable for any loss, damage, claim, or expense arising from use of or reliance on the site or its content, including indirect or consequential damages.</p>
+
+            <h2>Links & third-party content</h2>
+            <p>Links to other sites are provided for convenience and do not constitute endorsement. We are not responsible for third-party content or availability.</p>
+
+            <h2>Use equals acceptance</h2>
+            <p>By using this site, you agree to this Disclaimer & Terms of Use. If you do not agree, please discontinue use and consult official City sources.</p>
+
+            <h2>Contact</h2>
+            <p>Questions or corrections: <a href="mailto:eric.stacy1@gmail.com">eric.stacy1@gmail.com</a>. For official records, contact the City of Lebanon Assessing Office.</p>
+        </div>
+
+        <footer class="footer">
+            <a href="index.html">← Return to Lebanon Property Tax Database</a>
+        </footer>
+    </div>
+</body>
+</html>

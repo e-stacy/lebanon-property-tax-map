@@ -15,7 +15,7 @@
         * {
             box-sizing: border-box;
         }
-        
+
         body { 
             font-family: system-ui, Arial, sans-serif; 
             margin: 0; 
@@ -23,7 +23,8 @@
             background: #f8f9fa;
             line-height: 1.5;
             height: 100vh;
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .container {
@@ -32,67 +33,71 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            padding: 16px;
+            padding: 16px 16px 120px 16px;
             box-sizing: border-box;
             gap: 2px;
+            overflow: visible;
         }
-        
+
         /* Pagination above footer */
         .pagination-container {
-            padding: 0;
+            padding: 8px;
             text-align: center;
             background: white;
-            border-radius: 0;
-            margin: 0;
-            box-shadow: none;
+            border-radius: 6px;
+            margin: 8px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             flex-shrink: 0;
             line-height: 1;
-            height: 0;
-            overflow: hidden;
+            height: auto;
+            min-height: 40px;
+            overflow: visible;
         }
-        
+
         /* Fixed footer */
         .footer {
             background: #f8f9fa;
             border: 2px solid #2196F3;
-            padding: 4px 8px;
+            padding: 8px 12px;
             border-radius: 6px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             flex-shrink: 0;
             margin-top: 0;
             line-height: 1.2;
+            min-height: 50px;
         }
-        
+
         .footer-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 4px;
             line-height: 1;
-            height: 24px;
+            height: 32px;
+            min-height: 32px;
         }
-        
+
         .footer-left {
             display: flex;
             gap: 8px;
-            align-items: center;
+            align-items: flex-end;
             flex: 1;
         }
-        
+
         .footer-center {
             display: flex;
             justify-content: center;
             align-items: center;
             flex: 1;
         }
-        
+
         .footer-right {
             display: flex;
             justify-content: flex-end;
             align-items: center;
             flex: 1;
         }
-        
+
         .footer-btn {
             background: #3498db;
             color: white;
@@ -109,25 +114,28 @@
             transition: all 0.2s ease;
             line-height: 1;
         }
-        
+
         .footer-btn:hover {
             background: #2980b9;
             transform: translateY(-1px);
         }
-        
+
         .footer-btn.success { background: #27ae60; }
         .footer-btn.success:hover { background: #219a52; }
-        
+
         .footer-btn.warning { background: #f39c12; }
         .footer-btn.warning:hover { background: #d68910; }
-        
+
         .footer-btn.info { background: #17a2b8; }
         .footer-btn.info:hover { background: #138496; }
-        
+
+        .footer-btn.danger { background: #e74c3c; }
+        .footer-btn.danger:hover { background: #c0392b; }
+
         /* Compact inline data access */
         .data-access {
             background: #f0f8ff;
-            padding: 3px 5px;
+            padding: 8px 12px 8px 16px;
             border-radius: 2px;
             border-left: 1px solid #2196F3;
             font-size: 0.65em;
@@ -136,20 +144,20 @@
             min-width: 180px;
             white-space: nowrap;
         }
-        
+
         .data-access strong {
             color: #1976D2;
             font-weight: 600;
             font-size: 0.85em;
         }
-        
+
         .data-access a {
             color: #1976D2;
             text-decoration: none;
             font-weight: 500;
             margin: 0 3px;
         }
-        
+
         .data-access-note {
             color: #666;
             font-size: 0.8em;
@@ -159,7 +167,7 @@
 
         .header {
             background: white;
-            padding: 16px 24px;
+            padding: 0px 24px 16px 24px;
             border-radius: 12px;
             margin-bottom: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.07);
@@ -169,11 +177,12 @@
             align-items: flex-start;
             gap: 20px;
         }
-        
+
         .header-left {
             flex: 1;
+            font-weight: bold;
         }
-        
+
         .header-right {
             display: flex;
             flex-direction: column;
@@ -244,7 +253,7 @@
         .map-button:hover {
             background: #219a52;
         }
-        
+
         .disclaimer {
             font-size: 0.7em;
             color: #e74c3c;
@@ -266,46 +275,46 @@
             overflow: hidden;
             flex-shrink: 0;
         }
-        
+
         .stats-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.9em;
         }
-        
+
         .stats-table td {
             width: 25%;
             text-align: center;
         }
-        
+
         .stats-table td {
             padding: 12px 16px;
             border-bottom: 1px solid #f0f0f0;
             vertical-align: middle;
         }
-        
+
         .stats-table tr:last-child td {
             border-bottom: none;
         }
-        
+
         .stats-table tr:hover {
             background: #f8f9fa;
         }
-        
-        
+
+
         .percent-data {
             text-align: center;
             font-weight: 700;
             color: #e74c3c;
             font-size: 1.1em;
         }
-        
+
         .selected-data {
             text-align: center;
             font-weight: 600;
             color: #27ae60;
         }
-        
+
         .total-data {
             text-align: center;
             font-weight: 500;
@@ -319,7 +328,7 @@
             gap: 8px;
             margin-bottom: 10px;
         }
-        
+
         .stat-card {
             background: white;
             border-radius: 6px;
@@ -328,7 +337,7 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.06);
             border: 1px solid #e1e5e9;
         }
-        
+
         .stat-row {
             display: flex;
             justify-content: space-between;
@@ -342,7 +351,7 @@
         .stat-card {
             background: white;
             border-radius: 8px;
-            padding: 16px;
+            padding: 12px 16px 12px 16px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.07);
             text-align: center;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -372,7 +381,7 @@
         /* Controls Section - Simple Flexbox */
         .controls {
             background: white;
-            padding: 6px;
+            padding: 2px;
             border-radius: 6px;
             margin-bottom: 1px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -384,12 +393,12 @@
         .controls-row {
             display: flex;
             gap: 10px;
-            margin-bottom: 2px;
+            margin-bottom: 0px;
             align-items: flex-end;
             flex-wrap: nowrap;
             line-height: 1;
         }
-        
+
         .controls-row.second {
             margin-bottom: 0;
         }
@@ -397,29 +406,29 @@
         .control-item {
             flex: 0 0 auto;
         }
-        
+
         .control-item.search {
             flex: 1 1 240px;
             min-width: 200px;
         }
-        
+
         .control-item.filter {
             flex: 1;
             min-width: 160px;
         }
-        
+
         .control-item.value-input {
             width: 100px;
         }
-        
+
         .control-item.value-input.max {
             width: 80px;
         }
-        
+
         .control-item.buttons {
             flex: 0 0 auto;
         }
-        
+
         .btn.compact {
             padding: 4px 6px;
             font-size: 10px;
@@ -455,7 +464,7 @@
         .actions {
             display: flex;
             gap: 12px;
-            margin-bottom: 16px;
+            margin-bottom: 0px;
             flex-wrap: wrap;
         }
 
@@ -510,16 +519,22 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.07);
             display: flex;
             flex-direction: column;
-            margin-bottom: 0;
+            margin-bottom: 8px;
             border: 2px solid #e1e5e9;
-            max-height: 320px;
+            flex: 1;
+            min-height: 280px;
+            height: 300px;
         }
 
         .table-wrapper {
             overflow-x: auto;
-            overflow-y: hidden;
+            overflow-y: auto;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
+            flex: 1;
+            min-height: 260px;
+            height: 100%;
+            max-height: 310px;
         }
 
         table {
@@ -536,6 +551,8 @@
             border-bottom: 1px solid #f0f0f0;
             vertical-align: top;
             line-height: 1.1;
+            height: auto;
+            min-height: 25px;
         }
 
         th {
@@ -549,7 +566,8 @@
             top: 0;
             z-index: 100;
             padding: 2px 12px;
-            border-right: 1px solid #ddd;
+            border-right: 3px double #999;
+            border-left: 3px double #999;
             border-bottom: 2px solid #dee2e6;
         }
 
@@ -578,9 +596,9 @@
             text-overflow: ellipsis;
             line-height: 1.2;
         }
-        
+
         /* Column widths to prevent wrapping */
-        th:nth-child(1), td:nth-child(1) { min-width: 80px; }  /* Parcel ID */
+        th:nth-child(1), td:nth-child(1) { min-width: 65px; }  /* Parcel ID */
         th:nth-child(2), td:nth-child(2) { min-width: 200px; } /* Owner */
         th:nth-child(3), td:nth-child(3) { min-width: 60px; }  /* Class */
         th:nth-child(4), td:nth-child(4) { min-width: 80px; }  /* Year Built */
@@ -667,40 +685,40 @@
         /* Responsive Design */
         @media (max-width: 768px) {
             body { padding: 12px; }
-            
-            .header { padding: 16px; }
-            
+
+            .header { padding-top: 0; padding-left: 16px; padding-right: 16px; padding-bottom: 16px; }
+
             h1 { font-size: 1.8em; }
-            
+
             .stats-table-container {
                 margin-bottom: 6px;
             }
-            
+
             .stats-table {
                 font-size: 0.8em;
             }
-            
+
             .stats-table th, .stats-table td {
                 padding: 4px 8px;
             }
-            
+
             .controls-row {
                 flex-direction: column;
                 gap: 16px;
             }
-            
+
             .control-item {
                 min-width: auto;
             }
-            
+
             .actions {
                 justify-content: center;
             }
-            
+
             table {
                 font-size: 0.65em;
             }
-            
+
             th, td {
                 padding: 4px 6px;
             }
@@ -710,16 +728,16 @@
             .stats-table {
                 font-size: 0.75em;
             }
-            
+
             .stats-table th, .stats-table td {
                 padding: 6px 8px;
             }
-            
+
             .stats-table td {
                 width: 25%;
                 font-size: 0.8em;
             }
-            
+
             .stat-number {
                 font-size: 1.8em;
             }
@@ -731,16 +749,16 @@
         <header class="header">
             <div class="header-left">
                 <h1>Lebanon Property Info Repository</h1>
-                
+
                 <div class="disclaimer">
-                    <strong>Unofficial data portal.</strong> This site is not affiliated with or endorsed by the City of Lebanon. Data is derived from City-provided files with minimal reformatting and may contain errors or omissions. Do not rely on this site for legal, financial, or property decisions—verify with the City of Lebanon Assessing Office.
+                    <strong>UNOFFICIAL DATA PORTAL.</strong> This site is not affiliated with or endorsed by the City of Lebanon. Data is derived from City-provided files with minimal reformatting and may contain errors or omissions. Do not rely on this site for legal, financial, survey, or property decisions—verify with the City of Lebanon Assessing Office.
                 </div>
             </div>
-            
+
             <div class="header-right">
                 <a href="map.html" class="map-button">🗺️ View Map Interface</a>
                 <div class="subtitle-box">
-                    Comprehensive property assessment data for the City of Lebanon, NH
+                    Open source research tool for citizens of Lebanon to view their assessment and related property data
                 </div>
             </div>
         </header>
@@ -760,7 +778,7 @@
                     <div id="heating-filter"></div>
                 </div>
             </div>
-            
+
             <div class="controls-row second">
                 <div class="control-item search">
                     <label>Search Properties</label>
@@ -774,14 +792,14 @@
                     <label>Max ($)</label>
                     <input id="max-value" type="number" placeholder="Any">
                 </div>
-                <div class="control-item buttons">
-                    <div class="actions">
-                        <button class="btn compact" onclick="clearFilters()">🔄 Reset</button>
-                        <button class="btn compact" onclick="resetColumnWidths()">📏 Columns</button>
+                <div class="control-item buttons" style="align-self: flex-end; margin-top: 0px; margin-bottom: 0px;">
+                    <div class="actions" style="margin-bottom: 0px; align-self: flex-end;">
+                        <button class="btn compact" onclick="clearFilters()" style="line-height: 1.2;">🔄 Reset<br/>Filters</button>
+                        <button class="btn compact" onclick="resetColumnWidths()" style="line-height: 1.2;">📏 Reset<br/>Columns</button>
                     </div>
                 </div>
             </div>
-            
+
         </div>
 
         <div class="stats-grid">
@@ -824,6 +842,28 @@
             </div>
         </div>
 
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <button class="footer-btn warning" onclick="toggleAnalytics()">📈 Analytics</button>
+                    <button class="footer-btn info" onclick="toggleComparison()">⚖️ Compare</button>
+                    <button class="footer-btn" onclick="window.open('disclaimer.html', '_blank')" style="background: #e74c3c; margin-left: 8px;">🚫 Disclaimer</button>
+                </div>
+                <div class="footer-center">
+                    <div id="pagination" class="pagination"></div>
+                </div>
+                <div class="footer-right">
+                    <div class="data-access">
+                        <strong>🔗 Data:</strong> 
+                        <a href="data/parcels.csv">CSV</a> |
+                        <a href="spatial/parcels_wgs84.geojson">GeoJSON</a> |
+                        <a href="sitemap.xml">Sitemap</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
     </div>
 
     <!-- Working Checkbox Filter System -->
@@ -833,7 +873,7 @@
         let allParcels = [];
         let filteredParcels = [];
         let currentPage = 1;
-        const rowsPerPage = 9;
+        const rowsPerPage = 50;
 
         // Utility functions
         const formatCurrency = (value) => {
@@ -855,10 +895,10 @@
             const result = [];
             let current = '';
             let inQuotes = false;
-            
+
             for (let i = 0; i < line.length; i++) {
                 const char = line[i];
-                
+
                 if (char === '"') {
                     inQuotes = !inQuotes;
                 } else if (char === ',' && !inQuotes) {
@@ -877,13 +917,13 @@
             try {
                 const response = await fetch('data/parcels.csv');
                 const text = await response.text();
-                
+
                 const lines = text.trim().split('\n');
                 const headers = parseCSVLine(lines[0]);
-                
+
                 // Generate dynamic table headers for all columns
                 generateTableHeaders(headers);
-                
+
                 allParcels = lines.slice(1).map(line => {
                     const values = parseCSVLine(line);
                     const parcel = {};
@@ -894,18 +934,22 @@
                 }).filter(p => p.parcel_id && p.parcel_id.trim());
 
                 console.log(`Loaded ${allParcels.length} parcels with ${headers.length} columns`);
+
+                // Set filteredParcels to all parcels initially
+                filteredParcels = [...allParcels];
                 
                 updateStats();
                 initializeFilter();
+                renderTable(); // Render table immediately after loading
                 applyFilters();
-                
+
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('parcels-table').innerHTML = 
                     '<tr><td colspan="50" class="no-results">Error loading data</td></tr>';
             }
         }
-        
+
         // Generate table headers dynamically for filtered columns
         function generateTableHeaders(allHeaders) {
             // Remove unwanted columns
@@ -914,7 +958,7 @@
                 'nhdra_rem prcl locn street', 'nhdra_rem prcl locn', 'nhdra_address1', 'nhdra_city', 
                 'nhdra_state', 'nhdra_zip', 'nhdra_grantor', 'nhdra_book pg',
                 'nhdra_ID1 Prior Sale Price', 'nhdra_ID1 Prior Sale Date', 'nhdra_ID1 Prior Book Page',
-                'nhdra_ID2 Prior Sale Price', 'nhdra_ID2 Prior Sale Date', 'nhdra_ID2 Prior Book Page', 
+                'nhdra_ID2 Prior Sale Price', 'nhdra_ID2 Prior Sale Date', 'nhdra_ID2 Prior Book Page',
                 'nhdra_ID3 Prior Sale Price', 'nhdra_ID3 Prior Sale Date', 'nhdra_ID3 Prior Book Page',
                 'nhdra_own name', 'nhdra_co own name', 'nhdra_rem pid',
                 'nhdra_vns roof struct desc', 'nhdra_vns int wall1 desc', 'nhdra_vns int flr1 desc',
@@ -922,9 +966,9 @@
                 'nhdra_ahd ttl assess bldg', 'nhdra_ahd ttl assess xf', 'nhdra_ahd ttl assess lnd',
                 'nhdra_ahd ttl assess ob', 'nhdra_ahd ttl assess'
             ];
-            
+
             const filteredHeaders = allHeaders.filter(h => !excludeColumns.includes(h));
-            
+
             const headerRow = document.getElementById('table-headers');
             const headerHtml = filteredHeaders.map(header => {
                 let displayName = translateColumnName(header);
@@ -933,14 +977,14 @@
                 return `<th class="${className}" style="width: ${width}px; min-width: ${width}px;">${displayName}<div class="resize-handle"></div></th>`;
             }).join('');
             headerRow.innerHTML = headerHtml;
-            
+
             // Initialize column resizing after headers are created
             initializeColumnResizing();
-            
+
             // Store filtered headers for table rendering
             window.displayColumns = filteredHeaders;
         }
-        
+
         // Translate column names with proper meanings for abbreviations
         function translateColumnName(header) {
             const translations = {
@@ -981,7 +1025,7 @@
                 'nhdra_lnd nbhd': 'Land<br>Neighborhood',
                 'nhdra_vns stories': 'Stories'
             };
-            
+
             return translations[header] || header.replace('nhdra_', '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         }
 
@@ -1003,55 +1047,55 @@
             const totalValue = allParcels.reduce((sum, p) => sum + parseNumber(p.total_value), 0);
             const totalValues = allParcels.map(p => parseNumber(p.total_value)).filter(v => v > 0).sort((a, b) => a - b);
             const totalMedianValue = totalValues.length > 0 ? totalValues[Math.floor(totalValues.length / 2)] : 0;
-            
+
             // Calculate total median age
             const totalAges = allParcels.map(p => {
                 const year = parseNumber(p['nhdra_vns ayb']);
                 return year > 1800 && year <= 2025 ? 2025 - year : null;
             }).filter(age => age !== null).sort((a, b) => a - b);
             const totalMedianAge = totalAges.length > 0 ? totalAges[Math.floor(totalAges.length / 2)] : 0;
-            
+
             // Calculate total land area
             const totalLandArea = allParcels.reduce((sum, p) => sum + parseNumber(p.lot_size_acres), 0);
-            
+
             // Calculate selected (filtered) values
             const selectedParcels = filteredParcels.length;
             const selectedValue = filteredParcels.reduce((sum, p) => sum + parseNumber(p.total_value), 0);
             const selectedValues = filteredParcels.map(p => parseNumber(p.total_value)).filter(v => v > 0).sort((a, b) => a - b);
             const selectedMedianValue = selectedValues.length > 0 ? selectedValues[Math.floor(selectedValues.length / 2)] : 0;
-            
+
             // Calculate selected median age
             const selectedAges = filteredParcels.map(p => {
                 const year = parseNumber(p['nhdra_vns ayb']);
                 return year > 1800 && year <= 2025 ? 2025 - year : null;
             }).filter(age => age !== null).sort((a, b) => a - b);
             const selectedMedianAge = selectedAges.length > 0 ? selectedAges[Math.floor(selectedAges.length / 2)] : 0;
-            
+
             // Calculate selected land area
             const selectedLandArea = filteredParcels.reduce((sum, p) => sum + parseNumber(p.lot_size_acres), 0);
-            
+
             // Calculate percentages and ratios
             const parcelPercent = totalParcels > 0 ? (selectedParcels / totalParcels * 100).toFixed(1) : 0;
             const valuePercent = totalValue > 0 ? (selectedValue / totalValue * 100).toFixed(1) : 0;
             const landPercent = totalLandArea > 0 ? (selectedLandArea / totalLandArea * 100).toFixed(1) : 0;
             const ageRatio = totalMedianAge > 0 ? (selectedMedianAge / totalMedianAge * 100).toFixed(1) : 0;
-            
+
             // Update cards with standardized "Selected [Category]" labels
             // Card 1: Parcels
             document.getElementById('parcels-percent').innerHTML = `<span>Selected Parcels %</span><span>${parcelPercent}%</span>`;
             document.getElementById('parcels-selected').innerHTML = `<span>Selected Parcels</span><span>${formatNumber(selectedParcels)}</span>`;
             document.getElementById('parcels-total').innerHTML = `<span>Total Parcels</span><span>${formatNumber(totalParcels)}</span>`;
-            
+
             // Card 2: Assessed Value
-            document.getElementById('value-percent').innerHTML = `<span>Selected Value %</span><span>${valuePercent}%</span>`;
-            document.getElementById('value-selected').innerHTML = `<span>Selected Value</span><span>${formatCurrency(selectedValue)}</span>`;
+            document.getElementById('value-percent').innerHTML = `<span>Selected Parcel's Value %</span><span>${valuePercent}%</span>`;
+            document.getElementById('value-selected').innerHTML = `<span>Selected Parcel's Value</span><span>${formatCurrency(selectedValue)}</span>`;
             document.getElementById('value-total').innerHTML = `<span>Total Assessed Value</span><span>${formatCurrency(totalValue)}</span>`;
-            
+
             // Card 3: Median Age
             document.getElementById('age-ratio').innerHTML = `<span>Ratio of Selected Age</span><span>${ageRatio}%</span>`;
             document.getElementById('age-selected').innerHTML = `<span>Selected Median Age</span><span>${selectedMedianAge}</span>`;
             document.getElementById('age-total').innerHTML = `<span>Median Age</span><span>${totalMedianAge}</span>`;
-            
+
             // Card 4: Land Area
             document.getElementById('land-percent').innerHTML = `<span>Selected Land Area %</span><span>${landPercent}%</span>`;
             document.getElementById('land-selected').innerHTML = `<span>Selected Land Area</span><span>${selectedLandArea.toFixed(0)}</span>`;
@@ -1063,7 +1107,7 @@
             const searchTerm = document.getElementById('search').value.toLowerCase();
             const minValue = parseNumber(document.getElementById('min-value').value);
             const maxValue = parseNumber(document.getElementById('max-value').value);
-            
+
             // Get selected classes and years from working filters
             let selectedClasses = [];
             let selectedYears = [];
@@ -1122,13 +1166,13 @@
                 if (selectedHeating.length > 0) {
                     const heatFuel = parcel['nhdra_vns heat fuel desc'];
                     const heatType = parcel['nhdra_vns heat type desc'];
-                    
+
                     if (!heatFuel || heatFuel === '0' || heatFuel === '' ||
                         !heatType || heatType === '0' || heatType === '') {
                         // Include unknown heating properties only if "unknown" is selected
                         return selectedHeating.includes('unknown');
                     }
-                    
+
                     const heatingCombination = `${heatFuel.trim()}|${heatType.trim()}`;
                     if (!selectedHeating.includes(heatingCombination)) {
                         return false;
@@ -1152,7 +1196,7 @@
         // Render table
         function renderTable() {
             const tbody = document.getElementById('parcels-table');
-            
+
             if (filteredParcels.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="50" class="no-results">No properties match your criteria</td></tr>';
                 updatePagination();
@@ -1163,11 +1207,11 @@
             const endIndex = startIndex + rowsPerPage;
             // Use filtered columns for display
             const displayColumns = window.displayColumns || Object.keys(allParcels[0] || {});
-            
+
             const rows = filteredParcels.slice(startIndex, endIndex).map(parcel => {
                 const cells = displayColumns.map(column => {
                     let value = parcel[column] || '';
-                    
+
                     // Format specific column types
                     if (column.includes('value') || column.includes('price') || column.includes('Price')) {
                         const numValue = parseNumber(value);
@@ -1200,10 +1244,10 @@
                             value = 'N';
                         }
                     }
-                    
+
                     return `<td>${value}</td>`;
                 }).join('');
-                
+
                 return `<tr>${cells}</tr>`;
             }).join('');
 
@@ -1220,28 +1264,28 @@
         function updatePagination() {
             const totalPages = Math.ceil(filteredParcels.length / rowsPerPage);
             const pagination = document.getElementById('pagination');
-            
+
             if (totalPages <= 1) {
                 pagination.innerHTML = '';
                 return;
             }
 
             let html = '';
-            
+
             // Previous button
             html += `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹ Previous</button>`;
-            
+
             // Page numbers
             const startPage = Math.max(1, currentPage - 2);
             const endPage = Math.min(totalPages, currentPage + 2);
-            
+
             for (let i = startPage; i <= endPage; i++) {
                 html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
             }
-            
+
             // Next button
             html += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next ›</button>`;
-            
+
             pagination.innerHTML = html;
         }
 
@@ -1288,42 +1332,42 @@
 
         function initializeColumnResizing() {
             const resizeHandles = document.querySelectorAll('.resize-handle');
-            
+
             resizeHandles.forEach(handle => {
                 handle.addEventListener('mousedown', (e) => {
                     isResizing = true;
                     currentColumn = handle.parentElement;
                     startX = e.clientX;
                     startWidth = parseInt(window.getComputedStyle(currentColumn).width, 10);
-                    
+
                     handle.classList.add('resizing');
                     document.body.style.cursor = 'col-resize';
                     document.body.style.userSelect = 'none';
-                    
+
                     e.preventDefault();
                 });
             });
-            
+
             document.addEventListener('mousemove', (e) => {
                 if (!isResizing) return;
-                
+
                 const width = startWidth + e.clientX - startX;
                 const minWidth = 80; // Minimum column width
                 const maxWidth = 400; // Maximum column width
-                
+
                 if (width > minWidth && width < maxWidth) {
                     currentColumn.style.width = width + 'px';
                     currentColumn.style.minWidth = width + 'px';
                 }
             });
-            
+
             document.addEventListener('mouseup', () => {
                 if (isResizing) {
                     isResizing = false;
                     currentColumn = null;
                     document.body.style.cursor = '';
                     document.body.style.userSelect = '';
-                    
+
                     // Remove resizing class from all handles
                     document.querySelectorAll('.resize-handle').forEach(h => {
                         h.classList.remove('resizing');
@@ -1343,14 +1387,14 @@
                 'full_baths': 75,
                 'half_baths': 75,
                 'fireplaces': 80,
-                
+
                 // Currency columns - compact but readable
                 'total_value': 105,
                 'building_value': 105,
                 'land_value': 95,
                 'assessed_value': 105,
                 'price': 95,
-                
+
                 // Text columns - much tighter
                 'owner': 140,           // Names don't need huge space
                 'zoning_district': 90,  // Usually short codes
@@ -1361,24 +1405,24 @@
                 'heating': 85,         // Reduced from 100
                 'fuel': 65,            // Reduced from 80
                 'condition': 80,       // Reduced from 90
-                
+
                 // IDs and codes - very compact
                 'map_block_lot': 110,  // Reduced from 130
                 'parcel': 65,          // Reduced from 80
                 'account': 75,         // Reduced from 90
                 'lot_size_acres': 80,  // Decimal numbers don't need much space
-                
+
                 // Boolean/short text - minimal
                 'arms_length': 75,     // Just Y/N values
                 'multi_parcels': 85,   // Reduced from 100
                 'sale_date': 85        // Date format is consistent
             };
-            
+
             // Check if we have a specific width for this column
             if (widthMap[columnKey]) {
                 return widthMap[columnKey];
             }
-            
+
             // More aggressive fallback for unknown columns
             const textLength = displayName.length;
             if (textLength <= 6) return 60;
@@ -1394,7 +1438,7 @@
                 // Get the original column key to determine optimal width
                 const columnKey = window.displayColumns ? window.displayColumns[index] : null;
                 const displayName = header.textContent.replace(/\s+/g, ' ').trim();
-                
+
                 if (columnKey) {
                     const optimalWidth = getOptimalColumnWidth(columnKey, displayName);
                     header.style.width = optimalWidth + 'px';
@@ -1409,26 +1453,6 @@
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', loadData);
     </script>
-    
-    <!-- Utility Bar Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-left">
-                <button class="footer-btn warning" onclick="toggleAnalytics()">📈 Analytics</button>
-                <button class="footer-btn info" onclick="toggleComparison()">⚖️ Compare</button>
-            </div>
-            <div class="footer-center">
-                <div id="pagination" class="pagination"></div>
-            </div>
-            <div class="footer-right">
-                <div class="data-access">
-                    <strong>🔗 Data:</strong> 
-                    <a href="data/parcels.csv">CSV</a> |
-                    <a href="spatial/parcels_wgs84.geojson">GeoJSON</a> |
-                    <a href="sitemap.xml">Sitemap</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-</body>
+
+    </body>
 </html>
