@@ -12,6 +12,12 @@ This is a property tax database and data explorer for Lebanon, New Hampshire. Th
 - Previous chat history reset
 - Lebanon Property Database server running at http://0.0.0.0:5000/
 
+**✅ LATEST IMPROVEMENTS - September 10, 2025**
+- **Year Built Filter Added to Map Page**: Complete 4-filter system now operational on both interfaces
+- **Consistent Filter Behavior**: Both index and map pages now use "Apply Filters" button approach
+- **Index Page Apply Button**: Added Apply Filters button with 50% reduced search filter width for better layout
+- **Removed Auto-Application**: Eliminated automatic filter triggering on checkbox clicks for better user control
+
 ## ✅ COMPLETED FEATURES (September 2025)
 
 ### **Advanced Filtering System**
