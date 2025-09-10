@@ -1039,7 +1039,12 @@
                     return '#bdc3c7';
                     
                 case 'year':
-                    const year = parseInt(property.year_built) || 0;
+                    const yearValue = property['nhdra_vns ayb'];
+                    const year = parseInt(yearValue) || 0;
+                    // Only consider realistic years (1800-2030), treat others as unknown
+                    if (year < 1800 || year > 2030) {
+                        return '#bdc3c7'; // Gray for unknown/invalid years
+                    }
                     for (const range of colorSchemes.year.ranges) {
                         if (year >= range.min && year < range.max) {
                             return range.color;
@@ -1179,7 +1184,7 @@
                 <div class="popup-row"><span class="popup-label">Total Value:</span> $${formatNumber(property.total_value || 0)}</div>
                 <div class="popup-row"><span class="popup-label">Land Value:</span> $${formatNumber(property.land_value || 0)}</div>
                 <div class="popup-row"><span class="popup-label">Building Value:</span> $${formatNumber(property.building_value || 0)}</div>
-                ${property.year_built ? `<div class="popup-row"><span class="popup-label">Year Built:</span> ${property.year_built}</div>` : ''}
+                ${property['nhdra_vns ayb'] && parseInt(property['nhdra_vns ayb']) >= 1800 && parseInt(property['nhdra_vns ayb']) <= 2030 ? `<div class="popup-row"><span class="popup-label">Year Built:</span> ${property['nhdra_vns ayb']}</div>` : ''}
                 ${property.building_gla ? `<div class="popup-row"><span class="popup-label">Building Area:</span> ${formatNumber(property.building_gla)} sq ft</div>` : ''}
             `;
         }
@@ -1454,6 +1459,11 @@
                         ${label}
                     </div>`;
                 });
+                // Add unknown/no data legend entry
+                html += `<div class="color-legend">
+                    <div class="color-box" style="background-color: #bdc3c7"></div>
+                    Unknown/No Data (90.5% of parcels)
+                </div>`;
             } else if (colorBy === 'heating') {
                 // Show heating fuel type legend
                 const heatingTypes = [
