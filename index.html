@@ -412,27 +412,6 @@
             min-width: 100px;
         }
         
-        .control-item.apply-button {
-            flex: 0 0 auto;
-            margin-left: 8px;
-        }
-        
-        .apply-filters-btn {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9em;
-            font-weight: 500;
-            height: 32px;
-            margin-top: 20px;
-        }
-        
-        .apply-filters-btn:hover {
-            background: #2980b9;
-        }
 
         .control-item.filter {
             flex: 1;
@@ -806,9 +785,6 @@
                     <label>Search Properties</label>
                     <input id="search" type="search" placeholder="Search by address, owner, parcel...">
                 </div>
-                <div class="control-item apply-button">
-                    <button class="apply-filters-btn" onclick="applyFilters()">Apply Filters</button>
-                </div>
                 <div class="control-item value-input">
                     <label>Min ($)</label>
                     <input id="min-value" type="number" placeholder="0">
@@ -819,6 +795,7 @@
                 </div>
                 <div class="control-item buttons" style="align-self: flex-end; margin-top: 0px; margin-bottom: 0px;">
                     <div class="actions" style="margin-bottom: 0px; align-self: flex-end;">
+                        <button class="btn compact" onclick="applyFilters()" style="line-height: 1.2;">✅ Apply<br/>Filters</button>
                         <button class="btn compact" onclick="clearFilters()" style="line-height: 1.2;">🔄 Reset<br/>Filters</button>
                         <button class="btn compact" onclick="resetColumnWidths()" style="line-height: 1.2;">📏 Reset<br/>Columns</button>
                     </div>
