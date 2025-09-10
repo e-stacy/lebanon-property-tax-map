@@ -1016,6 +1016,11 @@
         
         // Get color for parcel based on visualization mode
         function getParcelColor(property, colorBy) {
+            // Handle case where property data is null/undefined
+            if (!property) {
+                return '#bdc3c7'; // Light gray for parcels without data
+            }
+            
             switch (colorBy) {
                 case 'class':
                     return colorSchemes.class[property?.class_code] || colorSchemes.class.default;
@@ -1781,7 +1786,10 @@
         }
         
         // Event listeners
-        document.getElementById('color-by').addEventListener('change', updateParcelLayer);
+        document.getElementById('color-by').addEventListener('change', function() {
+            updateParcelLayer();
+            updateLegend();
+        });
         
         // Add checkbox event listeners
         document.getElementById('show-parcels').addEventListener('change', toggleParcels);
