@@ -971,7 +971,8 @@ function updateWorkingFilter(containerId, clickedElement = null) {
         console.log('Selected classes:', selectedClasses);
         
         // Call the appropriate filter function based on which page we're on
-        if (typeof applyFilters === 'function') {
+        // Only auto-apply on index page, not map page (map page uses Apply Filters button)
+        if (typeof applyFilters === 'function' && typeof map === 'undefined') {
             applyFilters();
         }
     }
@@ -1063,7 +1064,8 @@ function updateWorkingYearFilter(containerId, clickedElement = null) {
     }
     
     // Apply filters
-    if (typeof applyFilters === 'function') {
+    // Only auto-apply on index page, not map page (map page uses Apply Filters button)
+    if (typeof applyFilters === 'function' && typeof map === 'undefined') {
         applyFilters();
     }
 }
@@ -1144,7 +1146,8 @@ function updateWorkingHeatingFilter(containerId, clickedElement = null) {
     }
     
     // Apply filters
-    if (typeof applyFilters === 'function') {
+    // Only auto-apply on index page, not map page (map page uses Apply Filters button)
+    if (typeof applyFilters === 'function' && typeof map === 'undefined') {
         applyFilters();
     }
 }
@@ -1275,7 +1278,8 @@ function updateWorkingZoningFilter(containerId, clickedElement = null) {
     }
     
     // Apply filters
-    if (typeof applyFilters === 'function') {
+    // Only auto-apply on index page, not map page (map page uses Apply Filters button)
+    if (typeof applyFilters === 'function' && typeof map === 'undefined') {
         applyFilters();
     }
 }
