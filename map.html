@@ -196,6 +196,10 @@
             </div>
             
             <div class="filter-group">
+                <div id="year-filter"></div>
+            </div>
+            
+            <div class="filter-group">
                 <div id="zoning-filter"></div>
             </div>
             
@@ -691,6 +695,7 @@
                 console.log('Initializing map filters with', properties.length, 'properties');
                 if (typeof workingFilters !== 'undefined') {
                     workingFilters.createPropertyClassFilter('class-filter', propertyData);
+                    workingFilters.createYearBuiltFilter('year-filter', propertyData);
                     workingFilters.createZoningFilter('zoning-filter', propertyData);
                     workingFilters.createHeatingFilter('heating-filter', propertyData);
                 }
@@ -1012,6 +1017,7 @@
         // Check if property passes current filters
         function passesFilters(property) {
             const selectedClasses = getSelectedValues('class-filter');
+            const selectedYears = getSelectedValues('year-filter');
             const selectedZones = getSelectedValues('zoning-filter');
             const selectedHeating = getSelectedValues('heating-filter');
             const minValue = parseFloat(document.getElementById('min-value').value) || 0;
@@ -1021,6 +1027,29 @@
             if (selectedClasses.length > 0 && property?.class_code) {
                 if (!selectedClasses.includes(property.class_code)) {
                     return false;
+                }
+            }
+            
+            // Year Built filter
+            if (selectedYears.length > 0) {
+                const yearValue = property['nhdra_vns ayb'];
+                if (!yearValue || yearValue === '0' || yearValue === '') {
+                    // Include unknown year properties only if "unknown" is selected
+                    if (!selectedYears.includes('unknown')) {
+                        return false;
+                    }
+                } else {
+                    const year = Math.floor(parseFloat(yearValue));
+                    if (year >= 1800 && year <= 2029) {
+                        if (!selectedYears.includes(year.toString())) {
+                            return false;
+                        }
+                    } else {
+                        // Invalid year - include only if "unknown" is selected
+                        if (!selectedYears.includes('unknown')) {
+                            return false;
+                        }
+                    }
                 }
             }
             
