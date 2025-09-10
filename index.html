@@ -860,6 +860,7 @@
                         <button class="btn compact" onclick="applyFilters()" style="line-height: 1.2;">✅ Apply<br/>Filters</button>
                         <button class="btn compact" onclick="clearFilters()" style="line-height: 1.2;">🔄 Reset<br/>Filters</button>
                         <button class="btn compact" onclick="resetColumnWidths()" style="line-height: 1.2;">📏 Reset<br/>Columns</button>
+                        <button class="btn compact" onclick="resetSort()" style="line-height: 1.2;">🔃 Reset<br/>Sort</button>
                     </div>
                 </div>
             </div>
@@ -1390,6 +1391,29 @@
                 if (valueA < valueB) return currentSortDirection === 'asc' ? -1 : 1;
                 if (valueA > valueB) return currentSortDirection === 'asc' ? 1 : -1;
                 return 0;
+            });
+
+            // Reset to first page and re-render
+            currentPage = 1;
+            renderTable();
+        }
+
+        // Reset sort to original order (by parcel ID)
+        function resetSort() {
+            // Clear sort state
+            currentSortColumn = null;
+            currentSortDirection = 'asc';
+
+            // Clear all sort classes from headers
+            document.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+            });
+
+            // Sort filtered data by parcel_id (original order)
+            filteredParcels.sort((a, b) => {
+                const idA = a.parcel_id || '';
+                const idB = b.parcel_id || '';
+                return idA.localeCompare(idB, undefined, { numeric: true, sensitivity: 'base' });
             });
 
             // Reset to first page and re-render
