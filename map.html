@@ -188,6 +188,8 @@
                     <option value="value">Total Value</option>
                     <option value="density">Value per Acre</option>
                     <option value="year">Year Built</option>
+                    <option value="heating">Heating Fuel Type</option>
+                    <option value="zoning">Zoning District</option>
                 </select>
             </div>
             
@@ -602,6 +604,44 @@
                     { min: 500000, max: Infinity, color: '#8e44ad' }
                 ]
             },
+            heating: {
+                'GAS': '#2ecc71',           // Green - Clean/renewable priority
+                'ELECTRIC': '#3498db',       // Blue - Electric
+                'OIL': '#e74c3c',           // Red - Oil
+                'COAL': '#34495e',          // Dark gray - Coal
+                'WOOD': '#e67e22',          // Orange - Wood
+                'PROPANE': '#f39c12',       // Golden - Propane
+                'SOLAR': '#27ae60',         // Bright green - Solar
+                'GEOTHERMAL': '#16a085',    // Teal - Geothermal
+                'NONE': '#bdc3c7',          // Light gray - None
+                'unknown': '#95a5a6',       // Gray - Unknown
+                'default': '#95a5a6'
+            },
+            zoning: {
+                // Residential zones
+                'R1': '#2ecc71',            // Single family - Green
+                'R2': '#27ae60',            // Two family - Dark green
+                'R3': '#1abc9c',            // Multi-family - Turquoise
+                'R4': '#16a085',            // High density - Dark turquoise
+                
+                // Commercial zones  
+                'C1': '#3498db',            // Neighborhood commercial - Blue
+                'C2': '#2980b9',            // General commercial - Dark blue
+                'CB': '#1f618d',            // Business - Navy
+                
+                // Industrial zones
+                'I1': '#e67e22',            // Light industrial - Orange
+                'I2': '#d35400',            // General industrial - Dark orange
+                
+                // Other zones
+                'Q': '#f1c40f',             // Q zone - Yellow
+                'A': '#e74c3c',             // Agricultural - Red
+                'RR': '#8e44ad',            // Rural residential - Purple
+                'PUD': '#9b59b6',           // Planned unit - Light purple
+                
+                'unknown': '#bdc3c7',       // Light gray - Unknown
+                'default': '#95a5a6'
+            },
             year: {
                 ranges: [
                     { min: 0, max: 1950, color: '#8e44ad' },
@@ -1008,6 +1048,32 @@
                         }
                     }
                     return '#bdc3c7';
+                    
+                case 'heating':
+                    const heatFuel = property['nhdra_vns heat fuel desc'];
+                    if (!heatFuel || heatFuel === '0' || heatFuel === '') {
+                        return colorSchemes.heating.unknown;
+                    }
+                    // Extract main fuel type from description
+                    const fuelType = heatFuel.toString().toUpperCase().trim();
+                    if (fuelType.includes('GAS')) return colorSchemes.heating.GAS;
+                    if (fuelType.includes('OIL')) return colorSchemes.heating.OIL;
+                    if (fuelType.includes('ELECTRIC')) return colorSchemes.heating.ELECTRIC;
+                    if (fuelType.includes('COAL')) return colorSchemes.heating.COAL;
+                    if (fuelType.includes('WOOD')) return colorSchemes.heating.WOOD;
+                    if (fuelType.includes('PROPANE')) return colorSchemes.heating.PROPANE;
+                    if (fuelType.includes('SOLAR')) return colorSchemes.heating.SOLAR;
+                    if (fuelType.includes('GEOTHERMAL')) return colorSchemes.heating.GEOTHERMAL;
+                    if (fuelType.includes('NONE')) return colorSchemes.heating.NONE;
+                    return colorSchemes.heating.default;
+                    
+                case 'zoning':
+                    const zone = property['nhdra_lnd zone'];
+                    if (!zone || zone === '0' || zone === '') {
+                        return colorSchemes.zoning.unknown;
+                    }
+                    const zoneCode = zone.toString().trim().toUpperCase();
+                    return colorSchemes.zoning[zoneCode] || colorSchemes.zoning.default;
                     
                 default:
                     return '#3498db';
