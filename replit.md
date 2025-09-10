@@ -13,10 +13,12 @@ This is a property tax database and data explorer for Lebanon, New Hampshire. Th
 - Lebanon Property Database server running at http://0.0.0.0:5000/
 
 **✅ LATEST IMPROVEMENTS - September 10, 2025**
-- **Year Built Filter Added to Map Page**: Complete 4-filter system now operational on both interfaces
-- **Consistent Filter Behavior**: Both index and map pages now use "Apply Filters" button approach
-- **Index Page Apply Button**: Added Apply Filters button with 50% reduced search filter width for better layout
-- **Removed Auto-Application**: Eliminated automatic filter triggering on checkbox clicks for better user control
+- **Enhanced Map Color-By Visualization**: Fixed JavaScript errors preventing map colors and legends from updating properly
+- **Granular Total Value Categories**: Expanded from 5 to 8 value ranges (0-100k, 100k-200k, 200k-300k, 300k-400k, 400k-500k, 500k-750k, 750k-1M, 1M+)
+- **Streamlined Map Options**: Removed "Value per Acre" option to focus on primary visualization modes
+- **Enhanced Year Built Groupings**: Updated to historical periods (1800-1849, 1850-1874, 1874-1899) followed by decade-based groupings through 2020s
+- **High-Contrast Zoning Colors**: Improved color contrast for better distinction between residential, commercial, industrial, and special zoning districts
+- **Dynamic Legend Updates**: Fixed legend system to properly update when switching between color-by options
 
 ## ✅ COMPLETED FEATURES (September 2025)
 
