@@ -1010,11 +1010,11 @@
             const filteredHeaders = allHeaders.filter(h => !excludeColumns.includes(h));
 
             const headerRow = document.getElementById('table-headers');
-            const headerHtml = filteredHeaders.map(header => {
+            const headerHtml = filteredHeaders.map((header, index) => {
                 let displayName = translateColumnName(header);
                 const className = header.includes('value') || header.includes('price') || header.includes('Price') ? 'currency' : '';
                 const width = getOptimalColumnWidth(header, displayName);
-                return `<th class="${className}" style="width: ${width}px; min-width: ${width}px;">${displayName}<div class="resize-handle"></div></th>`;
+                return `<th class="${className}" style="width: ${width}px; min-width: ${width}px;" onclick="sortTable('${header}')" data-column="${header}">${displayName}<span class="sort-icons"></span><div class="resize-handle"></div></th>`;
             }).join('');
             headerRow.innerHTML = headerHtml;
 
@@ -1305,6 +1305,65 @@
         // Update filtered count
         function updateFilteredCount() {
             // Element removed to save space - no longer updating count display
+        }
+
+        // Sorting state
+        let currentSortColumn = null;
+        let currentSortDirection = 'asc';
+
+        // Sort table by column
+        function sortTable(columnName) {
+            // Toggle direction if same column, otherwise set to ascending
+            if (currentSortColumn === columnName) {
+                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortColumn = columnName;
+                currentSortDirection = 'asc';
+            }
+
+            // Clear previous sort classes
+            document.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+            });
+
+            // Add sort class to current column
+            const currentHeader = document.querySelector(`th[data-column="${columnName}"]`);
+            if (currentHeader) {
+                currentHeader.classList.add(currentSortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+            }
+
+            // Sort the filtered data
+            filteredParcels.sort((a, b) => {
+                let valueA = a[columnName] || '';
+                let valueB = b[columnName] || '';
+
+                // Handle different data types
+                if (columnName.includes('value') || columnName.includes('price') || columnName.includes('Price') || columnName.includes('area')) {
+                    // Numeric comparison for monetary values and areas
+                    valueA = parseNumber(valueA);
+                    valueB = parseNumber(valueB);
+                } else if (columnName.includes('ayb')) {
+                    // Year comparison
+                    valueA = parseInt(valueA) || 0;
+                    valueB = parseInt(valueB) || 0;
+                } else if (columnName.includes('saledate')) {
+                    // Date comparison
+                    valueA = new Date(valueA || '1900-01-01').getTime();
+                    valueB = new Date(valueB || '1900-01-01').getTime();
+                } else {
+                    // String comparison (case-insensitive)
+                    valueA = valueA.toString().toLowerCase();
+                    valueB = valueB.toString().toLowerCase();
+                }
+
+                if (valueA < valueB) return currentSortDirection === 'asc' ? -1 : 1;
+                if (valueA > valueB) return currentSortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            // Reset to first page and re-render
+            currentPage = 1;
+            renderTable();
         }
 
         // Update pagination
