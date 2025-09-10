@@ -889,6 +889,24 @@ function updateWorkingFilter(containerId, clickedElement = null) {
     
     console.log('updateWorkingFilter called for:', containerId);
     
+    // Handle "All Classes" checkbox click - clear all specific selections
+    if (clickedElement && clickedElement === allCheckbox) {
+        console.log('DEBUG: All checkbox was clicked directly');
+        // Uncheck all specific boxes
+        otherCheckboxes.forEach(cb => cb.checked = false);
+        // Ensure All is checked
+        allCheckbox.checked = true;
+        dropdownText.textContent = 'All Classes';
+        console.log('DEBUG: Cleared all specific selections and checked All');
+        
+        // Early return - no need for further processing
+        if (containerId === 'class-filter') {
+            const selectedClasses = workingFilters.getSelectedClasses(containerId);
+            console.log('Selected classes:', selectedClasses);
+        }
+        return;
+    }
+    
     // HIERARCHICAL BEHAVIOR: Handle parent-child relationships
     if (clickedElement && clickedElement !== allCheckbox) {
         const clickedCode = clickedElement.value;
@@ -986,6 +1004,18 @@ function updateWorkingYearFilter(containerId, clickedElement = null) {
     
     console.log('updateWorkingYearFilter called for:', containerId);
     
+    // Handle "All Years" checkbox click - clear all specific selections
+    if (clickedElement && clickedElement === allCheckbox) {
+        console.log('DEBUG: All years checkbox was clicked directly');
+        // Uncheck all specific boxes
+        otherCheckboxes.forEach(cb => cb.checked = false);
+        // Ensure All is checked
+        allCheckbox.checked = true;
+        dropdownText.textContent = 'All Years';
+        console.log('DEBUG: Cleared all specific year selections and checked All');
+        return;
+    }
+    
     // HIERARCHICAL BEHAVIOR: Handle decade-year relationships
     if (clickedElement && clickedElement !== allCheckbox && workingFilters.yearHierarchy) {
         const clickedValue = clickedElement.value;
@@ -1078,6 +1108,18 @@ function updateWorkingHeatingFilter(containerId, clickedElement = null) {
     
     console.log('updateWorkingHeatingFilter called for:', containerId);
     
+    // Handle "All Heating Systems" checkbox click - clear all specific selections
+    if (clickedElement && clickedElement === allCheckbox) {
+        console.log('DEBUG: All heating systems checkbox was clicked directly');
+        // Uncheck all specific boxes
+        otherCheckboxes.forEach(cb => cb.checked = false);
+        // Ensure All is checked
+        allCheckbox.checked = true;
+        dropdownText.textContent = 'All Heating Systems';
+        console.log('DEBUG: Cleared all specific heating selections and checked All');
+        return;
+    }
+    
     // HIERARCHICAL BEHAVIOR: Handle fuel-type relationships
     if (clickedElement && clickedElement !== allCheckbox && workingFilters.heatingHierarchy) {
         const clickedValue = clickedElement.value;
@@ -1159,6 +1201,18 @@ function updateWorkingZoningFilter(containerId, clickedElement = null) {
     const dropdownText = document.querySelector(`#${containerId}-checkboxes`).parentNode.querySelector('.dropdown-text');
     
     console.log('updateWorkingZoningFilter called for:', containerId);
+    
+    // Handle "All Zones" checkbox click - clear all specific selections
+    if (clickedElement && clickedElement === allCheckbox) {
+        console.log('DEBUG: All zones checkbox was clicked directly');
+        // Uncheck all specific boxes
+        otherCheckboxes.forEach(cb => cb.checked = false);
+        // Ensure All is checked
+        allCheckbox.checked = true;
+        dropdownText.textContent = 'All Zones';
+        console.log('DEBUG: Cleared all specific zone selections and checked All');
+        return;
+    }
     
     // HIERARCHICAL BEHAVIOR: Handle category-district relationships
     if (clickedElement && clickedElement !== allCheckbox && workingFilters.zoningHierarchy) {
