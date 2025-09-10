@@ -1344,10 +1344,11 @@
             alert('Comparison feature will be implemented');
         }
 
-        // Event listeners
-        document.getElementById('search').addEventListener('input', applyFilters);
-        document.getElementById('min-value').addEventListener('input', applyFilters);
-        document.getElementById('max-value').addEventListener('input', applyFilters);
+        // Event listeners - removed automatic filter application
+        // Filters now only apply when user clicks Apply Filters button
+        // document.getElementById('search').addEventListener('input', applyFilters);
+        // document.getElementById('min-value').addEventListener('input', applyFilters);
+        // document.getElementById('max-value').addEventListener('input', applyFilters);
 
         // Column resizing functionality
         let isResizing = false;

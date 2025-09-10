@@ -971,10 +971,10 @@ function updateWorkingFilter(containerId, clickedElement = null) {
         console.log('Selected classes:', selectedClasses);
         
         // Call the appropriate filter function based on which page we're on
-        // Only auto-apply on index page, not map page (map page uses Apply Filters button)
-        if (typeof applyFilters === 'function' && typeof map === 'undefined') {
-            applyFilters();
-        }
+        // Disabled automatic filter application - now both pages use Apply Filters button
+        // if (typeof applyFilters === 'function') {
+        //     applyFilters();
+        // }
     }
 }
 
@@ -1064,10 +1064,10 @@ function updateWorkingYearFilter(containerId, clickedElement = null) {
     }
     
     // Apply filters
-    // Only auto-apply on index page, not map page (map page uses Apply Filters button)
-    if (typeof applyFilters === 'function' && typeof map === 'undefined') {
-        applyFilters();
-    }
+    // Disabled automatic filter application - now both pages use Apply Filters button
+    // if (typeof applyFilters === 'function') {
+    //     applyFilters();
+    // }
 }
 
 // Heating filter update function with hierarchical behavior
@@ -1146,10 +1146,10 @@ function updateWorkingHeatingFilter(containerId, clickedElement = null) {
     }
     
     // Apply filters
-    // Only auto-apply on index page, not map page (map page uses Apply Filters button)
-    if (typeof applyFilters === 'function' && typeof map === 'undefined') {
-        applyFilters();
-    }
+    // Disabled automatic filter application - now both pages use Apply Filters button
+    // if (typeof applyFilters === 'function') {
+    //     applyFilters();
+    // }
 }
 
 // Zoning filter update function with hierarchical behavior
@@ -1278,10 +1278,10 @@ function updateWorkingZoningFilter(containerId, clickedElement = null) {
     }
     
     // Apply filters
-    // Only auto-apply on index page, not map page (map page uses Apply Filters button)
-    if (typeof applyFilters === 'function' && typeof map === 'undefined') {
-        applyFilters();
-    }
+    // Disabled automatic filter application - now both pages use Apply Filters button
+    // if (typeof applyFilters === 'function') {
+    //     applyFilters();
+    // }
 }
 
 // Close dropdowns when clicking outside
