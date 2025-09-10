@@ -629,16 +629,13 @@
             position: relative;
             cursor: pointer;
             user-select: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-right: 20px !important;
+            text-align: left;
+            padding-right: 18px !important;
         }
 
         .header-text {
-            text-align: left;
-            flex: 1;
-            margin-right: 4px;
+            display: inline-block;
+            max-width: calc(100% - 14px);
             word-wrap: break-word;
             hyphens: auto;
         }
@@ -646,19 +643,21 @@
         .sort-arrows {
             position: absolute;
             right: 2px;
-            top: 50%;
-            transform: translateY(-50%);
+            top: 2px;
+            bottom: 2px;
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
             font-size: 0.6em;
-            line-height: 0.8;
+            line-height: 0.7;
             width: 12px;
         }
 
         .sort-up, .sort-down {
             color: #ccc;
             transition: color 0.2s ease;
+            display: block;
         }
 
         th:hover .sort-up,
