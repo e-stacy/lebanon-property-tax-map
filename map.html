@@ -1436,6 +1436,74 @@
                         ${label}
                     </div>`;
                 });
+            } else if (colorBy === 'density') {
+                colorSchemes.density.ranges.forEach(range => {
+                    const label = range.max === Infinity ? 
+                        `$${formatNumber(range.min)}+ per acre` : 
+                        `$${formatNumber(range.min)} - $${formatNumber(range.max)} per acre`;
+                    html += `<div class="color-legend">
+                        <div class="color-box" style="background-color: ${range.color}"></div>
+                        ${label}
+                    </div>`;
+                });
+            } else if (colorBy === 'year') {
+                colorSchemes.year.ranges.forEach(range => {
+                    const label = range.max === Infinity ? 
+                        `${range.min}+` : 
+                        `${range.min} - ${range.max}`;
+                    html += `<div class="color-legend">
+                        <div class="color-box" style="background-color: ${range.color}"></div>
+                        ${label}
+                    </div>`;
+                });
+            } else if (colorBy === 'heating') {
+                // Show heating fuel type legend
+                const heatingTypes = [
+                    {key: 'GAS', label: 'Natural Gas'},
+                    {key: 'ELECTRIC', label: 'Electric'},
+                    {key: 'OIL', label: 'Oil'},
+                    {key: 'WOOD', label: 'Wood'},
+                    {key: 'PROPANE', label: 'Propane'},
+                    {key: 'SOLAR', label: 'Solar'},
+                    {key: 'GEOTHERMAL', label: 'Geothermal'},
+                    {key: 'COAL', label: 'Coal'},
+                    {key: 'NONE', label: 'No Heating'},
+                    {key: 'unknown', label: 'Unknown'}
+                ];
+                
+                heatingTypes.forEach(type => {
+                    html += `<div class="color-legend">
+                        <div class="color-box" style="background-color: ${colorSchemes.heating[type.key]}"></div>
+                        ${type.label}
+                    </div>`;
+                });
+            } else if (colorBy === 'zoning') {
+                // Show zoning district legend
+                const zoningTypes = [
+                    {key: 'R1', label: 'R1 - Single Family Residential'},
+                    {key: 'R2', label: 'R2 - Two Family Residential'},
+                    {key: 'R3', label: 'R3 - Multi-Family Residential'},
+                    {key: 'R4', label: 'R4 - High Density Residential'},
+                    {key: 'C1', label: 'C1 - Neighborhood Commercial'},
+                    {key: 'C2', label: 'C2 - General Commercial'},
+                    {key: 'CB', label: 'CB - Commercial Business'},
+                    {key: 'I1', label: 'I1 - Light Industrial'},
+                    {key: 'I2', label: 'I2 - General Industrial'},
+                    {key: 'Q', label: 'Q - Qualified Zone'},
+                    {key: 'A', label: 'A - Agricultural'},
+                    {key: 'RR', label: 'RR - Rural Residential'},
+                    {key: 'PUD', label: 'PUD - Planned Unit Development'},
+                    {key: 'unknown', label: 'Unknown'}
+                ];
+                
+                zoningTypes.forEach(type => {
+                    if (colorSchemes.zoning[type.key]) {
+                        html += `<div class="color-legend">
+                            <div class="color-box" style="background-color: ${colorSchemes.zoning[type.key]}"></div>
+                            ${type.label}
+                        </div>`;
+                    }
+                });
             }
             // Add other legend types as needed
             
