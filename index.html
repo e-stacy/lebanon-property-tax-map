@@ -629,37 +629,51 @@
             position: relative;
             cursor: pointer;
             user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-right: 20px !important;
         }
 
-        .sort-icons {
-            display: inline-block;
-            margin-left: 6px;
-            font-size: 0.7em;
-            color: #bbb;
-            line-height: 1;
+        .header-text {
+            text-align: left;
+            flex: 1;
+            margin-right: 4px;
+            word-wrap: break-word;
+            hyphens: auto;
         }
 
-        .sort-icons.active {
+        .sort-arrows {
+            position: absolute;
+            right: 2px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.6em;
+            line-height: 0.8;
+            width: 12px;
+        }
+
+        .sort-up, .sort-down {
+            color: #ccc;
+            transition: color 0.2s ease;
+        }
+
+        th:hover .sort-up,
+        th:hover .sort-down {
+            color: #888;
+        }
+
+        th.sort-asc .sort-up {
             color: #2196F3;
             font-weight: bold;
         }
 
-        th:hover .sort-icons {
-            color: #666;
-        }
-
-        th.sort-asc .sort-icons::after {
-            content: "▲";
+        th.sort-desc .sort-down {
             color: #2196F3;
-        }
-
-        th.sort-desc .sort-icons::after {
-            content: "▼";
-            color: #2196F3;
-        }
-
-        th:not(.sort-asc):not(.sort-desc) .sort-icons::after {
-            content: "▲▼";
+            font-weight: bold;
         }
 
         /* Pagination - Pure CSS */
@@ -1014,7 +1028,14 @@
                 let displayName = translateColumnName(header);
                 const className = header.includes('value') || header.includes('price') || header.includes('Price') ? 'currency' : '';
                 const width = getOptimalColumnWidth(header, displayName);
-                return `<th class="${className}" style="width: ${width}px; min-width: ${width}px;" onclick="sortTable('${header}')" data-column="${header}">${displayName}<span class="sort-icons"></span><div class="resize-handle"></div></th>`;
+                return `<th class="${className}" style="width: ${width}px; min-width: ${width}px;" onclick="sortTable('${header}')" data-column="${header}">
+                    <span class="header-text">${displayName}</span>
+                    <div class="sort-arrows">
+                        <span class="sort-up">▲</span>
+                        <span class="sort-down">▼</span>
+                    </div>
+                    <div class="resize-handle"></div>
+                </th>`;
             }).join('');
             headerRow.innerHTML = headerHtml;
 
