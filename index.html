@@ -624,6 +624,44 @@
             font-weight: 500;
         }
 
+        /* Column sorting styles */
+        th {
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .sort-icons {
+            display: inline-block;
+            margin-left: 6px;
+            font-size: 0.7em;
+            color: #bbb;
+            line-height: 1;
+        }
+
+        .sort-icons.active {
+            color: #2196F3;
+            font-weight: bold;
+        }
+
+        th:hover .sort-icons {
+            color: #666;
+        }
+
+        th.sort-asc .sort-icons::after {
+            content: "▲";
+            color: #2196F3;
+        }
+
+        th.sort-desc .sort-icons::after {
+            content: "▼";
+            color: #2196F3;
+        }
+
+        th:not(.sort-asc):not(.sort-desc) .sort-icons::after {
+            content: "▲▼";
+        }
+
         /* Pagination - Pure CSS */
         .pagination {
             display: flex;
