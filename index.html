@@ -631,6 +631,8 @@
             user-select: none;
             text-align: left !important;
             padding-right: 18px !important;
+            font-weight: normal !important;
+            font-size: 0.7em !important;
         }
 
         .header-text {
@@ -639,6 +641,8 @@
             word-wrap: break-word;
             hyphens: auto;
             text-align: left !important;
+            font-weight: normal !important;
+            font-size: inherit !important;
         }
 
         .sort-arrows {
@@ -650,7 +654,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: 0.6em;
+            font-size: 0.6em !important;
             width: 12px;
         }
 
@@ -659,6 +663,8 @@
             transition: color 0.2s ease;
             display: block;
             line-height: 1;
+            font-weight: normal !important;
+            font-size: inherit !important;
         }
 
         .sort-up {
@@ -672,12 +678,12 @@
 
         th.sort-asc .sort-up {
             color: #2196F3;
-            font-weight: bold;
+            font-weight: normal !important;
         }
 
         th.sort-desc .sort-down {
             color: #2196F3;
-            font-weight: bold;
+            font-weight: normal !important;
         }
 
         /* Pagination - Pure CSS */
