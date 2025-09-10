@@ -1039,7 +1039,7 @@
                     return '#bdc3c7';
                     
                 case 'year':
-                    const yearValue = property['nhdra_vns ayb'];
+                    const yearValue = property.year_built;
                     const year = parseInt(yearValue) || 0;
                     // Only consider realistic years (1800-2030), treat others as unknown
                     if (year < 1800 || year > 2030) {
@@ -1101,7 +1101,7 @@
             
             // Year Built filter
             if (selectedYears.length > 0) {
-                const yearValue = property['nhdra_vns ayb'];
+                const yearValue = property.year_built;
                 if (!yearValue || yearValue === '0' || yearValue === '') {
                     // Include unknown year properties only if "unknown" is selected
                     if (!selectedYears.includes('unknown')) {
@@ -1184,7 +1184,7 @@
                 <div class="popup-row"><span class="popup-label">Total Value:</span> $${formatNumber(property.total_value || 0)}</div>
                 <div class="popup-row"><span class="popup-label">Land Value:</span> $${formatNumber(property.land_value || 0)}</div>
                 <div class="popup-row"><span class="popup-label">Building Value:</span> $${formatNumber(property.building_value || 0)}</div>
-                ${property['nhdra_vns ayb'] && parseInt(property['nhdra_vns ayb']) >= 1800 && parseInt(property['nhdra_vns ayb']) <= 2030 ? `<div class="popup-row"><span class="popup-label">Year Built:</span> ${property['nhdra_vns ayb']}</div>` : ''}
+                ${property.year_built && parseInt(property.year_built) >= 1800 && parseInt(property.year_built) <= 2030 ? `<div class="popup-row"><span class="popup-label">Year Built:</span> ${property.year_built}</div>` : ''}
                 ${property.building_gla ? `<div class="popup-row"><span class="popup-label">Building Area:</span> ${formatNumber(property.building_gla)} sq ft</div>` : ''}
             `;
         }
