@@ -186,11 +186,11 @@ class WorkingCheckboxFilters {
         }
         console.log('FILTER DEBUG: Creating Year Built filter for', containerId);
 
-        // Extract and clean year data from parcels file (more complete than NHDRA)
+        // Extract and clean year data - using NHDRA year built (most complete available)
         const years = [];
         if (Array.isArray(propertyData)) {
             propertyData.forEach(property => {
-                const yearValue = property.year_built;
+                const yearValue = property['nhdra_vns ayb'];
                 if (yearValue && yearValue !== '0' && yearValue !== '') {
                     const year = parseFloat(yearValue);
                     if (year >= 1800 && year <= 2029) {
@@ -200,7 +200,7 @@ class WorkingCheckboxFilters {
             });
         } else {
             propertyData.forEach(property => {
-                const yearValue = property.year_built;
+                const yearValue = property['nhdra_vns ayb'];
                 if (yearValue && yearValue !== '0' && yearValue !== '') {
                     const year = parseFloat(yearValue);
                     if (year >= 1800 && year <= 2029) {
