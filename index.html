@@ -1123,9 +1123,16 @@
             }
 
             filteredParcels = allParcels.filter(parcel => {
-                // Search filter
-                if (searchTerm && !['parcel_id', 'owner_name']
-                    .some(field => (parcel[field] || '').toLowerCase().includes(searchTerm))) {
+                // Search filter - expanded to include addresses and multiple name fields
+                if (searchTerm && ![
+                    'parcel_id', 
+                    'owner_name', 
+                    'situs_address', 
+                    'mailing_address1',
+                    'nhdra_rem prcl locn street',
+                    'nhdra_rem prcl locn', 
+                    'nhdra_own name'
+                ].some(field => (parcel[field] || '').toLowerCase().includes(searchTerm))) {
                     return false;
                 }
 
