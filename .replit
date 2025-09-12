@@ -1,10 +1,6 @@
-modules = ["web", "nodejs-20"]
+modules = ["python-3.11"]
 [agent]
 expertMode = true
-
-[nix]
-channel = "stable-25_05"
-deps = [pkgs.openssh]
 
 [workflows]
 runButton = "Project"
@@ -16,15 +12,15 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Lebanon Property Database"
+args = "Web Server"
 
 [[workflows.workflow]]
-name = "Lebanon Property Database"
+name = "Web Server"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "node server.js"
+args = "python -m http.server 5000"
 waitForPort = 5000
 
 [workflows.workflow.metadata]
@@ -34,6 +30,6 @@ outputType = "webview"
 localPort = 5000
 externalPort = 80
 
-[deployment]
-deploymentTarget = "autoscale"
-run = ["node", "server.js"]
+[nix]
+channel = "stable-25_05"
+packages = ["glibcLocales"]
