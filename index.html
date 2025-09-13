@@ -183,6 +183,21 @@
             font-weight: bold;
         }
 
+        nav {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            color: #2196F3;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
         .header-right {
             display: flex;
             flex-direction: column;
@@ -819,6 +834,14 @@
     <div class="container">
         <header class="header">
             <div class="header-left">
+                <nav aria-label="Main navigation">
+                    <a href="index.html" class="nav-link">Data</a> |
+                    <a href="map.html" class="nav-link">Map</a> |
+                    <a href="sitemap.xml" class="nav-link">Sitemap</a> |
+                    <a href="data/parcels.csv" class="nav-link">CSV</a> |
+                    <a href="spatial/parcels_wgs84.geojson" class="nav-link">GeoJSON</a>
+                </nav>
+
                 <h1>Lebanon Property Info Repository</h1>
 
                 <div class="disclaimer">
