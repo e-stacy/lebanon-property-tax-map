@@ -1,0 +1,6 @@
+- Operate on local files only. Do not fetch from GitHub/internet.
+- Never modify files under /data except to READ. All writes go to /data/clean or /artifacts.
+- Never read .env or OS credentials. Do not perform network requests.
+- Generate Python only (no shell/PowerShell/Bash). Prefer pure stdlib + pandas.
+- For destructive ops, require a dry-run that prints the planned changes to a log in /artifacts before real writes.
+- Log every run to /artifacts/runlog.txt (timestamp, inputs, outputs).
