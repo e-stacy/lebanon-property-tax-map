@@ -1465,6 +1465,11 @@
         async function loadSalesData() {
             try {
                 console.log('Loading sales data...');
+                // Ensure salesData is a Map
+                if (!salesData || typeof salesData.set !== 'function') {
+                    console.log('Initializing salesData as Map');
+                    salesData = new Map();
+                }
                 const response = await fetch('data/processed/final_property_sales_dataset.csv');
 
                 if (!response.ok) {
@@ -2240,11 +2245,14 @@
             let totalValue = 0;
             let saleCount = 0;
 
+            // Ensure salesData is a Map (defensive programming)
+            if (!salesData || typeof salesData.get !== 'function') {
+                console.warn('salesData is not a Map, initializing empty Map');
+                salesData = new Map();
+            }
+
             // Get comprehensive sales data from our merged dataset
-            console.log('salesData type:', typeof salesData, 'value:', salesData);
-            console.log('property.parcel_id:', property.parcel_id);
             const parcelSales = salesData.get(property.parcel_id) || [];
-            console.log('parcelSales:', parcelSales);
 
             // Process sales from comprehensive dataset
             parcelSales.forEach(sale => {
