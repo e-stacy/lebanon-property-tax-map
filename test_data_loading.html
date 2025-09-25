@@ -11,7 +11,7 @@
     <script>
         async function testDataLoading() {
             try {
-                const response = await fetch('../data/processed/parcels.csv');
+                const response = await fetch('data/processed/parcels.csv');
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }

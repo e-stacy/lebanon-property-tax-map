@@ -982,7 +982,7 @@
             try {
                 
                 // Load property database
-                const response = await fetch('../data/processed/parcels.csv');
+                const response = await fetch('data/processed/parcels.csv');
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
@@ -1061,7 +1061,7 @@
         async function loadActualSpatialData(properties) {
             try {
                 
-                const response = await fetch('../data/processed/spatial/parcels_wgs84.geojson');
+                const response = await fetch('data/processed/spatial/parcels_wgs84.geojson');
                 if (!response.ok) {
                     throw new Error(`Failed to load spatial data: ${response.status}`);
                 }

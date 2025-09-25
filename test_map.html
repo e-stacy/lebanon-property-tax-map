@@ -37,7 +37,7 @@
 
                 // Test spatial data loading
                 updateStatus('Loading spatial data...');
-                const spatialResponse = await fetch('../data/processed/spatial/parcels_wgs84.geojson');
+                const spatialResponse = await fetch('data/processed/spatial/parcels_wgs84.geojson');
                 if (!spatialResponse.ok) {
                     throw new Error(`Spatial data fetch failed: ${spatialResponse.status}`);
                 }
@@ -46,7 +46,7 @@
 
                 // Test property data loading
                 updateStatus('Loading property data...');
-                const propertyResponse = await fetch('../data/processed/parcels.csv');
+                const propertyResponse = await fetch('data/processed/parcels.csv');
                 if (!propertyResponse.ok) {
                     throw new Error(`Property data fetch failed: ${propertyResponse.status}`);
                 }
