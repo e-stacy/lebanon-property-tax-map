@@ -20,19 +20,21 @@ def analyze_comparison():
     print(f'Total parcels: {len(df) // 2}')
     print(f'Total rows: {len(df)}')
 
-    # Count improvements
-    improved = df[df['data_quality_notes'].str.contains('IMPROVED', na=False)]
-    maintained = df[df['data_quality_notes'].str.contains('MAINTAINED', na=False)]
+    # Count improvements using the new categories
+    enhanced = df[df['data_quality_notes'].str.contains('ENHANCED', na=False)]
+    validated = df[df['data_quality_notes'].str.contains('VALIDATED', na=False)]
+    preserved = df[df['data_quality_notes'].str.contains('PRESERVED', na=False)]
 
-    print(f'\nParcels with improved sales data: {len(improved) // 2}')
-    print(f'Parcels with maintained/corrected sales: {len(maintained) // 2}')
+    print(f'\nParcels with enhanced sales data: {len(enhanced) // 2}')
+    print(f'Parcels with validated sales data: {len(validated) // 2}')
+    print(f'Parcels with preserved sales data: {len(preserved) // 2}')
 
-    # Show a few examples of improvements
-    print(f'\n=== SAMPLE IMPROVEMENTS ===')
-    improvement_examples = df[df['data_quality_notes'].str.contains('IMPROVED', na=False)].head(8)  # Get more rows
+    # Show a few examples of enhancements
+    print(f'\n=== SAMPLE ENHANCEMENTS ===')
+    enhancement_examples = df[df['data_quality_notes'].str.contains('ENHANCED', na=False)].head(8)  # Get more rows
     current_parcel = None
 
-    for _, row in improvement_examples.iterrows():
+    for _, row in enhancement_examples.iterrows():
         if row['comparison_type'] == 'ORIGINAL_NHDRA':
             current_parcel = row['parcel_id']
             print(f"\nParcel {row['parcel_id']}:")

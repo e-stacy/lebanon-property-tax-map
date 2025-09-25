@@ -98,11 +98,58 @@ def create_nhdra_comparison():
                 'data_quality_notes': 'Comprehensive sales data from multiple sources'
             }
 
-            # Get comprehensive sales for this parcel
-            parcel_sales = sales_by_parcel.get(parcel_id, [])
+            # Create truly comprehensive sales data:
+            # 1. Start with our merged comprehensive dataset (highest quality)
+            # 2. Add any additional sales from original NHDRA that aren't already included
+            comprehensive_sales = sales_by_parcel.get(parcel_id, []).copy()
 
-            # Fill in the 4 sales slots (current + 3 prior) with comprehensive data
-            for i, sale in enumerate(parcel_sales[:4]):  # Take up to 4 most recent sales
+            # Add original NHDRA sales that aren't in our comprehensive data
+            original_sales = []
+            nhdra_current = {
+                'sale_price': nhdra_row.get('saleprice'),
+                'sale_date': nhdra_row.get('saledate'),
+                'qualified': nhdra_row.get('qualified'),
+                'book_page': nhdra_row.get('book pg'),
+                'source': 'original_nhdra_fallback'
+            }
+            if nhdra_current['sale_price'] and float(nhdra_current['sale_price']) > 0:
+                original_sales.append(nhdra_current)
+
+            # Add prior sales from original NHDRA
+            for i in range(1, 4):
+                prior_sale = {
+                    'sale_price': nhdra_row.get(f'ID{i} Prior Sale Price'),
+                    'sale_date': nhdra_row.get(f'ID{i} Prior Sale Date'),
+                    'qualified': 'Q',  # Assume qualified for prior sales
+                    'book_page': nhdra_row.get(f'ID{i} Prior Book Page'),
+                    'source': 'original_nhdra_fallback'
+                }
+                if prior_sale['sale_price'] and float(prior_sale['sale_price']) > 0:
+                    original_sales.append(prior_sale)
+
+            # Merge: Add original sales that don't conflict with comprehensive data
+            for orig_sale in original_sales:
+                # Check if this sale already exists in comprehensive data (by date and price)
+                exists = any(
+                    abs(float(comp_sale['sale_price']) - float(orig_sale['sale_price'])) < 1 and
+                    str(comp_sale['sale_date']).split(' ')[0] == str(orig_sale['sale_date']).split(' ')[0]
+                    for comp_sale in comprehensive_sales
+                    if comp_sale['sale_price'] and orig_sale['sale_price']
+                )
+                if not exists:
+                    comprehensive_sales.append(orig_sale)
+
+            # Sort all sales by date (most recent first)
+            def safe_date_sort(sale):
+                date_val = sale.get('sale_date')
+                if pd.isna(date_val) or date_val is None:
+                    return '1900-01-01'
+                return str(date_val).split(' ')[0]
+
+            comprehensive_sales.sort(key=safe_date_sort, reverse=True)
+
+            # Fill in the 4 sales slots with truly comprehensive data
+            for i, sale in enumerate(comprehensive_sales[:4]):  # Take up to 4 most recent sales
                 sale_date = str(sale['sale_date']).split(' ')[0] if pd.notna(sale['sale_date']) else ''
                 sale_price = sale['sale_price'] if pd.notna(sale['sale_price']) else ''
 
@@ -130,12 +177,19 @@ def create_nhdra_comparison():
             corrected_sales = sum(1 for key in ['current_sale_price', 'prior1_sale_price', 'prior2_sale_price', 'prior3_sale_price']
                                 if corrected_row.get(key) and str(corrected_row[key]).strip() and str(corrected_row[key]) != '0')
 
+            # Count additional sources used
+            sources_used = set()
+            for sale in comprehensive_sales[:4]:
+                sources_used.add(sale.get('source', 'unknown'))
+
+            additional_sources = sources_used - {'original_nhdra_fallback'}
+
             if corrected_sales > original_sales:
-                corrected_row['data_quality_notes'] += f' - IMPROVED: {original_sales} → {corrected_sales} sales'
-            elif corrected_sales == original_sales:
-                corrected_row['data_quality_notes'] += f' - SAME: {corrected_sales} sales (but more accurate)'
+                corrected_row['data_quality_notes'] += f' - ENHANCED: {original_sales} → {corrected_sales} sales from {len(sources_used)} sources'
+            elif len(additional_sources) > 0:
+                corrected_row['data_quality_notes'] += f' - VALIDATED: {corrected_sales} sales from {len(sources_used)} sources (includes original data)'
             else:
-                corrected_row['data_quality_notes'] += f' - MAINTAINED: {corrected_sales} sales'
+                corrected_row['data_quality_notes'] += f' - PRESERVED: {corrected_sales} sales from original NHDRA data'
 
             writer.writerow(corrected_row)
 
