@@ -2137,17 +2137,11 @@
 
         function openPropertyModal(parcelId) {
             // Find the property data directly by parcel_id
-            console.log('Opening modal for parcelId:', parcelId);
-            console.log('parcelDataMap has', parcelDataMap.size, 'entries');
-            console.log('Available parcelIds (first 5):', Array.from(parcelDataMap.keys()).slice(0, 5));
-
             const propertyData = parcelDataMap.get(parcelId);
             if (!propertyData) {
                 console.error('No property data found for parcelId:', parcelId);
-                alert('No parcel data present for: ' + parcelId);
                 return;
             }
-            console.log('Found property data:', propertyData.parcel_id, propertyData.situs_address);
 
             currentPropertyData = propertyData;
 
