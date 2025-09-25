@@ -1359,6 +1359,7 @@
         let allParcels = [];
         let filteredParcels = [];
         let salesData = new Map(); // parcel_id -> array of sales
+        let parcelDataMap = new Map(); // Store parcel data by parcel_id
         let currentPage = 1;
         const rowsPerPage = 50;
 
@@ -2125,7 +2126,6 @@
 
         // Modal Functions
         let currentPropertyData = null;
-        let parcelDataMap = new Map(); // Store parcel data by parcel_id
 
         function openPropertyModal(parcelId) {
             // Find the property data directly by parcel_id
