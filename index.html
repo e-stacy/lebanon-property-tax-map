@@ -1441,6 +1441,11 @@
                 console.log(`Loaded ${allParcels.length} parcels with ${headers.length} columns`);
                 filteredParcels = [...allParcels];
 
+                // Populate parcelDataMap for modal lookups
+                allParcels.forEach(parcel => {
+                    parcelDataMap.set(parcel.parcel_id, parcel);
+                });
+
                 // Load sales data
                 await loadSalesData();
 
@@ -1824,8 +1829,6 @@
                     return `<td>${value}</td>`;
                 }).join('');
 
-                // Store property data by parcel_id for easy lookup
-                parcelDataMap.set(parcel.parcel_id, parcel);
                 return `<tr data-parcel-id="${parcel.parcel_id}" style="cursor: pointer;">${cells}</tr>`;
             }).join('');
 
