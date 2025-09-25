@@ -1073,34 +1073,50 @@
             font-size: 0.85em !important;
         }
 
+        /* LARGER HEADERS FOR SALES TABLE */
+        #sales-table.modal-table th {
+            font-size: 0.9em !important;
+            font-weight: 700 !important;
+        }
+
         /* EXTREME COLUMN CONSTRAINTS - NO SCROLL ALLOWED */
         .modal-table {
             min-width: 0 !important;
         }
 
+        /* GENERAL MODAL TABLE STYLING */
         .modal-table th, .modal-table td {
             width: auto !important;
             white-space: nowrap !important;
             overflow: hidden !important;
-            text-overflow: ellipsis !important; /* Show ... for truncated text */
-            padding: 8px 6px !important;
-            font-size: 0.8em !important;
+            text-overflow: clip !important; /* Harsh clipping */
+            padding: 4px 2px !important;
+            font-size: 0.75em !important;
         }
 
-        .modal-table.sales-table th:nth-child(1),
-        .modal-table.sales-table td:nth-child(1) { width: 90px !important; }
+        /* SPECIFIC SALES TABLE OVERRIDES - HIGHER SPECIFICITY */
+        #sales-table.modal-table th,
+        #sales-table.modal-table td {
+            text-overflow: ellipsis !important;
+            padding: 8px 6px !important;
+            font-size: 0.85em !important;
+        }
 
-        .modal-table.sales-table th:nth-child(2),
-        .modal-table.sales-table td:nth-child(2) { width: 80px !important; }
+        /* FORCE SALES TABLE COLUMN WIDTHS */
+        #sales-table.modal-table th:nth-child(1),
+        #sales-table.modal-table td:nth-child(1) { width: 90px !important; min-width: 90px !important; }
 
-        .modal-table.sales-table th:nth-child(3),
-        .modal-table.sales-table td:nth-child(3) { width: 70px !important; }
+        #sales-table.modal-table th:nth-child(2),
+        #sales-table.modal-table td:nth-child(2) { width: 80px !important; min-width: 80px !important; }
 
-        .modal-table.sales-table th:nth-child(4),
-        .modal-table.sales-table td:nth-child(4) { width: 90px !important; }
+        #sales-table.modal-table th:nth-child(3),
+        #sales-table.modal-table td:nth-child(3) { width: 70px !important; min-width: 70px !important; }
 
-        .modal-table.sales-table th:nth-child(5),
-        .modal-table.sales-table td:nth-child(5) { width: 60px !important; }
+        #sales-table.modal-table th:nth-child(4),
+        #sales-table.modal-table td:nth-child(4) { width: 90px !important; min-width: 90px !important; }
+
+        #sales-table.modal-table th:nth-child(5),
+        #sales-table.modal-table td:nth-child(5) { width: 60px !important; min-width: 60px !important; }
 
         .modal-table.assessment-table th:nth-child(1),
         .modal-table.assessment-table td:nth-child(1) { width: 70px !important; }
