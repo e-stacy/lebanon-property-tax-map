@@ -2089,16 +2089,6 @@
         
         // Initialize map when page loads
         document.addEventListener('DOMContentLoaded', initMap);
-
-        // Ensure color overlay displays on initial load if checkbox is checked
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const checkbox = document.getElementById('transparent-colors');
-                if (checkbox && checkbox.checked && typeof updateParcelLayer === 'function') {
-                    updateParcelLayer();
-                }
-            }, 2000); // Wait for all data to load
-        });
     </script>
     
     <!-- Working Checkbox Filter System -->
