@@ -8,9 +8,9 @@
     <meta name="description" content="Lebanon NH property tax database - 5,622 properties with assessments, building details, and NHDRA data. Direct access to CSV files for analysis.">
     <meta name="keywords" content="Lebanon New Hampshire property tax assessment database CSV data transparency">
     <link rel="canonical" href="https://e-stacy.github.io/lebanon-property-tax-map/">
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="shortcut icon" href="favicon.png">
-    <link rel="stylesheet" href="working-checkbox-styles.css">
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+    <link rel="shortcut icon" href="assets/images/favicon.png">
+    <link rel="stylesheet" href="assets/css/working-checkbox-styles.css">
        <style>
         /* Pure CSS3 Layout - No Complex JavaScript Dependencies */
         * {
@@ -31,12 +31,12 @@
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            padding: 16px 16px 120px 16px;
+            padding: 16px 16px 16px 16px; /* Reduced bottom padding since footer handles spacing */
             box-sizing: border-box;
-            gap: 2px;
+            gap: 8px; /* Consistent gap between elements */
             overflow: visible;
         }
 
@@ -55,7 +55,7 @@
             overflow: visible;
         }
 
-        /* Fixed footer */
+        /* Footer positioned below table */
         .footer {
             background: #f8f9fa;
             border: 2px solid #2196F3;
@@ -63,9 +63,12 @@
             border-radius: 6px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             flex-shrink: 0;
-            margin-top: 0;
+            margin-top: 8px; /* Gap from table */
             line-height: 1.2;
             min-height: 50px;
+            position: relative;
+            z-index: 5; /* Below modal overlay */
+            clear: both; /* Ensure no floating interference */
         }
 
         .footer-content {
@@ -528,30 +531,20 @@
             color: #2c3e50;
         }
 
-        /* Table Container - CSS-only responsive */
-        .table-container {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 8px;
-            border: 2px solid #e1e5e9;
-            flex: 1;
-            min-height: 280px;
-            height: 300px;
+        /* Main Table Container - Fixed height for exactly 8 rows */
+        body > .container > .table-container {
+            height: 224px !important; /* Exactly 8 rows (28px each based on current display) */
+            overflow: hidden !important; /* Prevent container overflow */
         }
 
         .table-wrapper {
-            overflow-x: auto;
-            overflow-y: auto;
+            height: 100% !important; /* Fill container */
+            overflow-x: auto !important; /* Horizontal scroll for wide table */
+            overflow-y: auto !important; /* Vertical scroll for many rows */
             border: 1px solid #e0e0e0;
             border-radius: 8px;
-            flex: 1;
-            min-height: 260px;
-            height: 100%;
-            max-height: 310px;
+            position: relative;
+            z-index: 1;
         }
 
         table {
@@ -560,6 +553,7 @@
             border-collapse: collapse;
             font-size: 0.7em;
             white-space: nowrap;
+            table-layout: fixed; /* Prevent table from adjusting to content */
         }
 
         th, td {
@@ -655,7 +649,7 @@
         /* Force consistent styling on ALL table headers regardless of class */
         th, th.currency, table th {
             font-weight: normal !important;
-            font-size: 0.7em !important;
+            font-size: 0.85em !important;
             font-family: inherit !important;
         }
 
@@ -829,19 +823,414 @@
                 font-size: 1.8em;
             }
         }
+
+        /* CSS-Only Modal System */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay:target {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 600px !important;
+            max-width: 90vw !important;
+            max-height: 90vh !important;
+            overflow-y: auto !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            transform: scale(0.9) !important;
+            transition: transform 0.3s ease !important;
+        }
+
+        .modal-overlay:target .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            background: #f8f9fa;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 1.4em;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            color: #000;
+        }
+
+        .modal-body {
+            padding: 20px;
+            flex: 1;
+        }
+
+        .property-summary {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+
+        .summary-row {
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .summary-row strong {
+            color: #2c3e50;
+        }
+
+        .tab-nav {
+            display: flex;
+            border-bottom: 2px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: #007bff;
+        }
+
+        .tab-btn.active {
+            border-bottom-color: #007bff;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        /* CSS-Only Tab System */
+        .tab-nav {
+            display: flex;
+            border-bottom: 2px solid #e1e5e9;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .tab-input {
+            display: none;
+        }
+
+        .tab-label {
+            padding: 12px 20px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border-radius: 6px 6px 0 0;
+            margin-right: 4px;
+            font-weight: 500;
+        }
+
+        .tab-input:checked + .tab-label {
+            background: #007bff;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,123,255,0.3);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: white;
+            border-radius: 0 0 8px 8px;
+        }
+
+        /* Tab content visibility - controlled by JavaScript for reliability */
+        .tab-content {
+            display: none;
+        }
+
+        /* Modal Table Container */
+        .modal .table-container {
+            margin-bottom: 20px;
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            table-layout: fixed;
+        }
+
+        .history-table th:nth-child(1),
+        .history-table td:nth-child(1) {
+            width: 90px;
+            min-width: 90px;
+            max-width: 90px;
+        }
+
+        .history-table th:nth-child(2),
+        .history-table td:nth-child(2) {
+            width: 65px;
+            min-width: 65px;
+            max-width: 65px;
+        }
+
+        .history-table th:nth-child(3),
+        .history-table td:nth-child(3) {
+            width: 65px;
+            min-width: 65px;
+            max-width: 65px;
+        }
+
+        .history-table th:nth-child(4),
+        .history-table td:nth-child(4) {
+            width: 65px;
+            min-width: 65px;
+            max-width: 65px;
+        }
+
+        .history-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+            position: sticky;
+            top: 0;
+        }
+
+        /* AGGRESSIVE Modal Table Styling - Force Fixed Widths */
+        .modal-table {
+            width: 100% !important;
+            min-width: auto !important;
+            max-width: 100% !important;
+            table-layout: fixed !important;
+            border-collapse: collapse !important;
+            font-size: 0.9em !important;
+            margin-bottom: 15px !important;
+        }
+
+        .modal-table th,
+        .modal-table td {
+            padding: 6px 4px !important;
+            text-align: left !important;
+            border-bottom: 1px solid #e1e5e9 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            box-sizing: border-box !important;
+        }
+
+        .modal-table th {
+            background: #f8f9fa !important;
+            font-weight: 600 !important;
+            color: #2c3e50 !important;
+            font-size: 0.8em !important;
+        }
+
+        /* EXTREME COLUMN CONSTRAINTS - NO SCROLL ALLOWED */
+        .modal-table {
+            min-width: 0 !important;
+        }
+
+        .modal-table th, .modal-table td {
+            width: auto !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: clip !important; /* Harsh clipping */
+            padding: 4px 2px !important;
+            font-size: 0.75em !important;
+        }
+
+        .modal-table.sales-table th:nth-child(1),
+        .modal-table.sales-table td:nth-child(1) { width: 60px !important; }
+
+        .modal-table.sales-table th:nth-child(2),
+        .modal-table.sales-table td:nth-child(2) { width: 50px !important; }
+
+        .modal-table.sales-table th:nth-child(3),
+        .modal-table.sales-table td:nth-child(3) { width: 45px !important; }
+
+        .modal-table.sales-table th:nth-child(4),
+        .modal-table.sales-table td:nth-child(4) { width: 60px !important; }
+
+        .modal-table.assessment-table th:nth-child(1),
+        .modal-table.assessment-table td:nth-child(1) { width: 70px !important; }
+
+        .modal-table.assessment-table th:nth-child(2),
+        .modal-table.assessment-table td:nth-child(2) { width: 55px !important; }
+
+        .modal-table.assessment-table th:nth-child(3),
+        .modal-table.assessment-table td:nth-child(3) { width: 55px !important; }
+
+        .modal-table.assessment-table th:nth-child(4),
+        .modal-table.assessment-table td:nth-child(4) { width: 55px !important; }
+
+        /* FORCE NO HORIZONTAL SCROLL - CONTAIN TABLES */
+        .modal .table-container {
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            min-width: 0 !important;
+        }
+
+
+        .modal-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .current-sale {
+            background: #e8f5e8 !important;
+        }
+
+        .current-assessment {
+            background: #fff3cd !important;
+        }
+
+        .history-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .current-sale,
+        .current-assessment {
+            background-color: #e8f4fd !important;
+            font-weight: bold;
+        }
+
+        .analysis-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #28a745;
+        }
+
+        .analysis-box h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .analysis-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .analysis-box li {
+            margin-bottom: 5px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            background: #f8f9fa;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .btn-secondary {
+            padding: 8px 16px;
+            border: 1px solid #6c757d;
+            background: white;
+            color: #6c757d;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-secondary:hover {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-primary {
+            padding: 8px 16px;
+            border: 1px solid #007bff;
+            background: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                max-width: 95vw;
+                max-height: 95vh;
+            }
+
+            .tab-nav {
+                flex-wrap: wrap;
+            }
+
+            .tab-btn {
+                padding: 10px 16px;
+                font-size: 0.9em;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 8px 6px;
+                font-size: 0.9em;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header class="header">
             <div class="header-left">
-                <nav aria-label="Main navigation">
-                    <a href="index.html" class="nav-link">Data</a> |
-                    <a href="map.html" class="nav-link">Map</a> |
-                    <a href="sitemap.xml" class="nav-link">Sitemap</a> |
-                    <a href="data/parcels.csv" class="nav-link">CSV</a> |
-                    <a href="spatial/parcels_wgs84.geojson" class="nav-link">GeoJSON</a>
-                </nav>
 
                 <h1>Lebanon Property Info Repository</h1>
 
@@ -953,8 +1342,8 @@
                 <div class="footer-right">
                     <div class="data-access">
                         <strong>🔗 Data:</strong> 
-                        <a href="data/parcels.csv">CSV</a> |
-                        <a href="spatial/parcels_wgs84.geojson">GeoJSON</a> |
+                        <a href="../data/processed/parcels.csv">CSV</a> |
+                        <a href="../data/processed/spatial/parcels_wgs84.geojson">GeoJSON</a> |
                         <a href="sitemap.xml">Sitemap</a>
                     </div>
                 </div>
@@ -964,7 +1353,7 @@
     </div>
 
     <!-- Working Checkbox Filter System -->
-    <script src="working-checkbox-filters.js"></script>
+    <script src="assets/js/working-checkbox-filters.js"></script>
     <script>
         // Simplified, reliable JavaScript - Based on working map page approach
         let allParcels = [];
@@ -1012,10 +1401,27 @@
         // Load data - simplified approach
         async function loadData() {
             try {
-                const response = await fetch('data/parcels.csv');
+                const response = await fetch('../data/processed/parcels.csv');
+
+                if (!response.ok) {
+                    console.error('Failed to fetch CSV file');
+                    return;
+                }
+
                 const text = await response.text();
 
+                if (!text || text.trim().length === 0) {
+                    console.error('CSV file is empty');
+                    return;
+                }
+
                 const lines = text.trim().split('\n');
+
+                if (lines.length < 2) {
+                    console.error('CSV file has insufficient data');
+                    return;
+                }
+
                 const headers = parseCSVLine(lines[0]);
 
                 // Generate dynamic table headers for all columns
@@ -1031,10 +1437,8 @@
                 }).filter(p => p.parcel_id && p.parcel_id.trim());
 
                 console.log(`Loaded ${allParcels.length} parcels with ${headers.length} columns`);
-
-                // Set filteredParcels to all parcels initially
                 filteredParcels = [...allParcels];
-                
+
                 updateStats();
                 initializeFilter();
                 renderTable(); // Render table immediately after loading
@@ -1052,7 +1456,7 @@
             // Remove unwanted columns
             const excludeColumns = [
                 'situs_address', 'mailing_address1', 'mailing_city', 'mailing_state', 'mailing_zip',
-                'nhdra_rem prcl locn street', 'nhdra_rem prcl locn', 'nhdra_address1', 'nhdra_city', 
+                'nhdra_rem prcl locn street', 'nhdra_rem prcl locn', 'nhdra_address1', 'nhdra_city',
                 'nhdra_state', 'nhdra_zip', 'nhdra_grantor', 'nhdra_book pg',
                 'nhdra_ID1 Prior Sale Price', 'nhdra_ID1 Prior Sale Date', 'nhdra_ID1 Prior Book Page',
                 'nhdra_ID2 Prior Sale Price', 'nhdra_ID2 Prior Sale Date', 'nhdra_ID2 Prior Book Page',
@@ -1359,10 +1763,25 @@
                     return `<td>${value}</td>`;
                 }).join('');
 
-                return `<tr>${cells}</tr>`;
+                // Store property data by parcel_id for easy lookup
+                parcelDataMap.set(parcel.parcel_id, parcel);
+                return `<tr data-parcel-id="${parcel.parcel_id}" style="cursor: pointer;">${cells}</tr>`;
             }).join('');
 
             tbody.innerHTML = rows;
+
+            // Add click handlers to table rows
+            const tableRows = tbody.querySelectorAll('tr[data-parcel-id]');
+            tableRows.forEach(row => {
+                row.addEventListener('click', function(e) {
+                    // Don't trigger if clicking on a header (th elements)
+                    if (e.target.tagName.toLowerCase() === 'th') return;
+
+                    const parcelId = this.getAttribute('data-parcel-id');
+                    openPropertyModal(parcelId);
+                });
+            });
+
             updatePagination();
         }
 
@@ -1644,9 +2063,420 @@
             });
         }
 
+        // Modal Functions
+        let currentPropertyData = null;
+        let parcelDataMap = new Map(); // Store parcel data by parcel_id
+
+        function openPropertyModal(parcelId) {
+            // Find the property data directly by parcel_id
+            const propertyData = parcelDataMap.get(parcelId);
+            if (!propertyData) return;
+
+            currentPropertyData = propertyData;
+
+            // Update modal title
+            document.getElementById('modal-title').textContent =
+                `📍 ${propertyData.parcel_id} (${propertyData.situs_address || 'No Address'})`;
+
+            // Populate property summary
+            populatePropertySummary(propertyData);
+
+            // Populate overview tab
+            populateOverviewTab(propertyData);
+
+            // Populate sales history
+            populateSalesHistory(propertyData);
+
+            // Populate assessment history
+            populateAssessmentHistory(propertyData);
+
+            // Show modal using CSS :target
+            window.location.hash = 'property-modal';
+
+            // Set default tab to sales history (most useful) and show content
+            document.getElementById('sales-radio').checked = true;
+
+            // Show the sales tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            const salesTab = document.querySelector('.sales-radio');
+            if (salesTab) {
+                salesTab.style.display = 'block';
+            }
+        }
+
+        function closeModal() {
+            // Close modal by clearing the hash
+            if (window.location.hash === '#property-modal') {
+                window.location.hash = '';
+            }
+            currentPropertyData = null;
+        }
+
+
+        function populatePropertySummary(property) {
+            const summaryDiv = document.getElementById('property-summary');
+            summaryDiv.innerHTML = `
+                <div class="summary-row"><strong>Owner:</strong> ${property.owner_name || 'Unknown'}</div>
+                <div class="summary-row"><strong>Class:</strong> ${property.class_code || 'Unknown'}</div>
+                <div class="summary-row"><strong>Zoning:</strong> ${property.nhdra_zoning_code || 'Unknown'}</div>
+                <div class="summary-row"><strong>Heating Fuel:</strong> ${property.nhdra_heating_fuel || 'Unknown'}</div>
+                <div class="summary-row"><strong>Lot Size:</strong> ${property.lot_size_acres || '0'} acres</div>
+                <div class="summary-row"><strong>Total Value:</strong> $${formatNumber(property.total_value || 0)}</div>
+            `;
+        }
+
+        function populateOverviewTab(property) {
+            const overviewDiv = document.getElementById('overview-content');
+            let content = '';
+
+            // Add building details if available
+            if (property['nhdra_vns ayb'] && parseInt(property['nhdra_vns ayb']) >= 1800) {
+                content += `<div class="summary-row"><strong>Year Built:</strong> ${property['nhdra_vns ayb']}</div>`;
+            }
+
+            if (property['nhdra_vns style desc']) {
+                content += `<div class="summary-row"><strong>Building Style:</strong> ${property['nhdra_vns style desc']}</div>`;
+            }
+
+            if (property.building_gla) {
+                content += `<div class="summary-row"><strong>Building Area:</strong> ${formatNumber(property.building_gla)} sq ft</div>`;
+            }
+
+            if (property['nhdra_lnd zone']) {
+                content += `<div class="summary-row"><strong>Zoning:</strong> ${property['nhdra_lnd zone']}</div>`;
+            }
+
+            if (property['nhdra_vns heat type desc']) {
+                content += `<div class="summary-row"><strong>Heating:</strong> ${property['nhdra_vns heat type desc']}</div>`;
+            }
+
+            if (!content) {
+                content = '<div class="summary-row">No additional property details available.</div>';
+            }
+
+            overviewDiv.innerHTML = content;
+        }
+
+        function populateSalesHistory(property) {
+            const tbody = document.getElementById('sales-tbody');
+            const analysisDiv = document.getElementById('sales-analysis');
+
+            tbody.innerHTML = '';
+            let salesData = [];
+            let totalValue = 0;
+            let saleCount = 0;
+
+            // Current sale
+            if (property.nhdra_saleprice && parseFloat(property.nhdra_saleprice) > 0) {
+                salesData.push({
+                    date: property.nhdra_saledate,
+                    price: parseFloat(property.nhdra_saleprice),
+                    qualified: property.nhdra_qualified || 'N/A',
+                    isCurrent: true
+                });
+                totalValue += parseFloat(property.nhdra_saleprice);
+                saleCount++;
+            }
+
+            // Prior sales
+            const priorSales = [
+                {price: property['nhdra_ID1 Prior Sale Price'], date: property['nhdra_ID1 Prior Sale Date']},
+                {price: property['nhdra_ID2 Prior Sale Price'], date: property['nhdra_ID2 Prior Sale Date']},
+                {price: property['nhdra_ID3 Prior Sale Price'], date: property['nhdra_ID3 Prior Sale Date']}
+            ];
+
+            priorSales.forEach((sale, index) => {
+                if (sale.price && sale.price > 0) {
+                    salesData.push({
+                        date: sale.date,
+                        price: sale.price,
+                        qualified: 'Q', // Assume qualified for prior sales
+                        isCurrent: false
+                    });
+                    totalValue += sale.price;
+                    saleCount++;
+                }
+            });
+
+            // Sort by date (most recent first)
+            salesData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // Populate table
+            salesData.forEach((sale, index) => {
+                const rowClass = sale.isCurrent ? 'current-sale' : '';
+                const timeGap = index < salesData.length - 1 ?
+                    calculateTimeGap(sale.date, salesData[index + 1].date) : '';
+
+                tbody.innerHTML += `
+                    <tr class="${rowClass}">
+                        <td title="${formatDate(sale.date)}">${formatDate(sale.date)}</td>
+                        <td title="$${formatNumber(sale.price)}">$${formatNumber(sale.price)}</td>
+                        <td title="${sale.qualified}">${sale.qualified}</td>
+                        <td title="${timeGap}">${timeGap}</td>
+                    </tr>
+                `;
+            });
+
+            // Generate analysis
+            if (salesData.length > 0) {
+                const avgPrice = totalValue / saleCount;
+                const highestSale = Math.max(...salesData.map(s => s.price));
+                const lowestSale = Math.min(...salesData.map(s => s.price));
+
+                analysisDiv.innerHTML = `
+                    <h4>📊 Sales Analysis</h4>
+                    <ul>
+                        <li><strong>Total Sales:</strong> ${saleCount}</li>
+                        <li><strong>Highest Sale:</strong> $${formatNumber(highestSale)}</li>
+                        <li><strong>Lowest Sale:</strong> $${formatNumber(lowestSale)}</li>
+                        <li><strong>Average Sale Price:</strong> $${formatNumber(avgPrice)}</li>
+                        ${salesData.length > 1 ? `<li><strong>Total Appreciation:</strong> ${calculateAppreciation(salesData)}%</li>` : ''}
+                    </ul>
+                `;
+            } else {
+                analysisDiv.innerHTML = '<p>No sales history available for this property.</p>';
+            }
+        }
+
+        function populateAssessmentHistory(property) {
+            const tbody = document.getElementById('assessment-tbody');
+            const analysisDiv = document.getElementById('assessment-analysis');
+
+            tbody.innerHTML = '';
+
+            // Current assessments (2024)
+            const currentLand = parseFloat(property['nhdra_prc ttl assess lnd'] || 0);
+            const currentBuilding = parseFloat(property['nhdra_prc ttl assess bldg'] || 0);
+            const currentTotal = parseFloat(property['nhdra_prc ttl assess'] || 0);
+
+            // Previous assessments (adjusted/historical)
+            const previousLand = parseFloat(property['nhdra_ahd ttl assess lnd'] || 0);
+            const previousBuilding = parseFloat(property['nhdra_ahd ttl assess bldg'] || 0);
+            const previousTotal = parseFloat(property['nhdra_ahd ttl assess'] || 0);
+
+            // Current assessment row (most recent first)
+            if (currentTotal > 0) {
+                tbody.innerHTML += `
+                    <tr class="current-assessment">
+                        <td title="Current Assessment (2024)">Current (2024)</td>
+                        <td title="$${formatNumber(currentLand)}">$${formatNumber(currentLand)}</td>
+                        <td title="$${formatNumber(currentBuilding)}">$${formatNumber(currentBuilding)}</td>
+                        <td title="$${formatNumber(currentTotal)}"><strong>$${formatNumber(currentTotal)}</strong></td>
+                    </tr>
+                `;
+            }
+
+            // Previous assessment row (if available)
+            if (previousTotal > 0) {
+                tbody.innerHTML += `
+                    <tr>
+                        <td title="Previous Assessment">Previous</td>
+                        <td title="$${formatNumber(previousLand)}">$${formatNumber(previousLand)}</td>
+                        <td title="$${formatNumber(previousBuilding)}">$${formatNumber(previousBuilding)}</td>
+                        <td title="$${formatNumber(previousTotal)}"><strong>$${formatNumber(previousTotal)}</strong></td>
+                    </tr>
+                `;
+            }
+
+            // Generate analysis
+            if (currentTotal > 0 && previousTotal > 0) {
+                const changePercent = ((currentTotal - previousTotal) / previousTotal * 100);
+                analysisDiv.innerHTML = `
+                    <h4>🏛️ Assessment Analysis</h4>
+                    <ul>
+                        <li><strong>Assessment Change:</strong> ${formatChange(currentTotal - previousTotal)} (${changePercent.toFixed(1)}%)</li>
+                        <li><strong>Current Assessment:</strong> $${formatNumber(currentTotal)}</li>
+                        <li><strong>Previous Assessment:</strong> $${formatNumber(previousTotal)}</li>
+                        ${property.nhdra_saleprice && property.nhdra_saleprice > 0 ?
+                            `<li><strong>Sale-to-Assessment Ratio:</strong> ${(currentTotal / property.nhdra_saleprice * 100).toFixed(1)}%</li>` : ''}
+                    </ul>
+                `;
+            } else {
+                analysisDiv.innerHTML = '<p>Limited assessment history available.</p>';
+            }
+        }
+
+        function calculateTimeGap(date1, date2) {
+            if (!date1 || !date2) return '';
+            const d1 = new Date(date1);
+            const d2 = new Date(date2);
+            const diffTime = Math.abs(d1 - d2);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 365) {
+                return `${diffDays}d`;
+            } else {
+                const years = Math.floor(diffDays / 365);
+                const months = Math.floor((diffDays % 365) / 30);
+                return `${years}y ${months}m`;
+            }
+        }
+
+        function calculateAppreciation(salesData) {
+            if (salesData.length < 2) return 0;
+            const sorted = salesData.sort((a, b) => new Date(a.date) - new Date(b.date));
+            const firstSale = sorted[0].price;
+            const lastSale = sorted[sorted.length - 1].price;
+            return (((lastSale - firstSale) / firstSale) * 100).toFixed(1);
+        }
+
+        function formatChange(amount) {
+            const sign = amount >= 0 ? '+' : '';
+            return `${sign}$${formatNumber(amount)}`;
+        }
+
+        function exportPropertyData() {
+            if (!currentPropertyData) return;
+
+            const dataStr = JSON.stringify(currentPropertyData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `property_${currentPropertyData.parcel_id}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
         // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', loadData);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up modal event listeners after DOM is loaded
+            const modal = document.getElementById('property-modal');
+            if (modal) {
+                // Close modal when clicking outside
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal();
+                    }
+                });
+            }
+
+            // Close modal on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && window.location.hash === '#property-modal') {
+                    closeModal();
+                }
+            });
+
+            // Handle tab switching
+            const tabRadios = document.querySelectorAll('input[name="property-tabs"]');
+            tabRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    // Hide all tab content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.style.display = 'none';
+                    });
+
+                    // Show the selected tab content
+                    const selectedTab = document.querySelector(`.${this.id}`);
+                    if (selectedTab) {
+                        selectedTab.style.display = 'block';
+                    }
+                });
+            });
+
+            loadData();
+        });
+
+        // Helper functions
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            try {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('en-US');
+            } catch (e) {
+                return dateStr;
+            }
+        }
     </script>
+
+    <!-- CSS-Only Property Details Modal -->
+    <div id="property-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Property Details</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Property Summary -->
+                <div class="property-summary" id="property-summary">
+                    <!-- Populated by JavaScript -->
+                </div>
+
+                <!-- CSS-Only Tab Navigation -->
+                <div class="tab-nav">
+                    <input type="radio" name="property-tabs" id="overview-radio" class="tab-input" checked>
+                    <label for="overview-radio" class="tab-label">Overview</label>
+
+                    <input type="radio" name="property-tabs" id="sales-radio" class="tab-input">
+                    <label for="sales-radio" class="tab-label">Sales History</label>
+
+                    <input type="radio" name="property-tabs" id="assessment-radio" class="tab-input">
+                    <label for="assessment-radio" class="tab-label">Assessment History</label>
+                </div>
+
+                <!-- CSS-Only Tab Content -->
+                <div class="overview-radio tab-content">
+                    <div id="overview-content">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="sales-radio tab-content">
+                    <div class="table-container">
+                        <table class="modal-table sales-table" id="sales-table">
+                            <thead>
+                                <tr>
+                                    <th>Sale Date</th>
+                                    <th>Sale Price</th>
+                                    <th>Arms Length</th>
+                                    <th>Time Since Last Sale</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sales-tbody">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="analysis-box" id="sales-analysis">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="assessment-radio tab-content">
+                    <div class="table-container">
+                        <table class="modal-table assessment-table" id="assessment-table">
+                            <thead>
+                                <tr>
+                                    <th>Assessment Year</th>
+                                    <th>Land Assessment</th>
+                                    <th>Building Assessment</th>
+                                    <th>Total Assessment</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assessment-tbody">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="analysis-box" id="assessment-analysis">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal()">Close</button>
+                <button class="btn-primary" onclick="exportPropertyData()">Export Data</button>
+            </div>
+        </div>
+    </div>
 
     </body>
 </html>

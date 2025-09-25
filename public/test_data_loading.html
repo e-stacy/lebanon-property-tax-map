@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Data Loading</title>
+</head>
+<body>
+    <h1>Testing Data Loading</h1>
+    <div id="status">Loading...</div>
+    <div id="results"></div>
+
+    <script>
+        async function testDataLoading() {
+            try {
+                const response = await fetch('../data/processed/parcels.csv');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const text = await response.text();
+                const lines = text.trim().split('\n');
+                const headers = lines[0].split(',');
+                const dataRows = lines.slice(1);
+
+                document.getElementById('status').textContent = `✅ Successfully loaded CSV with ${dataRows.length} rows and ${headers.length} columns`;
+
+                // Show first few rows
+                let results = '<h2>Sample Data:</h2><table border="1"><tr>';
+                headers.forEach(h => results += `<th>${h}</th>`);
+                results += '</tr>';
+
+                dataRows.slice(0, 3).forEach(row => {
+                    results += '<tr>';
+                    row.split(',').forEach(cell => results += `<td>${cell}</td>`);
+                    results += '</tr>';
+                });
+                results += '</table>';
+
+                document.getElementById('results').innerHTML = results;
+
+            } catch (error) {
+                document.getElementById('status').textContent = `❌ Error: ${error.message}`;
+                document.getElementById('results').textContent = '';
+            }
+        }
+
+        testDataLoading();
+    </script>
+</body>
+</html>
+

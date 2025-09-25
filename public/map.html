@@ -4,12 +4,12 @@
     <meta charset="utf-8">
     <title>Lebanon Property Tax Map</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="shortcut icon" href="favicon.png">
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+    <link rel="shortcut icon" href="assets/images/favicon.png">
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="working-checkbox-styles.css">
+    <link rel="stylesheet" href="assets/css/working-checkbox-styles.css">
     
     <style>
         body {
@@ -195,17 +195,246 @@
             font-weight: bold;
             color: #666;
         }
+
+        /* Modal Dialog Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            background: #f8f9fa;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 1.4em;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            color: #000;
+        }
+
+        .modal-body {
+            padding: 20px;
+            flex: 1;
+        }
+
+        .property-summary {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+
+        .summary-row {
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .summary-row strong {
+            color: #2c3e50;
+        }
+
+        .tab-nav {
+            display: flex;
+            border-bottom: 2px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: #007bff;
+        }
+
+        .tab-btn.active {
+            border-bottom-color: #007bff;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .table-container {
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .history-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+            position: sticky;
+            top: 0;
+        }
+
+        .history-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .current-sale,
+        .current-assessment {
+            background-color: #e8f4fd !important;
+            font-weight: bold;
+        }
+
+        .analysis-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #28a745;
+        }
+
+        .analysis-box h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .analysis-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .analysis-box li {
+            margin-bottom: 5px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            background: #f8f9fa;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .btn-secondary {
+            padding: 8px 16px;
+            border: 1px solid #6c757d;
+            background: white;
+            color: #6c757d;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-secondary:hover {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-primary {
+            padding: 8px 16px;
+            border: 1px solid #007bff;
+            background: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                max-width: 95vw;
+                max-height: 95vh;
+            }
+
+            .tab-nav {
+                flex-wrap: wrap;
+            }
+
+            .tab-btn {
+                padding: 10px 16px;
+                font-size: 0.9em;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 8px 6px;
+                font-size: 0.9em;
+            }
+        }
     </style>
 </head>
 <body>
     <header class="header">
-        <nav aria-label="Main navigation">
-            <a href="index.html" class="nav-link">Data</a> |
-            <a href="map.html" class="nav-link">Map</a> |
-            <a href="sitemap.xml" class="nav-link">Sitemap</a> |
-            <a href="data/parcels.csv" class="nav-link">CSV</a> |
-            <a href="spatial/parcels_wgs84.geojson" class="nav-link">GeoJSON</a>
-        </nav>
     </header>
 
     <div id="map"></div>
@@ -599,14 +828,42 @@
         // Generate colors for all actual Lebanon class codes
         function generateClassColors() {
             const colors = {};
+            // HIGH CONTRAST COLOR PALETTE - Maximally distinct colors for better visibility
             const colorPalette = [
-                '#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#e67e22', '#1abc9c', '#34495e',
-                '#f1c40f', '#d35400', '#8e44ad', '#27ae60', '#2980b9', '#16a085', '#c0392b', '#7f8c8d',
-                '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4',
-                '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722',
-                '#795548', '#9e9e9e', '#607d8b', '#ff1744', '#f50057', '#d500f9', '#651fff', '#3d5afe',
-                '#2979ff', '#00b0ff', '#00e5ff', '#1de9b6', '#00e676', '#76ff03', '#c6ff00', '#ffff00',
-                '#ffd600', '#ffab00', '#ff6d00', '#dd2c00', '#bf360c', '#3e2723', '#212121', '#263238'
+                // Primary distinct colors - far apart on color wheel
+                '#e41a1c', // Red
+                '#377eb8', // Blue
+                '#4daf4a', // Green
+                '#984ea3', // Purple
+                '#ff7f00', // Orange
+                '#ffff33', // Yellow
+                '#a65628', // Brown
+                '#f781bf', // Pink
+                '#999999', // Gray
+                '#66c2a5', // Teal
+                '#fc8d62', // Coral
+                '#8da0cb', // Light Blue
+                '#e78ac3', // Magenta
+                '#a6d854', // Lime
+                '#ffd92f', // Gold
+                '#e5c494', // Tan
+                '#b3b3b3', // Light Gray
+                '#8dd3c7', // Mint
+                '#ffffb3', // Light Yellow
+                '#bebada', // Lavender
+                '#fb8072', // Salmon
+                '#80b1d3', // Sky Blue
+                '#fdb462', // Peach
+                '#b3de69', // Light Green
+                '#fccde5', // Light Pink
+                '#d9d9d9', // Very Light Gray
+                '#bc80bd', // Plum
+                '#ccebc5', // Pale Green
+                '#ffed6f', // Pale Yellow
+                '#8c510a', // Dark Brown
+                '#01665e', // Dark Teal
+                '#762a83', // Dark Purple
+                '#1b7837'  // Dark Green
             ];
             
             lebanonClassCodes.forEach((code, index) => {
@@ -619,15 +876,16 @@
         const colorSchemes = {
             class: generateClassColors(),
             value: {
+                // HIGH CONTRAST VALUE RANGES - Alternating warm/cool colors for maximum distinction
                 ranges: [
-                    { min: 0, max: 100000, color: '#27ae60' },
-                    { min: 100000, max: 200000, color: '#2ecc71' },
-                    { min: 200000, max: 300000, color: '#f1c40f' },
-                    { min: 300000, max: 400000, color: '#f39c12' },
-                    { min: 400000, max: 500000, color: '#e67e22' },
-                    { min: 500000, max: 750000, color: '#d35400' },
-                    { min: 750000, max: 1000000, color: '#e74c3c' },
-                    { min: 1000000, max: Infinity, color: '#8e44ad' }
+                    { min: 0, max: 100000, color: '#2ecc71' },        // Bright Green
+                    { min: 100000, max: 200000, color: '#e74c3c' },   // Red
+                    { min: 200000, max: 300000, color: '#3498db' },   // Blue
+                    { min: 300000, max: 400000, color: '#f39c12' },   // Orange
+                    { min: 400000, max: 500000, color: '#9b59b6' },   // Purple
+                    { min: 500000, max: 750000, color: '#1abc9c' },   // Teal
+                    { min: 750000, max: 1000000, color: '#e67e22' },  // Dark Orange
+                    { min: 1000000, max: Infinity, color: '#34495e' }  // Dark Blue-Gray
                 ]
             },
             heating: {
@@ -644,29 +902,29 @@
                 'default': '#95a5a6'
             },
             zoning: {
-                // Residential zones - High contrast greens
-                'R1': '#27ae60',            // Single family - Dark green
-                'R2': '#2ecc71',            // Two family - Green
-                'R3': '#1abc9c',            // Multi-family - Turquoise
-                'R4': '#16a085',            // High density - Dark turquoise
-                
-                // Commercial zones - High contrast blues
-                'C1': '#3498db',            // Neighborhood commercial - Blue
-                'C2': '#2980b9',            // General commercial - Dark blue
-                'CB': '#1f618d',            // Business - Navy
-                
-                // Industrial zones - High contrast oranges/reds
-                'I1': '#e67e22',            // Light industrial - Orange
-                'I2': '#d35400',            // General industrial - Dark orange
-                
-                // Other zones - High contrast distinct colors
-                'Q': '#f39c12',             // Q zone - Gold
-                'A': '#e74c3c',             // Agricultural - Red
-                'RR': '#8e44ad',            // Rural residential - Purple
-                'PUD': '#9b59b6',           // Planned unit - Light purple
-                
-                'unknown': '#95a5a6',       // Gray - Unknown
-                'default': '#34495e'        // Dark gray - Default
+                // MAXIMUM CONTRAST ZONING COLORS - Distinct hues for each zone type
+                'R1': '#2ecc71',            // Single family - Bright Green
+                'R2': '#e74c3c',            // Two family - Red
+                'R3': '#3498db',            // Multi-family - Blue
+                'R4': '#f39c12',            // High density - Orange
+
+                // Commercial zones - Distinct cool colors
+                'C1': '#9b59b6',            // Neighborhood commercial - Purple
+                'C2': '#1abc9c',            // General commercial - Teal
+                'CB': '#34495e',            // Business - Dark Gray
+
+                // Industrial zones - Warm earth tones
+                'I1': '#e67e22',            // Light industrial - Dark Orange
+                'I2': '#f1c40f',            // General industrial - Yellow
+
+                // Other zones - Maximally distinct
+                'Q': '#ff7f00',             // Q zone - Bright Orange
+                'A': '#a65628',             // Agricultural - Brown
+                'RR': '#66c2a5',            // Rural residential - Mint
+                'PUD': '#fc8d62',           // Planned unit - Coral
+
+                'unknown': '#636363',       // Darker gray - Unknown
+                'default': '#2c3e50'        // Very dark gray - Default
             },
             year: {
                 ranges: [
@@ -722,27 +980,22 @@
         // Load property data
         async function loadPropertyData() {
             try {
-                console.log('Loading property data...');
                 
                 // Load property database
-                const response = await fetch('data/parcels.csv');
+                const response = await fetch('../data/processed/parcels.csv');
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 const text = await response.text();
-                console.log('Raw CSV text length:', text.length);
-                console.log('First 200 chars:', text.substring(0, 200));
                 
                 const lines = text.trim().split('\n');
-                console.log('Number of lines:', lines.length);
                 
                 if (lines.length < 2) {
                     throw new Error('CSV file appears to be empty or malformed');
                 }
                 
                 const headers = parseCSVLine(lines[0]);
-                console.log('Headers found:', headers);
                 
                 const properties = lines.slice(1).map((line, index) => {
                     try {
@@ -764,12 +1017,8 @@
                 });
                 
                 console.log(`Successfully loaded ${properties.length} properties`);
-                if (properties.length > 0) {
-                    console.log('Sample property:', properties[0]);
-                }
                 
                 // Initialize working checkbox filters
-                console.log('Initializing map filters with', properties.length, 'properties');
                 if (typeof workingFilters !== 'undefined') {
                     workingFilters.createPropertyClassFilter('class-filter', propertyData);
                     workingFilters.createYearBuiltFilter('year-filter', propertyData);
@@ -811,22 +1060,17 @@
         // Load actual spatial data
         async function loadActualSpatialData(properties) {
             try {
-                console.log('Loading parcel boundaries...');
                 
-                const response = await fetch('spatial/parcels_wgs84.geojson');
+                const response = await fetch('../data/processed/spatial/parcels_wgs84.geojson');
                 if (!response.ok) {
                     throw new Error(`Failed to load spatial data: ${response.status}`);
                 }
                 
                 const geojsonText = await response.text();
-                console.log('GeoJSON loaded, size:', geojsonText.length);
-                
                 const geojsonData = JSON.parse(geojsonText);
-                console.log('Parsed GeoJSON, features:', geojsonData.features?.length || 0);
                 
                 if (geojsonData.features && geojsonData.features.length > 0) {
                     parcelData = geojsonData.features;
-                    console.log(`Successfully loaded ${parcelData.length} parcel boundaries`);
                     
                     // Add parcels directly to map with prominent boundaries
                     parcelsLayer = L.geoJSON(geojsonData, {
@@ -859,7 +1103,6 @@
                         }
                     }).addTo(map);
                     
-                    console.log('Parcel boundaries added to map successfully');
                     
                     // Store parcel data for later processing
                     parcelData = geojsonData.features;
@@ -1027,13 +1270,22 @@
                         `;
                     }
                     
+                    // Bind popup for hover
                     layer.bindPopup(popupContent);
-                    
+
+                    // Add click handler to open modal with full property details
+                    layer.on('click', function(e) {
+                        if (prop) {
+                            // Open modal with property data
+                            openPropertyModal(prop);
+                        }
+                    });
+
                     // Add hover effects
                     layer.on('mouseover', function() {
                         this.setStyle({ weight: 4, color: '#000' });
                     });
-                    
+
                     layer.on('mouseout', function() {
                         this.setStyle({ weight: 2, color: '#333' });
                     });
@@ -1213,6 +1465,8 @@
                 <div class="popup-row"><span class="popup-label">Parcel:</span> ${property.parcel_id}</div>
                 <div class="popup-row"><span class="popup-label">Owner:</span> ${property.owner_name || 'Unknown'}</div>
                 <div class="popup-row"><span class="popup-label">Class:</span> ${property?.class_code || 'Unknown'}</div>
+                <div class="popup-row"><span class="popup-label">Zoning:</span> ${property.nhdra_zoning_code || 'Unknown'}</div>
+                <div class="popup-row"><span class="popup-label">Heating:</span> ${property.nhdra_heating_fuel || 'Unknown'}</div>
                 <div class="popup-row"><span class="popup-label">Lot Size:</span> ${property.lot_size_acres || '0'} acres</div>
                 <div class="popup-row"><span class="popup-label">Total Value:</span> $${formatNumber(property.total_value || 0)}</div>
                 <div class="popup-row"><span class="popup-label">Land Value:</span> $${formatNumber(property.land_value || 0)}</div>
@@ -1873,7 +2127,403 @@
         });
         
         // Note: Filter and statistics initialization happens automatically
+
+        // Modal Functions for Map Page
+        let currentPropertyData = null;
+
+        function closeModal() {
+            document.getElementById('property-modal').style.display = 'none';
+            currentPropertyData = null;
+        }
+
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        function openPropertyModal(propertyData) {
+            currentPropertyData = propertyData;
+
+            // Update modal title
+            document.getElementById('modal-title').textContent =
+                `📍 ${propertyData.parcel_id} (${propertyData.situs_address || 'No Address'})`;
+
+            // Populate property summary
+            populatePropertySummary(propertyData);
+
+            // Populate overview tab
+            populateOverviewTab(propertyData);
+
+            // Populate sales history
+            populateSalesHistory(propertyData);
+
+            // Populate assessment history
+            populateAssessmentHistory(propertyData);
+
+            // Show modal
+            document.getElementById('property-modal').style.display = 'flex';
+
+            // Show overview tab by default
+            showTab('overview');
+        }
+
+        function populatePropertySummary(property) {
+            const summaryDiv = document.getElementById('property-summary');
+            summaryDiv.innerHTML = `
+                <div class="summary-row"><strong>Parcel:</strong> ${property.parcel_id}</div>
+                <div class="summary-row"><strong>Owner:</strong> ${property.owner_name || 'Unknown'}</div>
+                <div class="summary-row"><strong>Class:</strong> ${property.class_code || 'Unknown'}</div>
+                <div class="summary-row"><strong>Zoning:</strong> ${property.nhdra_zoning_code || 'Unknown'}</div>
+                <div class="summary-row"><strong>Heating Fuel:</strong> ${property.nhdra_heating_fuel || 'Unknown'}</div>
+                <div class="summary-row"><strong>Total Value:</strong> $${formatNumber(property.total_value || 0)}</div>
+            `;
+        }
+
+        function populateOverviewTab(property) {
+            const overviewDiv = document.getElementById('overview-content');
+            let content = '';
+
+            // Add building details if available
+            if (property['nhdra_vns ayb'] && parseInt(property['nhdra_vns ayb']) >= 1800) {
+                content += `<div class="summary-row"><strong>Year Built:</strong> ${property['nhdra_vns ayb']}</div>`;
+            }
+
+            if (property['nhdra_vns style desc']) {
+                content += `<div class="summary-row"><strong>Building Style:</strong> ${property['nhdra_vns style desc']}</div>`;
+            }
+
+            if (property.building_gla) {
+                content += `<div class="summary-row"><strong>Building Area:</strong> ${formatNumber(property.building_gla)} sq ft</div>`;
+            }
+
+            if (property['nhdra_lnd zone']) {
+                content += `<div class="summary-row"><strong>Zoning:</strong> ${property['nhdra_lnd zone']}</div>`;
+            }
+
+            if (property['nhdra_vns heat type desc']) {
+                content += `<div class="summary-row"><strong>Heating:</strong> ${property['nhdra_vns heat type desc']}</div>`;
+            }
+
+            if (!content) {
+                content = '<div class="summary-row">No additional property details available.</div>';
+            }
+
+            overviewDiv.innerHTML = content;
+        }
+
+        function populateSalesHistory(property) {
+            const tbody = document.getElementById('sales-tbody');
+            const analysisDiv = document.getElementById('sales-analysis');
+
+            tbody.innerHTML = '';
+            let salesData = [];
+            let totalValue = 0;
+            let saleCount = 0;
+
+            // Current sale
+            if (property.nhdra_saleprice && property.nhdra_saleprice > 0) {
+                salesData.push({
+                    date: property.nhdra_saledate,
+                    price: property.nhdra_saleprice,
+                    qualified: property.nhdra_qualified || 'N/A',
+                    isCurrent: true
+                });
+                totalValue += property.nhdra_saleprice;
+                saleCount++;
+            }
+
+            // Prior sales
+            const priorSales = [
+                {price: property['nhdra_ID1 Prior Sale Price'], date: property['nhdra_ID1 Prior Sale Date']},
+                {price: property['nhdra_ID2 Prior Sale Price'], date: property['nhdra_ID2 Prior Sale Date']},
+                {price: property['nhdra_ID3 Prior Sale Price'], date: property['nhdra_ID3 Prior Sale Date']}
+            ];
+
+            priorSales.forEach((sale, index) => {
+                if (sale.price && sale.price > 0) {
+                    salesData.push({
+                        date: sale.date,
+                        price: sale.price,
+                        qualified: 'Q', // Assume qualified for prior sales
+                        isCurrent: false
+                    });
+                    totalValue += sale.price;
+                    saleCount++;
+                }
+            });
+
+            // Sort by date (most recent first)
+            salesData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // Populate table
+            salesData.forEach((sale, index) => {
+                const rowClass = sale.isCurrent ? 'current-sale' : '';
+                const timeGap = index < salesData.length - 1 ?
+                    calculateTimeGap(sale.date, salesData[index + 1].date) : '';
+
+                tbody.innerHTML += `
+                    <tr class="${rowClass}">
+                        <td>${formatDate(sale.date)}</td>
+                        <td>$${formatNumber(sale.price)}</td>
+                        <td>${sale.qualified}</td>
+                        <td>${timeGap}</td>
+                    </tr>
+                `;
+            });
+
+            // Generate analysis
+            if (salesData.length > 0) {
+                const avgPrice = totalValue / saleCount;
+                const highestSale = Math.max(...salesData.map(s => s.price));
+                const lowestSale = Math.min(...salesData.map(s => s.price));
+
+                analysisDiv.innerHTML = `
+                    <h4>📊 Sales Analysis</h4>
+                    <ul>
+                        <li><strong>Total Sales:</strong> ${saleCount}</li>
+                        <li><strong>Highest Sale:</strong> $${formatNumber(highestSale)}</li>
+                        <li><strong>Lowest Sale:</strong> $${formatNumber(lowestSale)}</li>
+                        <li><strong>Average Sale Price:</strong> $${formatNumber(avgPrice)}</li>
+                        ${salesData.length > 1 ? `<li><strong>Total Appreciation:</strong> ${calculateAppreciation(salesData)}%</li>` : ''}
+                    </ul>
+                `;
+            } else {
+                analysisDiv.innerHTML = '<p>No sales history available for this property.</p>';
+            }
+        }
+
+        function populateAssessmentHistory(property) {
+            const tbody = document.getElementById('assessment-tbody');
+            const analysisDiv = document.getElementById('assessment-analysis');
+
+            tbody.innerHTML = '';
+
+            // Current assessments (2024)
+            const currentLand = parseFloat(property['nhdra_prc ttl assess lnd'] || 0);
+            const currentBuilding = parseFloat(property['nhdra_prc ttl assess bldg'] || 0);
+            const currentTotal = parseFloat(property['nhdra_prc ttl assess'] || 0);
+
+            // Previous assessments (adjusted/historical)
+            const previousLand = parseFloat(property['nhdra_ahd ttl assess lnd'] || 0);
+            const previousBuilding = parseFloat(property['nhdra_ahd ttl assess bldg'] || 0);
+            const previousTotal = parseFloat(property['nhdra_ahd ttl assess'] || 0);
+
+            // Current assessment row (most recent first)
+            if (currentTotal > 0) {
+                tbody.innerHTML += `
+                    <tr class="current-assessment">
+                        <td>Current Assessment (2024)</td>
+                        <td>$${formatNumber(currentLand)}</td>
+                        <td>$${formatNumber(currentBuilding)}</td>
+                        <td><strong>$${formatNumber(currentTotal)}</strong></td>
+                    </tr>
+                `;
+            }
+
+            // Previous assessment row (if available)
+            if (previousTotal > 0) {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>Previous Assessment</td>
+                        <td>$${formatNumber(previousLand)}</td>
+                        <td>$${formatNumber(previousBuilding)}</td>
+                        <td><strong>$${formatNumber(previousTotal)}</strong></td>
+                    </tr>
+                `;
+            }
+
+            // Generate analysis
+            if (currentTotal > 0 && previousTotal > 0) {
+                const changePercent = ((currentTotal - previousTotal) / previousTotal * 100);
+                analysisDiv.innerHTML = `
+                    <h4>🏛️ Assessment Analysis</h4>
+                    <ul>
+                        <li><strong>Assessment Change:</strong> ${formatChange(currentTotal - previousTotal)} (${changePercent.toFixed(1)}%)</li>
+                        <li><strong>Current Assessment:</strong> $${formatNumber(currentTotal)}</li>
+                        <li><strong>Previous Assessment:</strong> $${formatNumber(previousTotal)}</li>
+                        ${property.nhdra_saleprice && property.nhdra_saleprice > 0 ?
+                            `<li><strong>Sale-to-Assessment Ratio:</strong> ${(currentTotal / property.nhdra_saleprice * 100).toFixed(1)}%</li>` : ''}
+                    </ul>
+                `;
+            } else {
+                analysisDiv.innerHTML = '<p>Limited assessment history available.</p>';
+            }
+        }
+
+        function calculateTimeGap(date1, date2) {
+            if (!date1 || !date2) return '';
+            const d1 = new Date(date1);
+            const d2 = new Date(date2);
+            const diffTime = Math.abs(d1 - d2);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 365) {
+                return `${diffDays}d`;
+            } else {
+                const years = Math.floor(diffDays / 365);
+                const months = Math.floor((diffDays % 365) / 30);
+                return `${years}y ${months}m`;
+            }
+        }
+
+        function calculateAppreciation(salesData) {
+            if (salesData.length < 2) return 0;
+            const sorted = salesData.sort((a, b) => new Date(a.date) - new Date(b.date));
+            const firstSale = sorted[0].price;
+            const lastSale = sorted[sorted.length - 1].price;
+            return (((lastSale - firstSale) / firstSale) * 100).toFixed(1);
+        }
+
+        function formatChange(amount) {
+            const sign = amount >= 0 ? '+' : '';
+            return `${sign}$${formatNumber(amount)}`;
+        }
+
+        function exportPropertyData() {
+            if (!currentPropertyData) return;
+
+            const dataStr = JSON.stringify(currentPropertyData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `property_${currentPropertyData.parcel_id}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // Helper functions
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            try {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('en-US');
+            } catch (e) {
+                return dateStr;
+            }
+        }
+
+        function formatNumber(num) {
+            if (typeof num === 'string') num = parseFloat(num);
+            if (isNaN(num)) return '0';
+            return num.toLocaleString();
+        }
     </script>
-    
+
+    <!-- Property Details Modal -->
+    <div id="property-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Property Details</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Property Summary -->
+                <div class="property-summary" id="property-summary">
+                    <!-- Populated by JavaScript -->
+                </div>
+
+                <!-- Tab Navigation -->
+                <div class="tab-nav">
+                    <button class="tab-btn active" onclick="showTab('overview')">Overview</button>
+                    <button class="tab-btn" onclick="showTab('sales')">Sales History</button>
+                    <button class="tab-btn" onclick="showTab('assessment')">Assessment History</button>
+                </div>
+
+                <!-- Tab Content -->
+                <div id="overview-tab" class="tab-content active">
+                    <div id="overview-content">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div id="sales-tab" class="tab-content">
+                    <div class="table-container">
+                        <table class="history-table" id="sales-table">
+                            <thead>
+                                <tr>
+                                    <th>Sale Date</th>
+                                    <th>Sale Price</th>
+                                    <th>Arms Length</th>
+                                    <th>Time Since Last Sale</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sales-tbody">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="analysis-box" id="sales-analysis">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div id="assessment-tab" class="tab-content">
+                    <div class="table-container">
+                        <table class="history-table" id="assessment-table">
+                            <thead>
+                                <tr>
+                                    <th>Assessment Year</th>
+                                    <th>Land Assessment</th>
+                                    <th>Building Assessment</th>
+                                    <th>Total Assessment</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assessment-tbody">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="analysis-box" id="assessment-analysis">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal()">Close</button>
+                <button class="btn-primary" onclick="exportPropertyData()">Export Data</button>
+            </div>
+        </div>
+    </div>
+    </script>
+
+    <script>
+        // Set up modal event listeners after DOM is loaded
+        const modal = document.getElementById('property-modal');
+        if (modal) {
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal && modal.style.display === 'flex') {
+                closeModal();
+            }
+        });
+    </script>
+
 </body>
 </html>

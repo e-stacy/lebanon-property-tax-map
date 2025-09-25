@@ -7,6 +7,56 @@ The Lebanon Property Tax Database is a **public transparency initiative** that p
 **Live Database**: https://e-stacy.github.io/lebanon-property-tax-map/  
 **Repository**: https://github.com/e-stacy/lebanon-property-tax-map
 
+## Quick Start & Development
+
+### Project Structure Overview
+This project uses a clean, professional folder structure that separates web assets, data, scripts, and documentation:
+
+- **`public/`** - All web-deployable files (deploy this folder to web server)
+- **`data/`** - Raw data, processed datasets, and schema documentation
+- **`scripts/`** - Python data processing and analysis scripts
+- **`docs/`** - Documentation, testing tools, and artifacts
+
+### Local Development Setup
+```bash
+# Clone the repository
+git clone https://github.com/e-stacy/lebanon-property-tax-map.git
+cd lebanon-property-tax-map
+
+# Start local web server for testing
+cd public
+python -m http.server 8000
+# Visit http://localhost:8000 to test the application
+```
+
+### Data Processing
+```bash
+# Run data processing scripts (from project root)
+cd scripts
+python scrub_data.py  # Process raw data into clean CSV
+python analyze_data.py  # Generate analysis reports
+```
+
+### Testing & Debugging
+The project includes testing tools in the `docs/` folder:
+
+- **`test_data_loading.html`**: Verifies CSV data loading and parsing
+- **`test_map.html`**: Tests map initialization and spatial data loading
+
+Run these locally to debug data loading issues:
+```bash
+cd docs
+python -m http.server 8001
+# Visit http://localhost:8001/test_data_loading.html
+# Visit http://localhost:8001/test_map.html
+```
+
+### Deployment
+The `public/` directory contains all files needed for web deployment. Deploy this folder to:
+- **GitHub Pages**: Push `public/` contents to `gh-pages` branch or root
+- **Web Server**: Copy `public/` contents to web root
+- **CDN**: Upload `public/` contents to CDN provider
+
 ## Public Interest & Legal Foundation
 
 ### Transparency Mission
@@ -40,6 +90,15 @@ This project directly serves **New Hampshire's Right-to-Know Law (RSA 91-A)**, w
 - Infrastructure specifications (heating, roofing, exterior materials)
 - Sales history with transaction dates and prices
 
+### Building Footprints (Optional Enhancement)
+**Microsoft US Building Footprints Integration**:
+- **Source**: Microsoft US Building Footprints dataset (free, open data)
+- **Coverage**: Complete building footprints for Lebanon, NH
+- **Format**: GeoJSON polygons optimized for web mapping
+- **Size**: ~5-10MB compressed for entire Lebanon area
+- **Usage**: Optional layer showing actual building outlines on map
+- **Tool**: `scripts/download_buildings_manual.py` for acquisition and processing
+
 ## Technical Architecture & Data Quality
 
 ### Professional Standards
@@ -49,11 +108,19 @@ This project directly serves **New Hampshire's Right-to-Know Law (RSA 91-A)**, w
 - **Open Source**: Fully transparent methodology available for public inspection
 - **Format Compliance**: Industry-standard CSV, GeoJSON, and web formats
 
+### Data Storage Strategy
+**Self-Contained vs External Dependencies**:
+- **Primary Data**: Stored locally in repository (parcels, assessments, zoning)
+- **Building Footprints**: Optional local storage (~5-10MB compressed)
+- **External Services**: Only Leaflet tiles and basic web dependencies
+- **No External APIs**: All data loads from local files for reliability
+- **Version Control**: All datasets tracked in Git for reproducibility
+
 ### Data Processing Pipeline
 The system implements a **two-stage normalization process** that transforms raw municipal data into standardized, publicly accessible formats:
 
 **Stage A - Source Normalization**:
-- Converts source columns to snake_case while preserving data provenance  
+- Converts source columns to snake_case while preserving data provenance
 - Maintains immutable originals in timestamped folders (`data/raw/`)
 - All transformations driven by mapping tables stored in CSV format
 
@@ -72,24 +139,51 @@ The system implements a **two-stage normalization process** that transforms raw 
 ### Directory Structure & Data Organization
 ```
 lebanon-property-tax-map/
-├── data/
-│   ├── parcels.csv                    # Current integrated dataset (5,622 properties)
-│   └── city_data/
-│       ├── versions/
-│       │   ├── v2025-09-06/          # Historical data versions
-│       │   │   ├── nhdra.csv         # NHDRA building characteristics  
-│       │   │   ├── parcels.csv       # Basic assessment data
-│       │   │   ├── buildings.csv     # Building details
-│       │   │   ├── land.csv          # Land records
-│       │   │   └── sales.csv         # Transaction history
-│       │   └── v2025-09-05/          # Previous version
-│       └── spatial/raw/               # Original shapefiles
-├── spatial/
-│   ├── parcels_wgs84.geojson         # Web-optimized spatial data
-│   └── parcels.geojson               # Original coordinate system
-├── index.html                        # Main data explorer interface
-├── map.html                          # Interactive mapping interface  
-└── sitemap.xml                       # Search engine data discovery
+├── 🌐 public/                        # 🆕 Web-deployable files
+│   ├── 📄 index.html                # Main data explorer interface
+│   ├── 📄 map.html                  # Interactive mapping interface
+│   ├── 📄 disclaimer.html           # Legal disclaimer
+│   └── 🎨 assets/                   # Static web assets
+│       ├── 🖼️ images/              # Images, favicon, screenshots
+│       ├── 🎨 css/                 # Stylesheets
+│       └── 📜 js/                  # JavaScript files
+│
+├── 📊 data/                         # Data files and schemas
+│   ├── 🗃️ processed/                # Clean processed data
+│   │   ├── parcels.csv             # Main property data (5,622 properties)
+│   │   ├── parcels_backup_before_zoning_fix.csv
+│   │   └── spatial/                # GeoJSON files
+│   │       ├── parcels_wgs84.geojson  # Web-optimized spatial data
+│   │       ├── parcels_real.geojson   # Original coordinate system
+│   │       └── parcels.geojson
+│   ├── 📋 schemas/                 # Data documentation
+│   │   ├── parcels_schema.md
+│   │   ├── column_mapping_*.md
+│   │   └── v2025-09-05_*.md        # Versioned schema docs
+│   └── 🗂️ raw/                     # Raw source data
+│       └── RecoveredRawData/       # Original municipal data
+│
+├── 📚 docs/                        # Documentation & testing
+│   ├── 📄 report.md                # Analysis reports
+│   ├── 🧪 test_data_loading.html   # CSV loading verification
+│   ├── 🧪 test_map.html           # Map functionality testing
+│   └── 📋 artifacts/              # Processing logs
+│       └── zoning_fix_log.txt
+│
+├── 🔧 scripts/                     # Python processing scripts
+│   ├── 🧹 scrub_data.py            # Main data processor
+│   ├── 📊 analyze_*.py             # Analysis scripts
+│   ├── 🔍 check_zoning.py          # Validation scripts
+│   ├── 🏢 download_buildings_manual.py  # Building footprints tool
+│   └── 📋 zoning_mapping.json      # Configuration
+│
+├── 🗂️ archive/                     # Old backups (compressed)
+│   └── RecoveredRawData_Backup_*/  # Historical data snapshots
+│
+├── 📄 README.md                    # Project documentation
+├── 📄 LICENSE                      # License
+├── 📄 CNAME                        # GitHub Pages config
+└── 📄 sitemap.xml                  # Search engine data discovery
 ```
 
 ### Web Interface Architecture
@@ -108,9 +202,15 @@ The system demonstrates **transparent data access** while maintaining usable int
 - **Static Site**: GitHub Pages hosting for reliability and transparency
 
 **Data Loading Strategy**:
-- Asynchronous CSV fetch from `/data/parcels.csv` (911KB for 5,622 properties)
+- Asynchronous CSV fetch from `data/processed/parcels.csv` (911KB for 5,622 properties)
+- Spatial data loaded from `data/processed/spatial/parcels_wgs84.geojson`
 - Client-side parsing and filtering for responsive user experience
 - Efficient pagination and search without server dependencies
+
+**Deployment Structure**:
+- `public/` directory contains all web-deployable files
+- Static assets organized in `public/assets/` subdirectories
+- Data files accessible via relative paths from web interface
 
 ### Database Design & Integration Strategy
 
