@@ -1057,7 +1057,7 @@
 
         .modal-table th,
         .modal-table td {
-            padding: 6px 4px !important;
+            padding: 8px 6px !important;
             text-align: left !important;
             border-bottom: 1px solid #e1e5e9 !important;
             white-space: nowrap !important;
@@ -1083,21 +1083,24 @@
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: clip !important; /* Harsh clipping */
-            padding: 4px 2px !important;
+            padding: 8px 6px !important;
             font-size: 0.75em !important;
         }
 
         .modal-table.sales-table th:nth-child(1),
-        .modal-table.sales-table td:nth-child(1) { width: 60px !important; }
+        .modal-table.sales-table td:nth-child(1) { width: 90px !important; }
 
         .modal-table.sales-table th:nth-child(2),
-        .modal-table.sales-table td:nth-child(2) { width: 50px !important; }
+        .modal-table.sales-table td:nth-child(2) { width: 80px !important; }
 
         .modal-table.sales-table th:nth-child(3),
-        .modal-table.sales-table td:nth-child(3) { width: 45px !important; }
+        .modal-table.sales-table td:nth-child(3) { width: 70px !important; }
 
         .modal-table.sales-table th:nth-child(4),
-        .modal-table.sales-table td:nth-child(4) { width: 60px !important; }
+        .modal-table.sales-table td:nth-child(4) { width: 90px !important; }
+
+        .modal-table.sales-table th:nth-child(5),
+        .modal-table.sales-table td:nth-child(5) { width: 60px !important; }
 
         .modal-table.assessment-table th:nth-child(1),
         .modal-table.assessment-table td:nth-child(1) { width: 70px !important; }
@@ -2329,7 +2332,7 @@
                     sale.grantor ? `Grantor: ${sale.grantor}` : '',
                     sale.grantee ? `Grantee: ${sale.grantee}` : '',
                     sale.property_address ? `Address: ${sale.property_address}` : ''
-                ].filter(info => info).join('\n');
+                ].filter(info => info).join(' • ');
 
                 tbody.innerHTML += `
                     <tr class="${rowClass}" title="${tooltipInfo}">
