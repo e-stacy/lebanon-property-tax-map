@@ -1070,52 +1070,17 @@
                 const geojsonData = JSON.parse(geojsonText);
                 
                 if (geojsonData.features && geojsonData.features.length > 0) {
+                    // Store parcel data for processing
                     parcelData = geojsonData.features;
-                    
-                    // Add parcels directly to map with prominent boundaries
-                    parcelsLayer = L.geoJSON(geojsonData, {
-                        style: {
-                            color: '#000000',
-                            weight: 3,
-                            fillColor: '#87CEEB',
-                            fillOpacity: getDefaultOpacity(),
-                            opacity: 1.0
-                        },
-                        onEachFeature: function(feature, layer) {
-                            const mapLot = feature.properties.MAP_LOT;
-                            
-                            // Simple popup with spatial data
-                            const popupContent = `
-                                <div class="popup-title">Parcel ${mapLot}</div>
-                                <div class="popup-row"><span class="popup-label">GIS ID:</span> ${feature.properties.GIS_ID || 'Unknown'}</div>
-                                <div class="popup-row"><span class="popup-label">Acres:</span> ${(feature.properties.CALC_ACRES || 0).toFixed(2)}</div>
-                            `;
-                            
-                            layer.bindPopup(popupContent);
-                            
-                            layer.on('mouseover', function() {
-                                this.setStyle({ weight: 4, color: '#000' });
-                            });
-                            
-                            layer.on('mouseout', function() {
-                                this.setStyle({ weight: 2, color: '#333' });
-                            });
-                        }
-                    }).addTo(map);
-                    
-                    
-                    // Store parcel data for later processing
-                    parcelData = geojsonData.features;
-                    
-                    // Remove the basic layer and add properly colored parcels
-                    map.removeLayer(parcelsLayer);
-                    
-                    // Add parcels with proper coloring
-                    // Small delay to ensure DOM and checkbox state are ready
+
+                    // Add parcels with proper coloring immediately
+                    // Since transparent-colors checkbox is checked by default, show colors from start
                     setTimeout(() => {
                         updateParcelLayer();
                         updateLegend();
-                    }, 500);
+                        // Mark initial load as complete so future calls respect checkbox state
+                        initialLoadComplete = true;
+                    }, 100);
                     
                 } else {
                     throw new Error('No features found in GeoJSON data');
@@ -1459,6 +1424,13 @@
         }
         
         function shouldShowColorCoding() {
+            // For initial load, always show colors since checkbox is checked by default
+            // After initial load, respect the checkbox state
+            if (typeof initialLoadComplete === 'undefined') {
+                initialLoadComplete = false;
+                // Force color coding for initial load
+                return true;
+            }
             return document.getElementById('transparent-colors').checked;
         }
         
