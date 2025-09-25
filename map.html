@@ -1019,11 +1019,8 @@
                 console.log(`Successfully loaded ${properties.length} properties`);
                 
                 // Initialize working checkbox filters
-                if (typeof workingFilters !== 'undefined') {
-                    workingFilters.createPropertyClassFilter('class-filter', propertyData);
-                    workingFilters.createYearBuiltFilter('year-filter', propertyData);
-                    workingFilters.createZoningFilter('zoning-filter', propertyData);
-                    workingFilters.createHeatingFilter('heating-filter', propertyData);
+                if (typeof initializeWorkingFilters !== 'undefined') {
+                    initializeWorkingFilters();
                 }
                 
                 // Load spatial data
