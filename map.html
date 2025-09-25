@@ -982,7 +982,7 @@
             try {
                 
                 // Load property database
-                const response = await fetch('data/processed/parcels.csv');
+                const response = await fetch('../data/processed/parcels.csv');
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
@@ -1061,7 +1061,7 @@
         async function loadActualSpatialData(properties) {
             try {
                 
-                const response = await fetch('data/processed/spatial/parcels_wgs84.geojson');
+                const response = await fetch('../data/processed/spatial/parcels_wgs84.geojson');
                 if (!response.ok) {
                     throw new Error(`Failed to load spatial data: ${response.status}`);
                 }
@@ -1110,18 +1110,8 @@
                     // Remove the basic layer and add properly colored parcels
                     map.removeLayer(parcelsLayer);
                     
-                    // Add parcels with proper coloring immediately
-                    // Force color overlay for initial load since checkbox is checked by default
-                    const originalShouldShowColorCoding = shouldShowColorCoding;
-                    shouldShowColorCoding = () => true; // Force color overlay for initial load
-
+                    // Add parcels with proper coloring
                     updateParcelLayer();
-                    updateLegend();
-
-                    // Restore original function after initial load
-                    setTimeout(() => {
-                        shouldShowColorCoding = originalShouldShowColorCoding;
-                    }, 1000);
                     
                 } else {
                     throw new Error('No features found in GeoJSON data');
@@ -2096,9 +2086,19 @@
         document.getElementById('show-labels').addEventListener('change', toggleMapLabels);
         document.getElementById('show-values').addEventListener('change', toggleMapLabels);
         document.getElementById('transparent-colors').addEventListener('change', updateParcelLayer);
-
+        
         // Initialize map when page loads
         document.addEventListener('DOMContentLoaded', initMap);
+
+        // Ensure color overlay displays on initial load if checkbox is checked
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const checkbox = document.getElementById('transparent-colors');
+                if (checkbox && checkbox.checked && typeof updateParcelLayer === 'function') {
+                    updateParcelLayer();
+                }
+            }, 2000); // Wait for all data to load
+        });
     </script>
     
     <!-- Working Checkbox Filter System -->
