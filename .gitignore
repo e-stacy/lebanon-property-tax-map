@@ -27,3 +27,7 @@ Thumbs.db
 # Build and output directories
 dist/
 build/
+
+# Generated/processed data files (large Excel files)
+data/processed/*.xlsx
+data/processed/*.csv
