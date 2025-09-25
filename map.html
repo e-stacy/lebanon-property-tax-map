@@ -596,6 +596,7 @@
         let parcelsLayer;
         let parcelData = [];
         let propertyData = new Map();
+        let salesData = new Map(); // parcel_id -> array of sales
         let currentFilters = {};
         
         // Color schemes for different visualization modes
@@ -1027,12 +1028,15 @@
                 });
                 
                 console.log(`Successfully loaded ${properties.length} properties`);
-                
+
+                // Load sales data
+                await loadSalesData();
+
                 // Initialize working checkbox filters
                 if (typeof initializeWorkingFilters !== 'undefined') {
                     initializeWorkingFilters();
                 }
-                
+
                 // Load spatial data
                 loadActualSpatialData(properties);
                 
@@ -1041,7 +1045,63 @@
                 alert('Error loading property data: ' + error.message);
             }
         }
-        
+
+        // Load sales data
+        async function loadSalesData() {
+            try {
+                console.log('Loading sales data...');
+                const response = await fetch('../data/processed/final_property_sales_dataset.csv');
+
+                if (!response.ok) {
+                    console.warn('Sales data file not found - sales history will be limited');
+                    return;
+                }
+
+                const text = await response.text();
+                const lines = text.trim().split('\n');
+
+                if (lines.length < 2) {
+                    console.warn('Sales data file is empty');
+                    return;
+                }
+
+                const headers = parseCSVLine(lines[0]);
+
+                // Process sales data
+                for (let i = 1; i < lines.length; i++) {
+                    const values = parseCSVLine(lines[i]);
+                    if (values.length >= headers.length) {
+                        const sale = {};
+                        headers.forEach((header, index) => {
+                            sale[header] = values[index] || '';
+                        });
+
+                        const parcelId = sale['parcel_id'];
+                        if (parcelId) {
+                            if (!salesData.has(parcelId)) {
+                                salesData.set(parcelId, []);
+                            }
+                            salesData.get(parcelId).push(sale);
+                        }
+                    }
+                }
+
+                // Sort sales by date for each parcel (most recent first)
+                for (const [parcelId, sales] of salesData) {
+                    sales.sort((a, b) => {
+                        const dateA = new Date(a['sale_date'] || '1900-01-01');
+                        const dateB = new Date(b['sale_date'] || '1900-01-01');
+                        return dateB - dateA; // Most recent first
+                    });
+                }
+
+                console.log(`Loaded sales data for ${salesData.size} parcels`);
+
+            } catch (error) {
+                console.warn('Error loading sales data:', error);
+            }
+        }
+
         // Parse CSV line (same function as in main app)
         function parseCSVLine(line) {
             const result = [];
@@ -2288,76 +2348,145 @@
             let totalValue = 0;
             let saleCount = 0;
 
-            // Current sale
-            if (property.nhdra_saleprice && property.nhdra_saleprice > 0) {
-                salesData.push({
-                    date: property.nhdra_saledate,
-                    price: property.nhdra_saleprice,
-                    qualified: property.nhdra_qualified || 'N/A',
-                    isCurrent: true
-                });
-                totalValue += property.nhdra_saleprice;
-                saleCount++;
-            }
+            // Get comprehensive sales data from our merged dataset
+            const parcelSales = salesData.get(property.parcel_id) || [];
 
-            // Prior sales
-            const priorSales = [
-                {price: property['nhdra_ID1 Prior Sale Price'], date: property['nhdra_ID1 Prior Sale Date']},
-                {price: property['nhdra_ID2 Prior Sale Price'], date: property['nhdra_ID2 Prior Sale Date']},
-                {price: property['nhdra_ID3 Prior Sale Price'], date: property['nhdra_ID3 Prior Sale Date']}
-            ];
+            // Process sales from comprehensive dataset
+            parcelSales.forEach(sale => {
+                const salePrice = parseFloat(sale.sale_price) || 0;
+                if (salePrice > 0) {
+                    const saleEntry = {
+                        date: sale.sale_date,
+                        price: salePrice,
+                        qualified: sale.qualified || 'N/A',
+                        source: sale.data_source || 'unknown',
+                        strategy_tier: sale.strategy_tier || 'unknown',
+                        deed_type: sale.deed_type || '',
+                        grantor: sale.grantor || '',
+                        grantee: sale.grantee || '',
+                        property_address: sale.property_address || ''
+                    };
 
-            priorSales.forEach((sale, index) => {
-                if (sale.price && sale.price > 0) {
-                    salesData.push({
-                        date: sale.date,
-                        price: sale.price,
-                        qualified: 'Q', // Assume qualified for prior sales
-                        isCurrent: false
-                    });
-                    totalValue += sale.price;
+                    // Mark most recent sale as current
+                    if (salesData.length === 0) {
+                        saleEntry.isCurrent = true;
+                    }
+
+                    salesData.push(saleEntry);
+                    totalValue += salePrice;
                     saleCount++;
                 }
             });
 
-            // Sort by date (most recent first)
-            salesData.sort((a, b) => new Date(b.date) - new Date(a.date));
+            // Fallback to NHDRA data if no comprehensive sales found
+            if (salesData.length === 0) {
+                // Current sale
+                if (property.nhdra_saleprice && parseFloat(property.nhdra_saleprice) > 0) {
+                    salesData.push({
+                        date: property.nhdra_saledate,
+                        price: parseFloat(property.nhdra_saleprice),
+                        qualified: property.nhdra_qualified || 'N/A',
+                        source: 'nhdra_fallback',
+                        isCurrent: true
+                    });
+                    totalValue += parseFloat(property.nhdra_saleprice);
+                    saleCount++;
+                }
 
-            // Populate table
+                // Prior sales
+                const priorSales = [
+                    {price: property['nhdra_ID1 Prior Sale Price'], date: property['nhdra_ID1 Prior Sale Date']},
+                    {price: property['nhdra_ID2 Prior Sale Price'], date: property['nhdra_ID2 Prior Sale Date']},
+                    {price: property['nhdra_ID3 Prior Sale Price'], date: property['nhdra_ID3 Prior Sale Date']}
+                ];
+
+                priorSales.forEach((sale, index) => {
+                    if (sale.price && sale.price > 0) {
+                        salesData.push({
+                            date: sale.date,
+                            price: sale.price,
+                            qualified: 'Q', // Assume qualified for prior sales
+                            source: 'nhdra_fallback',
+                            isCurrent: false
+                        });
+                        totalValue += sale.price;
+                        saleCount++;
+                    }
+                });
+            }
+
+            // Sort by date (most recent first)
+            salesData.sort((a, b) => new Date(b.date || '1900-01-01') - new Date(a.date || '1900-01-01'));
+
+            // Populate table with enhanced information
             salesData.forEach((sale, index) => {
                 const rowClass = sale.isCurrent ? 'current-sale' : '';
                 const timeGap = index < salesData.length - 1 ?
                     calculateTimeGap(sale.date, salesData[index + 1].date) : '';
 
+                // Create detailed tooltip
+                const tooltipInfo = [
+                    `Source: ${sale.source}`,
+                    `Strategy: ${sale.strategy_tier}`,
+                    sale.deed_type ? `Deed Type: ${sale.deed_type}` : '',
+                    sale.grantor ? `Grantor: ${sale.grantor}` : '',
+                    sale.grantee ? `Grantee: ${sale.grantee}` : '',
+                    sale.property_address ? `Address: ${sale.property_address}` : ''
+                ].filter(info => info).join('\n');
+
                 tbody.innerHTML += `
-                    <tr class="${rowClass}">
-                        <td>${formatDate(sale.date)}</td>
-                        <td>$${formatNumber(sale.price)}</td>
-                        <td>${sale.qualified}</td>
-                        <td>${timeGap}</td>
+                    <tr class="${rowClass}" title="${tooltipInfo}">
+                        <td title="${formatDate(sale.date)}">${formatDate(sale.date)}</td>
+                        <td title="$${formatNumber(sale.price)}">$${formatNumber(sale.price)}</td>
+                        <td title="${sale.qualified}">${sale.qualified}</td>
+                        <td title="${timeGap}">${timeGap}</td>
+                        <td title="${sale.source}">${getSourceIcon(sale.source)}</td>
                     </tr>
                 `;
             });
 
-            // Generate analysis
+            // Generate enhanced analysis
             if (salesData.length > 0) {
                 const avgPrice = totalValue / saleCount;
                 const highestSale = Math.max(...salesData.map(s => s.price));
                 const lowestSale = Math.min(...salesData.map(s => s.price));
 
+                // Count sales by source
+                const sourceCounts = {};
+                salesData.forEach(sale => {
+                    sourceCounts[sale.source] = (sourceCounts[sale.source] || 0) + 1;
+                });
+
+                const sourceBreakdown = Object.entries(sourceCounts)
+                    .map(([source, count]) => `${source}: ${count}`)
+                    .join(', ');
+
                 analysisDiv.innerHTML = `
                     <h4>📊 Sales Analysis</h4>
                     <ul>
                         <li><strong>Total Sales:</strong> ${saleCount}</li>
+                        <li><strong>Data Sources:</strong> ${sourceBreakdown}</li>
                         <li><strong>Highest Sale:</strong> $${formatNumber(highestSale)}</li>
                         <li><strong>Lowest Sale:</strong> $${formatNumber(lowestSale)}</li>
                         <li><strong>Average Sale Price:</strong> $${formatNumber(avgPrice)}</li>
                         ${salesData.length > 1 ? `<li><strong>Total Appreciation:</strong> ${calculateAppreciation(salesData)}%</li>` : ''}
                     </ul>
+                    <p><small>💡 Hover over sales for detailed information</small></p>
                 `;
             } else {
                 analysisDiv.innerHTML = '<p>No sales history available for this property.</p>';
             }
+        }
+
+        // Helper function to get source icon
+        function getSourceIcon(source) {
+            const icons = {
+                'annual_combined_2019_2024': '✅',
+                'nhdra_csv_2025': '🆕',
+                'nhdra_csv_historical': '📚',
+                'nhdra_fallback': '⚠️'
+            };
+            return icons[source] || '📄';
         }
 
         function populateAssessmentHistory(property) {
@@ -2518,6 +2647,7 @@
                                     <th>Sale Price</th>
                                     <th>Arms Length</th>
                                     <th>Time Since Last Sale</th>
+                                    <th>Source</th>
                                 </tr>
                             </thead>
                             <tbody id="sales-tbody">
