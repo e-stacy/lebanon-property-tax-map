@@ -988,26 +988,26 @@
             });
         }
         
-        // Load property data
+        // Load property data from CSV
         async function loadPropertyData() {
             try {
-                
+
                 // Load property database
                 const response = await fetch('../data/processed/parcels.csv');
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-                
+
                 const text = await response.text();
-                
+
                 const lines = text.trim().split('\n');
-                
+
                 if (lines.length < 2) {
                     throw new Error('CSV file appears to be empty or malformed');
                 }
-                
+
                 const headers = parseCSVLine(lines[0]);
-                
+
                 const properties = lines.slice(1).map((line, index) => {
                     try {
                         const values = parseCSVLine(line);
@@ -1021,12 +1021,12 @@
                         return null;
                     }
                 }).filter(p => p && p.parcel_id && p.parcel_id.trim());
-                
+
                 // Index properties by parcel ID for quick lookup
                 properties.forEach(prop => {
                     propertyData.set(prop.parcel_id, prop);
                 });
-                
+
                 console.log(`Successfully loaded ${properties.length} properties`);
 
                 // Load sales data
@@ -1039,14 +1039,14 @@
 
                 // Load spatial data
                 loadActualSpatialData(properties);
-                
+
             } catch (error) {
                 console.error('Error loading property data:', error);
                 alert('Error loading property data: ' + error.message);
             }
         }
 
-        // Load sales data
+        // Load sales data from CSV
         async function loadSalesData() {
             try {
                 console.log('Loading sales data...');

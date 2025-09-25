@@ -78,7 +78,7 @@ class WorkingCheckboxFilters {
         if (Array.isArray(propertyData)) {
             // For array data (index page)
             propertyData.forEach(property => {
-                const classCode = property.class_code;
+                const classCode = property['Prop\nCode'] || property.class_code;
                 if (classCode) {
                     classCounts[classCode] = (classCounts[classCode] || 0) + 1;
                 }
@@ -86,7 +86,7 @@ class WorkingCheckboxFilters {
         } else {
             // For Map data (map page)
             propertyData.forEach(property => {
-                const classCode = property.class_code;
+                const classCode = property['Prop\nCode'] || property.class_code;
                 if (classCode) {
                     classCounts[classCode] = (classCounts[classCode] || 0) + 1;
                 }
@@ -186,25 +186,31 @@ class WorkingCheckboxFilters {
         }
         console.log('FILTER DEBUG: Creating Year Built filter for', containerId);
 
-        // Extract and clean year data - using NHDRA year built (most complete available)
+        // Extract and clean year data - check for available year fields
         const years = [];
+        let hasYearData = false;
+
         if (Array.isArray(propertyData)) {
             propertyData.forEach(property => {
-                const yearValue = property['nhdra_vns ayb'];
-                if (yearValue && yearValue !== '0' && yearValue !== '') {
+                // Try multiple possible year fields
+                const yearValue = property['Year Built'] || property['nhdra_vns ayb'] || property['vns ayb'];
+                if (yearValue && yearValue !== '0' && yearValue !== '' && yearValue !== 'NaN') {
                     const year = parseFloat(yearValue);
                     if (year >= 1800 && year <= 2029) {
                         years.push(Math.floor(year));
+                        hasYearData = true;
                     }
                 }
             });
         } else {
             propertyData.forEach(property => {
-                const yearValue = property['nhdra_vns ayb'];
-                if (yearValue && yearValue !== '0' && yearValue !== '') {
+                // Try multiple possible year fields
+                const yearValue = property['Year Built'] || property['nhdra_vns ayb'] || property['vns ayb'];
+                if (yearValue && yearValue !== '0' && yearValue !== '' && yearValue !== 'NaN') {
                     const year = parseFloat(yearValue);
                     if (year >= 1800 && year <= 2029) {
                         years.push(Math.floor(year));
+                        hasYearData = true;
                     }
                 }
             });
@@ -392,16 +398,18 @@ class WorkingCheckboxFilters {
         const zones = [];
         if (Array.isArray(propertyData)) {
             propertyData.forEach(property => {
-                const zoneValue = property['nhdra_lnd zone'];
-                if (zoneValue && zoneValue !== '0' && zoneValue !== '') {
-                    zones.push(zoneValue.trim());
+                // Try multiple possible zoning fields
+                const zoneValue = property['Town\nNotes'] || property['nhdra_lnd zone'] || property['lnd zone'];
+                if (zoneValue && zoneValue !== '0' && zoneValue !== '' && zoneValue !== 'NaN') {
+                    zones.push(String(zoneValue).trim());
                 }
             });
         } else {
             propertyData.forEach(property => {
-                const zoneValue = property['nhdra_lnd zone'];
-                if (zoneValue && zoneValue !== '0' && zoneValue !== '') {
-                    zones.push(zoneValue.trim());
+                // Try multiple possible zoning fields
+                const zoneValue = property['Town\nNotes'] || property['nhdra_lnd zone'] || property['lnd zone'];
+                if (zoneValue && zoneValue !== '0' && zoneValue !== '' && zoneValue !== 'NaN') {
+                    zones.push(String(zoneValue).trim());
                 }
             });
         }
@@ -646,25 +654,27 @@ class WorkingCheckboxFilters {
         const heatingSystems = [];
         if (Array.isArray(propertyData)) {
             propertyData.forEach(property => {
-                const fuelValue = property['nhdra_vns heat fuel desc'];
-                const typeValue = property['nhdra_vns heat type desc'];
-                if (fuelValue && fuelValue !== '0' && fuelValue !== '' && 
-                    typeValue && typeValue !== '0' && typeValue !== '') {
+                // Try multiple possible heating fields
+                const fuelValue = property['Heat Type'] || property['nhdra_vns heat fuel desc'];
+                const typeValue = property['Heat Type'] || property['nhdra_vns heat type desc'];
+                if (fuelValue && fuelValue !== '0' && fuelValue !== '' && fuelValue !== 'NaN' &&
+                    typeValue && typeValue !== '0' && typeValue !== '' && typeValue !== 'NaN') {
                     heatingSystems.push({
-                        fuel: fuelValue.trim(),
-                        type: typeValue.trim()
+                        fuel: String(fuelValue).trim(),
+                        type: String(typeValue).trim()
                     });
                 }
             });
         } else {
             propertyData.forEach(property => {
-                const fuelValue = property['nhdra_vns heat fuel desc'];
-                const typeValue = property['nhdra_vns heat type desc'];
-                if (fuelValue && fuelValue !== '0' && fuelValue !== '' && 
-                    typeValue && typeValue !== '0' && typeValue !== '') {
+                // Try multiple possible heating fields
+                const fuelValue = property['Heat Type'] || property['nhdra_vns heat fuel desc'];
+                const typeValue = property['Heat Type'] || property['nhdra_vns heat type desc'];
+                if (fuelValue && fuelValue !== '0' && fuelValue !== '' && fuelValue !== 'NaN' &&
+                    typeValue && typeValue !== '0' && typeValue !== '' && typeValue !== 'NaN') {
                     heatingSystems.push({
-                        fuel: fuelValue.trim(),
-                        type: typeValue.trim()
+                        fuel: String(fuelValue).trim(),
+                        type: String(typeValue).trim()
                     });
                 }
             });

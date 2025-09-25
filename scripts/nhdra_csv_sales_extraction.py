@@ -15,14 +15,23 @@ def extract_nhdra_csv_sales():
     nhdra_sales = []
 
     try:
-        with open('data/raw/RawData/data/Lebanon/nhdra.csv', 'r', encoding='utf-8') as f:
+        with open('data/raw/city/nhdra.csv', 'r', encoding='utf-8') as f:
             lines = f.readlines()
             headers = lines[1].strip().split(',')  # Second row has actual headers
 
             reader = csv.DictReader(lines[2:], fieldnames=headers)  # Skip first two rows
 
             for row in reader:
-                parcel_id = f"{row.get('rem mblu map', '').strip()}-{row.get('rem mblu block', '').strip()}-{row.get('rem mblu lot', '').strip()}"
+                # Create parcel ID, handling empty/whitespace lot values
+                map_val = row.get('rem mblu map', '').strip()
+                block_val = row.get('rem mblu block', '').strip()
+                lot_val = row.get('rem mblu lot', '').strip()
+
+                # Handle cases where lot is empty or just whitespace
+                if lot_val and lot_val.strip():
+                    parcel_id = f"{map_val}-{block_val}-{lot_val}"
+                else:
+                    parcel_id = f"{map_val}-{block_val}"
 
                 if parcel_id and parcel_id != '--':
                     # Extract all sales for this parcel

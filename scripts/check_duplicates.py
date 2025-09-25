@@ -35,7 +35,7 @@ def check_duplicates():
     # Check original NHDRA data
     print()
     print('Original NHDRA data:')
-    nhdra_df = pd.read_csv('data/raw/RawData/data/Lebanon/nhdra.csv', header=1)
+    nhdra_df = pd.read_csv('data/raw/city/nhdra.csv', header=1)
     nhdra_parcel = nhdra_df[(nhdra_df['rem mblu map'] == '4') &
                            (nhdra_df['rem mblu block'] == '23') &
                            (nhdra_df['rem mblu lot'] == '706')]

@@ -10,7 +10,7 @@ def populate_previous_assessed():
     print("=== POPULATING MISSING PREVIOUS ASSESSED VALUES ===\n")
 
     # Load the enriched sales file
-    sales_file = 'data/processed/sales-data-09-25-25-enriched.xlsx'
+    sales_file = 'data/processed/sales-data-09-25-25.xlsx'
     print(f"Loading sales data: {sales_file}")
     df_sales = pd.read_excel(sales_file)
     print(f"Sales data shape: {df_sales.shape}")
@@ -83,7 +83,7 @@ def populate_previous_assessed():
         print(f"  {source}: {stats['filled']}/{stats['total']} ({pct:.1f}%)")
 
     # Save the updated file
-    output_file = 'data/processed/sales-data-09-25-25-enriched.xlsx'  # Overwrite the existing file
+    output_file = 'data/processed/sales-data-09-25-25.xlsx'  # Overwrite the existing file
     print(f"\nSaving updated file: {output_file}")
 
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:

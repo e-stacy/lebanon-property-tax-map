@@ -1,0 +1,5 @@
+[33m71d3a1e[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Populate missing Previous Assessed values using AHD assessment data
+[33m4090a08[m Enriched historical sales data with parcel information from original NHDRA file
+[33m01f7690[m Created merged sales data file sales-data-09-25-25.xlsx
+[33m88a3c5f[m Created normalized Excel files for NHDRA data comparison
+[33m209a60e[m Fixed phantom sales issue and improved data quality assessment

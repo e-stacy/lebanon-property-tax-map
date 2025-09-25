@@ -17,7 +17,7 @@ def validate_sales_prices():
     nhdra_records_processed = 0
 
     try:
-        with open('data/raw/RawData/data/Lebanon/nhdra.csv', 'r', encoding='utf-8') as f:
+        with open('data/raw/city/nhdra.csv', 'r', encoding='utf-8') as f:
             lines = f.readlines()
             headers = lines[1].strip().split(',')  # Second row has headers
             data_lines = lines[2:]  # Data starts from third row
@@ -57,7 +57,7 @@ def validate_sales_prices():
     separate_records_processed = 0
 
     try:
-        sales_combined = pd.read_excel('data/raw/RawData/data/NHDRA/SalesList_2020-2024_combined.xlsx')
+        sales_combined = pd.read_excel('data/raw/nhdra/SalesList_2020-2024_combined.xlsx')
 
         for _, row in sales_combined.iterrows():
             separate_records_processed += 1

@@ -9,10 +9,10 @@ def analyze_sales_data():
     """Analyze sales data across all Lebanon folder files"""
 
     files_to_check = [
-        'data/raw/RawData/data/Lebanon/parcels.csv',
-        'data/raw/RawData/data/Lebanon/buildings.csv',
-        'data/raw/RawData/data/Lebanon/land.csv',
-        'data/raw/RawData/data/Lebanon/nhdra.csv'
+        'data/raw/city/parcels.csv',
+        'data/raw/city/buildings.csv',
+        'data/raw/city/land.csv',
+        'data/raw/city/nhdra.csv'
     ]
 
     print('=== SALES DATA COMPARISON ACROSS LEBANON FILES ===\n')
@@ -94,7 +94,7 @@ def analyze_sales_data():
     # Compare with the separate sales files
     try:
         import pandas as pd
-        sales_combined = pd.read_excel('data/raw/RawData/data/NHDRA/SalesList_2020-2024_combined.xlsx')
+        sales_combined = pd.read_excel('data/raw/nhdra/SalesList_2020-2024_combined.xlsx')
 
         print(f'Separate NHDRA Sales Files: {len(sales_combined)} records')
 

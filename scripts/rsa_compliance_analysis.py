@@ -79,7 +79,7 @@ def analyze_rsa_compliance():
     print('SALES DATA PROVIDED:')
     try:
         import pandas as pd
-        combined_sales = pd.read_excel('data/raw/RawData/data/NHDRA/SalesList_2020-2024_combined.xlsx')
+        combined_sales = pd.read_excel('data/raw/nhdra/SalesList_2020-2024_combined.xlsx')
         print(f'  Total Sales Records: {len(combined_sales)} (2020-2024)')
         print(f'  Fields per record: {len(combined_sales.columns)}')
         print(f'  Includes: Verified Price, Assessment, Ratio, Property Codes')

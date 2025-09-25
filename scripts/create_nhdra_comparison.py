@@ -12,7 +12,7 @@ def create_nhdra_comparison():
 
     # Read NHDRA original data
     print("Reading original NHDRA CSV...")
-    nhdra_df = pd.read_csv('data/raw/RawData/data/Lebanon/nhdra.csv', header=1)  # Skip first row of unnameds
+    nhdra_df = pd.read_csv('data/raw/city/nhdra.csv', header=1)  # Skip first row of unnameds
     print(f"Loaded {len(nhdra_df)} parcels from NHDRA")
 
     # Read our comprehensive sales data

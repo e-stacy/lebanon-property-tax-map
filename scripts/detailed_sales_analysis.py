@@ -18,7 +18,7 @@ def analyze_sales_discrepancies():
     separate_data = defaultdict(list)
 
     # Load NHDRA
-    with open('data/raw/RawData/data/Lebanon/nhdra.csv', 'r', encoding='utf-8') as f:
+    with open('data/raw/city/nhdra.csv', 'r', encoding='utf-8') as f:
         lines = f.readlines()
         headers = lines[1].strip().split(',')
         data_lines = lines[2:]
@@ -30,7 +30,7 @@ def analyze_sales_discrepancies():
                 nhdra_data[parcel_id] = row
 
     # Load separate sales
-    sales_combined = pd.read_excel('data/raw/RawData/data/NHDRA/SalesList_2020-2024_combined.xlsx')
+    sales_combined = pd.read_excel('data/raw/nhdra/SalesList_2020-2024_combined.xlsx')
     for _, row in sales_combined.iterrows():
         map_lot = str(row['Map\nLot']).strip()
         if map_lot:

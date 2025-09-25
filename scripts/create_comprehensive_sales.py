@@ -12,7 +12,7 @@ def create_comprehensive_sales():
 
     print('=== CREATING COMPREHENSIVE SALES DATABASE ===\n')
 
-    sales_dir = Path('data/raw/RawData/data/NHDRA')
+    sales_dir = Path('data/raw/nhdra')
     annual_files = [
         'SalesList - 2020.xlsx',
         'SalesList - 2021.xlsx',

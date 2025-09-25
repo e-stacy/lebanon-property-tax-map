@@ -15,7 +15,7 @@ def create_nhdra_normalized():
 
     # 1. Process original NHDRA file
     print("Processing original NHDRA CSV...")
-    nhdra_df = pd.read_csv('data/raw/RawData/data/Lebanon/nhdra.csv', header=1)
+    nhdra_df = pd.read_csv('data/raw/city/nhdra.csv', header=1)
     print(f"Loaded {len(nhdra_df)} parcels from NHDRA")
 
     # Create normalized rows for NHDRA

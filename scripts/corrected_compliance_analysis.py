@@ -38,7 +38,7 @@ def corrected_compliance_analysis():
 
     # Check what's in nhdra.csv vs Vision exports
     try:
-        with open('data/raw/RawData/data/Lebanon/nhdra.csv', 'r', encoding='utf-8') as f:
+        with open('data/raw/city/nhdra.csv', 'r', encoding='utf-8') as f:
             lines = f.readlines()
             header_row = lines[1]  # Second row has actual headers
             headers = header_row.strip().split(',')

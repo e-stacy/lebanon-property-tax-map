@@ -28,6 +28,9 @@ Thumbs.db
 dist/
 build/
 
-# Generated/processed data files (large Excel files)
+# Generated/processed data files (large Excel files only)
 data/processed/*.xlsx
-data/processed/*.csv
+# Keep essential CSV and GeoJSON files for GitHub Pages
+!data/processed/parcels.csv
+!data/processed/final_property_sales_dataset.csv
+!data/processed/spatial/

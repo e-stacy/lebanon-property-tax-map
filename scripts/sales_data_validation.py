@@ -17,7 +17,7 @@ def validate_sales_data():
     sales_parcels = set()
 
     try:
-        sales_combined = pd.read_excel('data/raw/RawData/data/NHDRA/SalesList_2020-2024_combined.xlsx')
+        sales_combined = pd.read_excel('data/raw/nhdra/SalesList_2020-2024_combined.xlsx')
         print(f'Separate Sales Files: {len(sales_combined)} records')
 
         # Get unique parcel identifiers from sales files
@@ -38,7 +38,7 @@ def validate_sales_data():
     nhdra_parcels = set()
 
     try:
-        with open('data/raw/RawData/data/Lebanon/nhdra.csv', 'r', encoding='utf-8') as f:
+        with open('data/raw/city/nhdra.csv', 'r', encoding='utf-8') as f:
             lines = f.readlines()
             headers = lines[1].strip().split(',')  # Second row has headers
             data_lines = lines[2:]  # Data starts from third row

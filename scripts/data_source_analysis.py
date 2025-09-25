@@ -110,10 +110,10 @@ def analyze_data_sources():
 
     # File paths
     files = {
-        'parcel_master': 'data/raw/RawData/Parcel Master Export.csv',
-        'building': 'data/raw/RawData/Building Export.csv',
-        'land': 'data/raw/RawData/Land Export.csv',
-        'nhdra': 'data/raw/RawData/data/Lebanon/nhdra.csv',
+        'parcel_master': 'data/raw/city/Parcel Master Export.csv',
+        'building': 'data/raw/city/Building Export.csv',
+        'land': 'data/raw/city/Land Export.csv',
+        'nhdra': 'data/raw/city/nhdra.csv',
         'final': 'data/processed/parcels.csv'
     }
 

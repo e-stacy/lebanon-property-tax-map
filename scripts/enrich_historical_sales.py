@@ -16,7 +16,7 @@ def enrich_historical_sales():
     print(f"Merged file shape: {df_merged.shape}")
 
     # Load original NHDRA data
-    nhdra_file = 'data/raw/RawData/data/Lebanon/nhdra.csv'
+    nhdra_file = 'data/raw/city/nhdra.csv'
     print(f"\nLoading original NHDRA: {nhdra_file}")
     df_nhdra = pd.read_csv(nhdra_file, header=1)
     print(f"NHDRA shape: {df_nhdra.shape}")
@@ -62,11 +62,13 @@ def enrich_historical_sales():
     # Field mapping from NHDRA to merged file (parcel-level only)
     field_mapping = {
         'Address': 'address',
-        'Acres': 'acres',
-        'Prop\nCode': 'prop_code',
-        'Current\nAssed': 'current_assed',
-        'Grantor': 'owner_name',  # Owner name could be used for grantor if no sale-specific data
-        'Town\nNotes': 'land_zone'  # Zone info in town notes
+        'Acres': 'prc ttl lnd area acres',
+        'Prop\nCode': 'rem use code',
+        'Current\nAssed': 'prc ttl assess',
+        'Grantor': 'own name',  # Owner name could be used for grantor if no sale-specific data
+        'Town\nNotes': 'lnd zone',  # Zoning code
+        'Year Built': 'vns ayb',  # Year built for filtering
+        'Heat Type': 'vns heat type desc'  # Heating type for filtering
     }
 
     print("\nField mapping for enrichment:")
@@ -96,7 +98,7 @@ def enrich_historical_sales():
     print(f"Total field updates made: {updated_count}")
 
     # Save updated file
-    output_file = 'data/processed/sales-data-09-25-25-enriched.xlsx'
+    output_file = 'data/processed/sales-data-09-25-25.xlsx'
     print(f"\nSaving enriched file: {output_file}")
 
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
