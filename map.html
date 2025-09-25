@@ -566,6 +566,16 @@
                         <td style="padding: 2px 4px; text-align: right;">$<span id="median-value">0</span></td>
                         <td style="padding: 2px 4px; text-align: right;"><span id="median-percentage">0%</span></td>
                     </tr>
+                    <tr>
+                        <td style="padding: 2px 4px;">Median Age</td>
+                        <td style="padding: 2px 4px; text-align: right;"><span id="median-age">0</span> years</td>
+                        <td style="padding: 2px 4px; text-align: right;"><span id="age-ratio">0%</span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 2px 4px;">Land Area</td>
+                        <td style="padding: 2px 4px; text-align: right;"><span id="land-area">0</span> acres</td>
+                        <td style="padding: 2px 4px; text-align: right;"><span id="land-percentage">0%</span></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -1805,13 +1815,15 @@
         // Calculate total value for all properties (once)
         let allPropertiesTotal = 0;
         let allPropertiesCount = 0;
-        
+        let allPropertiesLandArea = 0;
+
         function calculateTotalValue() {
             if (allPropertiesTotal > 0) return; // Already calculated
-            
+
             for (const [id, prop] of propertyData) {
                 allPropertiesTotal += parseFloat(prop.total_value) || 0;
                 allPropertiesCount++;
+                allPropertiesLandArea += parseFloat(prop.lot_size_acres) || 0;
             }
             
             // Update total value section
@@ -1837,30 +1849,43 @@
         // Update statistics
         function updateStats() {
             calculateTotalValue();
-            
-            // Calculate stats based on current filters, not just visible parcels
-            let visibleCount = 0;
-            let totalValue = 0;
-            
+
             // Check if any filters are applied
             const selectedClasses = getSelectedValues('class-filter');
             const selectedYears = getSelectedValues('year-filter');
-            const selectedZones = getSelectedValues('zoning-filter');  
+            const selectedZones = getSelectedValues('zoning-filter');
             const selectedHeating = getSelectedValues('heating-filter');
             const minValue = document.getElementById('min-value').value;
             const maxValue = document.getElementById('max-value').value;
             const hasFilters = selectedClasses.length > 0 || selectedYears.length > 0 || selectedZones.length > 0 || selectedHeating.length > 0 || minValue || maxValue;
-            
+
+            // Calculate stats based on current filters, not just visible parcels
+            let visibleCount = 0;
+            let totalValue = 0;
+            let landArea = 0;
+            let values = [];
+            let ages = [];
+
             if (!hasFilters) {
                 // No filters applied - show total statistics
                 visibleCount = propertyData.size;
                 totalValue = allPropertiesTotal; // Use pre-calculated city total
+                landArea = allPropertiesLandArea; // Use pre-calculated land area
             } else {
-                // Filters applied - calculate filtered statistics
+                // Filters applied - calculate filtered statistics in single pass
                 for (const [id, prop] of propertyData) {
                     if (passesFilters(prop)) {
                         visibleCount++;
                         totalValue += parseFloat(prop.total_value) || 0;
+                        landArea += parseFloat(prop.lot_size_acres) || 0;
+
+                        // Collect values and ages for median calculations
+                        const value = parseFloat(prop.total_value) || 0;
+                        if (value > 0) values.push(value);
+
+                        const year = parseFloat(prop['nhdra_vns ayb']);
+                        const age = year > 1800 && year <= 2025 ? 2025 - year : null;
+                        if (age !== null) ages.push(age);
                     }
                 }
             }
@@ -1875,17 +1900,30 @@
                     .sort((a, b) => a - b);
                 medianValue = allValues.length > 0 ? allValues[Math.floor(allValues.length / 2)] : 0;
             } else {
-                // Filters applied - calculate filtered median
-                if (visibleCount > 0) {
-                    const values = [];
-                    for (const [id, prop] of propertyData) {
-                        if (passesFilters(prop)) {
-                            const value = parseFloat(prop.total_value) || 0;
-                            if (value > 0) values.push(value);
-                        }
-                    }
+                // Filters applied - use pre-collected values
+                if (values.length > 0) {
                     values.sort((a, b) => a - b);
-                    medianValue = values.length > 0 ? values[Math.floor(values.length / 2)] : 0;
+                    medianValue = values[Math.floor(values.length / 2)];
+                }
+            }
+
+            // Calculate median age
+            let medianAge = 0;
+            if (!hasFilters) {
+                // No filters - use city-wide median age
+                const allAges = [...propertyData.values()]
+                    .map(p => {
+                        const year = parseFloat(p['nhdra_vns ayb']);
+                        return year > 1800 && year <= 2025 ? 2025 - year : null;
+                    })
+                    .filter(age => age !== null)
+                    .sort((a, b) => a - b);
+                medianAge = allAges.length > 0 ? allAges[Math.floor(allAges.length / 2)] : 0;
+            } else {
+                // Filters applied - use pre-collected ages
+                if (ages.length > 0) {
+                    ages.sort((a, b) => a - b);
+                    medianAge = ages[Math.floor(ages.length / 2)];
                 }
             }
             const percentage = allPropertiesTotal > 0 ? (totalValue / allPropertiesTotal * 100) : 0;
@@ -1917,17 +1955,37 @@
             // Calculate all percentages
             const parcelPercentage = !hasFilters ? 100 : (allPropertiesCount > 0 ? (visibleCount / allPropertiesCount * 100) : 0);
             const valuePercentage = !hasFilters ? 100 : (allPropertiesTotal > 0 ? (totalValue / allPropertiesTotal * 100) : 0);
-            // Get all values for median calculation
+
+            // Calculate median percentages (cached for performance)
             const allPropValues = [...propertyData.values()]
                 .map(p => parseFloat(p.total_value) || 0)
                 .filter(v => v > 0)
                 .sort((a, b) => a - b);
             const allMedianValue = allPropValues.length > 0 ? allPropValues[Math.floor(allPropValues.length / 2)] : 0;
             const medianPercentage = !hasFilters ? 100 : (allMedianValue > 0 ? (medianValue / allMedianValue * 100) : 0);
-            
+
+            // Calculate median age percentage/ratio (cached for performance)
+            const allAges = [...propertyData.values()]
+                .map(p => {
+                    const year = parseFloat(p['nhdra_vns ayb']);
+                    return year > 1800 && year <= 2025 ? 2025 - year : null;
+                })
+                .filter(age => age !== null)
+                .sort((a, b) => a - b);
+            const allMedianAge = allAges.length > 0 ? allAges[Math.floor(allAges.length / 2)] : 0;
+            const ageRatio = !hasFilters ? 100 : (allMedianAge > 0 ? (medianAge / allMedianAge * 100) : 0);
+
+            // Calculate land area percentage (using pre-calculated totals)
+            const landPercentage = !hasFilters ? 100 : (allPropertiesLandArea > 0 ? (landArea / allPropertiesLandArea * 100) : 0);
+
+            // Update display elements
             document.getElementById('parcel-percentage').textContent = parcelPercentage.toFixed(1) + '%';
             document.getElementById('value-percentage').textContent = valuePercentage.toFixed(1) + '%';
             document.getElementById('median-percentage').textContent = medianPercentage.toFixed(1) + '%';
+            document.getElementById('median-age').textContent = medianAge.toFixed(0);
+            document.getElementById('age-ratio').textContent = ageRatio.toFixed(1) + '%';
+            document.getElementById('land-area').textContent = formatLargeNumber(landArea);
+            document.getElementById('land-percentage').textContent = landPercentage.toFixed(1) + '%';
         }
         
         // Apply filters
