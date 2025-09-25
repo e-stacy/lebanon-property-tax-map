@@ -98,55 +98,99 @@ def create_nhdra_comparison():
                 'data_quality_notes': 'Comprehensive sales data from multiple sources'
             }
 
-            # Create truly comprehensive sales data:
-            # 1. Start with our merged comprehensive dataset (highest quality)
-            # 2. Add any additional sales from original NHDRA that aren't already included
-            comprehensive_sales = sales_by_parcel.get(parcel_id, []).copy()
+            # Create truly comprehensive sales data by combining ALL sources
+            # Start with original NHDRA data as foundation, then add enhancements
+            all_sales = []
 
-            # Add original NHDRA sales that aren't in our comprehensive data
-            original_sales = []
-            nhdra_current = {
-                'sale_price': nhdra_row.get('saleprice'),
-                'sale_date': nhdra_row.get('saledate'),
-                'qualified': nhdra_row.get('qualified'),
-                'book_page': nhdra_row.get('book pg'),
-                'source': 'original_nhdra_fallback'
-            }
-            if nhdra_current['sale_price'] and float(nhdra_current['sale_price']) > 0:
-                original_sales.append(nhdra_current)
+            # Add ALL original NHDRA sales first (they include metadata like book_page)
+            # Current sale - include even if $0 as it represents a transaction
+            current_price = nhdra_row.get('saleprice')
+            if current_price is not None and str(current_price).strip():
+                try:
+                    price_val = float(current_price)
+                    all_sales.append({
+                        'sale_price': price_val,
+                        'sale_date': nhdra_row.get('saledate'),
+                        'qualified': nhdra_row.get('qualified', 'Q'),
+                        'book_page': nhdra_row.get('book pg', ''),
+                        'source': 'original_nhdra_current'
+                    })
+                except (ValueError, TypeError):
+                    pass  # Skip invalid prices
 
-            # Add prior sales from original NHDRA
+            # Prior sales - include even if $0 as they represent transaction history
             for i in range(1, 4):
-                prior_sale = {
-                    'sale_price': nhdra_row.get(f'ID{i} Prior Sale Price'),
-                    'sale_date': nhdra_row.get(f'ID{i} Prior Sale Date'),
-                    'qualified': 'Q',  # Assume qualified for prior sales
-                    'book_page': nhdra_row.get(f'ID{i} Prior Book Page'),
-                    'source': 'original_nhdra_fallback'
-                }
-                if prior_sale['sale_price'] and float(prior_sale['sale_price']) > 0:
-                    original_sales.append(prior_sale)
+                price_field = f'ID{i} Prior Sale Price'
+                date_field = f'ID{i} Prior Sale Date'
+                book_field = f'ID{i} Prior Book Page'
 
-            # Merge: Add original sales that don't conflict with comprehensive data
-            for orig_sale in original_sales:
-                # Check if this sale already exists in comprehensive data (by date and price)
-                exists = any(
-                    abs(float(comp_sale['sale_price']) - float(orig_sale['sale_price'])) < 1 and
-                    str(comp_sale['sale_date']).split(' ')[0] == str(orig_sale['sale_date']).split(' ')[0]
-                    for comp_sale in comprehensive_sales
-                    if comp_sale['sale_price'] and orig_sale['sale_price']
-                )
-                if not exists:
-                    comprehensive_sales.append(orig_sale)
+                price = nhdra_row.get(price_field)
+                if price is not None and str(price).strip():
+                    try:
+                        price_val = float(price)
+                        all_sales.append({
+                            'sale_price': price_val,
+                            'sale_date': nhdra_row.get(date_field),
+                            'qualified': 'Q',  # Prior sales typically qualified
+                            'book_page': nhdra_row.get(book_field, ''),
+                            'source': f'original_nhdra_prior{i}'
+                        })
+                    except (ValueError, TypeError):
+                        pass  # Skip invalid prices
 
-            # Sort all sales by date (most recent first)
+            # Add our merged comprehensive data as enhancements (only if they add new information)
+            merged_sales = sales_by_parcel.get(parcel_id, [])
+            for sale in merged_sales:
+                sale_price = sale.get('sale_price')
+                if pd.notna(sale_price) and sale_price > 0:
+                    # Check if this sale already exists in our collection
+                    exists = any(
+                        abs(float(sale_price) - float(existing['sale_price'])) < 1 and
+                        str(sale['sale_date']).split(' ')[0] == str(existing['sale_date']).split(' ')[0]
+                        for existing in all_sales
+                        if existing['sale_price'] > 0  # Only compare with non-zero prices
+                    )
+                    if not exists:
+                        all_sales.append({
+                            'sale_price': float(sale_price),
+                            'sale_date': sale.get('sale_date'),
+                            'qualified': sale.get('qualified', 'Q'),
+                            'book_page': sale.get('book_page', ''),  # May be empty for recent sales
+                            'source': sale.get('data_source', 'comprehensive_merged')
+                        })
+
+            # Remove duplicates more intelligently
+            # Consider sales duplicates if they have the same date and price is very close
+            unique_sales = []
+            for sale in all_sales:
+                if pd.isna(sale['sale_date']):
+                    continue  # Skip sales without dates
+
+                sale_date = str(sale['sale_date']).split(' ')[0]
+                sale_price = sale['sale_price']
+
+                is_duplicate = False
+                for existing in unique_sales:
+                    existing_date = str(existing['sale_date']).split(' ')[0]
+                    existing_price = existing['sale_price']
+
+                    # Same date and price difference < $1 = duplicate
+                    if (sale_date == existing_date and
+                        abs(float(sale_price) - float(existing_price)) < 1):
+                        is_duplicate = True
+                        break
+
+                if not is_duplicate:
+                    unique_sales.append(sale)
+
+            # Sort by date (most recent first)
             def safe_date_sort(sale):
                 date_val = sale.get('sale_date')
                 if pd.isna(date_val) or date_val is None:
                     return '1900-01-01'
                 return str(date_val).split(' ')[0]
 
-            comprehensive_sales.sort(key=safe_date_sort, reverse=True)
+            comprehensive_sales = sorted(unique_sales, key=safe_date_sort, reverse=True)
 
             # Fill in the 4 sales slots with truly comprehensive data
             for i, sale in enumerate(comprehensive_sales[:4]):  # Take up to 4 most recent sales
