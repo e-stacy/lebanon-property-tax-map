@@ -5,6 +5,17 @@
 
 // Property class hierarchy with parent-child relationships
 const PROPERTY_CLASS_HIERARCHY = {
+    // 01xx - Early Classes
+    '013R': { name: 'Residential Rural', primary: true },
+
+    // 03xx - Agricultural
+    '0310': { name: 'Agricultural Other', primary: true },
+    '031R': { name: 'Agricultural Rural', primary: true },
+
+    // 04xx - Special
+    '0430': { name: 'Special Use', primary: true },
+
+    // 10xx - Residential
     '1010': {
         name: 'Residential Single Family',
         primary: true,
@@ -14,7 +25,7 @@ const PROPERTY_CLASS_HIERARCHY = {
     '101A': { name: 'Residential Accessory', parent: '1010' },
     '101C': { name: 'Residential Commercial', parent: '1010' },
     '101T': { name: 'Residential Temp', parent: '1010' },
-    
+
     '1020': {
         name: 'Manufactured Housing',
         primary: true,
@@ -22,39 +33,250 @@ const PROPERTY_CLASS_HIERARCHY = {
     },
     '102C': { name: 'Manufactured Commercial', parent: '1020' },
     '102V': { name: 'Manufactured Village', parent: '1020' },
-    
+
     '1030': {
         name: 'Condominium',
         primary: true,
         subclasses: ['103V']
     },
     '103V': { name: 'Condo Village', parent: '1030' },
-    
+
     '1040': { name: 'Multi-Family 2-4 Units', primary: true },
     '1050': { name: 'Multi-Family 5+ Units', primary: true },
     '1060': { name: 'Multi-Family Other', primary: true },
     '1090': { name: 'Residential Other', primary: true },
-    
+
+    // 11xx - Hospitality
     '1100': { name: 'Dormitory', primary: true },
-    '1110': { name: 'Hotel/Motel', primary: true },
-    '111C': { name: 'Hotel Commercial', primary: true },
-    '1120': { name: 'Resort', primary: true },
-    '112C': { name: 'Resort Commercial', primary: true },
-    
+    '1110': {
+        name: 'Hotel/Motel',
+        primary: true,
+        subclasses: ['111C']
+    },
+    '111C': { name: 'Hotel Commercial', parent: '1110' },
+    '1120': {
+        name: 'Resort',
+        primary: true,
+        subclasses: ['112C']
+    },
+    '112C': { name: 'Resort Commercial', parent: '1120' },
+
+    // 12xx - Commercial
+    '1210': { name: 'Commercial Other', primary: true },
+
+    // 13xx - Vacant Land
     '1300': { name: 'Vacant Residential Land', primary: true },
     '1310': { name: 'Vacant Commercial Land', primary: true },
     '1320': { name: 'Vacant Industrial Land', primary: true },
-    
+
+    // 30xx - Agricultural
     '3000': { name: 'Agricultural', primary: true },
-    '3160': { name: 'Forest Land', primary: true },
-    '3250': { name: 'Open Space/Recreation', primary: true },
-    '3400': { name: 'Other Exempt', primary: true },
-    
+    '3010': { name: 'Agricultural Other', primary: true },
+    '301R': { name: 'Agricultural Rural', primary: true },
+    '3040': { name: 'Farmstead', primary: true },
+    '3050': { name: 'Farm Other', primary: true },
+
+    // 31xx - Forest/Open Space
+    '3110': { name: 'Forest Managed', primary: true },
+    '313C': { name: 'Forest Commercial', primary: true },
+    '3140': { name: 'Forest Other', primary: true },
+    '3160': {
+        name: 'Forest Land',
+        primary: true,
+        subclasses: ['316C']
+    },
+    '316C': { name: 'Forest Conservation', parent: '3160' },
+
+    // 32xx - Open Space/Recreation
+    '3230': { name: 'Recreation Other', primary: true },
+    '323I': { name: 'Recreation Institutional', primary: true },
+    '3240': { name: 'Open Space Other', primary: true },
+    '3250': {
+        name: 'Open Space/Recreation',
+        primary: true,
+        subclasses: ['325I', '325R', '325V']
+    },
+    '325I': { name: 'Open Space Institutional', parent: '3250' },
+    '325R': { name: 'Open Space Rural', parent: '3250' },
+    '325V': { name: 'Open Space Village', parent: '3250' },
+    '3260': { name: 'Park/Recreation', primary: true },
+    '3270': { name: 'Conservation Other', primary: true },
+
+    // 33xx - Exempt
+    '3300': { name: 'Exempt Other', primary: true },
+    '3310': { name: 'Exempt Institutional', primary: true },
+    '3320': { name: 'Exempt Religious', primary: true },
+    '332I': { name: 'Exempt Religious Institutional', primary: true },
+    '3330': { name: 'Exempt Educational', primary: true },
+    '333V': { name: 'Exempt Educational Village', primary: true },
+    '3340': { name: 'Exempt Charitable', primary: true },
+    '3350': { name: 'Exempt Hospital', primary: true },
+    '3370': { name: 'Exempt Cemetery', primary: true },
+    '3380': { name: 'Exempt Other', primary: true },
+
+    // 34xx - Other Exempt
+    '3400': {
+        name: 'Other Exempt',
+        primary: true,
+        subclasses: ['340I', '340R', '3410', '3420', '342R', '3430']
+    },
+    '340I': { name: 'Exempt Institutional', parent: '3400' },
+    '340R': { name: 'Exempt Rural', parent: '3400' },
+    '3410': { name: 'Exempt Historical', parent: '3400' },
+    '3420': { name: 'Exempt Cultural', parent: '3400' },
+    '342R': { name: 'Exempt Cultural Rural', parent: '3400' },
+    '3430': { name: 'Exempt Other', parent: '3400' },
+
+    // 35xx - Special Exempt
+    '3520': { name: 'Exempt Veterans', primary: true },
+    '3530': { name: 'Exempt Disabled', primary: true },
+    '3540': { name: 'Exempt Senior', primary: true },
+    '354C': { name: 'Exempt Senior Commercial', primary: true },
+    '3550': { name: 'Exempt Low Income', primary: true },
+    '3560': { name: 'Exempt Other', primary: true },
+
+    // 37xx-38xx - Special
+    '3740': { name: 'Historic District', primary: true },
+    '3800': { name: 'Brownfield', primary: true },
+    '3830': { name: 'Enterprise Zone', primary: true },
+    '3850': { name: 'Revolving Loan', primary: true },
+    '386C': { name: 'Revolving Loan Commercial', primary: true },
+    '3880': { name: 'Other Incentive', primary: true },
+
+    // 39xx - Conservation
+    '3900': { name: 'Conservation Easement', primary: true },
+    '3910': { name: 'Conservation Other', primary: true },
+    '3920': { name: 'Land Trust', primary: true },
+
+    // 40xx - Commercial
+    '4000': {
+        name: 'Commercial General',
+        primary: true,
+        subclasses: ['400C', '4010', '401V', '4020', '402C', '4040']
+    },
+    '400C': { name: 'Commercial General Condo', parent: '4000' },
+    '4010': { name: 'Commercial Office', parent: '4000' },
+    '401V': { name: 'Commercial Office Village', parent: '4000' },
+    '4020': { name: 'Commercial Retail', parent: '4000' },
+    '402C': { name: 'Commercial Retail Condo', parent: '4000' },
+    '4040': { name: 'Commercial Mixed Use', parent: '4000' },
+
+    // 41xx - Industrial Light
+    '4100': {
+        name: 'Industrial Light',
+        primary: true,
+        subclasses: ['410V', '4120']
+    },
+    '410V': { name: 'Industrial Light Village', parent: '4100' },
+    '4120': { name: 'Industrial Flex', parent: '4100' },
+
+    // 42xx - Special Commercial
+    '4270': { name: 'Commercial Special', primary: true },
+
+    // 43xx - Industrial Heavy
+    '4300': {
+        name: 'Industrial Heavy',
+        primary: true,
+        subclasses: ['430V', '4310', '4320', '433C']
+    },
+    '430V': { name: 'Industrial Heavy Village', parent: '4300' },
+    '4310': { name: 'Industrial Warehouse', parent: '4300' },
+    '4320': { name: 'Industrial Manufacturing', parent: '4300' },
+    '433C': { name: 'Industrial Manufacturing Commercial', parent: '4300' },
+
+    // 44xx - Commercial Other
+    '4400': {
+        name: 'Commercial Other',
+        primary: true,
+        subclasses: ['4410', '4420', '442C', '4440']
+    },
+    '4410': { name: 'Commercial Service', parent: '4400' },
+    '4420': { name: 'Commercial Automotive', parent: '4400' },
+    '442C': { name: 'Commercial Automotive Condo', parent: '4400' },
+    '4440': { name: 'Commercial Other', parent: '4400' },
+
+    // 45xx - Commercial Special
+    '4500': {
+        name: 'Commercial Special',
+        primary: true,
+        subclasses: ['450C', '450I']
+    },
+    '450C': { name: 'Commercial Special Condo', parent: '4500' },
+    '450I': { name: 'Commercial Special Institutional', parent: '4500' },
+
+    // 60xx - Utility
+    '6000': { name: 'Utility Electric', primary: true },
+    '6001': { name: 'Utility Electric Transmission', primary: true },
+
+    // 61xx - Utility Other
+    '6100': { name: 'Utility Water', primary: true },
+    '6110': { name: 'Utility Sewer', primary: true },
+    '6111': { name: 'Utility Sewer Treatment', primary: true },
+    '6120': { name: 'Utility Gas', primary: true },
+    '6121': { name: 'Utility Gas Distribution', primary: true },
+    '6131': { name: 'Utility Telecom', primary: true },
+
+    // 62xx - Utility Infrastructure
+    '6200': { name: 'Utility Other', primary: true },
+    '6201': { name: 'Utility Pipeline', primary: true },
+    '6210': { name: 'Utility Rail', primary: true },
+    '6211': { name: 'Utility Rail Freight', primary: true },
+    '6220': { name: 'Utility Airport', primary: true },
+    '6221': { name: 'Utility Airport Commercial', primary: true },
+    '6230': { name: 'Utility Other', primary: true },
     '6231': { name: 'Utility - Gas', primary: true },
-    
-    '9010': { name: 'State Property', primary: true },
-    '9030': { name: 'Municipal Property', primary: true },
-    '9090': { name: 'Other Government', primary: true }
+
+    // 90xx - Government
+    '9000': { name: 'Government Federal', primary: true },
+    '900I': { name: 'Government Federal Institutional', primary: true },
+    '9010': {
+        name: 'State Property',
+        primary: true,
+        subclasses: ['901C', '901I']
+    },
+    '901C': { name: 'State Commercial', parent: '9010' },
+    '901I': { name: 'State Institutional', parent: '9010' },
+
+    '9030': {
+        name: 'Municipal Property',
+        primary: true,
+        subclasses: ['903C', '903I', '903R']
+    },
+    '903C': { name: 'Municipal Commercial', parent: '9030' },
+    '903I': { name: 'Municipal Institutional', parent: '9030' },
+    '903R': { name: 'Municipal Rural', parent: '9030' },
+
+    '9040': { name: 'School Property', primary: true },
+    '9050': { name: 'County Property', primary: true },
+    '905I': { name: 'County Institutional', primary: true },
+    '905R': { name: 'County Rural', primary: true },
+    '905V': { name: 'County Village', primary: true },
+    '9060': { name: 'Fire District', primary: true },
+    '906R': { name: 'Fire District Rural', primary: true },
+    '9080': { name: 'Library', primary: true },
+    '908R': { name: 'Library Rural', primary: true },
+    '9090': { name: 'Other Government', primary: true },
+
+    // 91xx - Special Government
+    '9130': {
+        name: 'Government Special',
+        primary: true,
+        subclasses: ['913C', '9150']
+    },
+    '913C': { name: 'Government Special Commercial', parent: '9130' },
+    '9150': { name: 'Government Other', parent: '9130' },
+
+    // 92xx - Government Other
+    '9200': { name: 'Government Utility', primary: true },
+
+    // 95xx - Tax Exempt
+    '9550': { name: 'Tax Exempt Other', primary: true },
+
+    // 97xx - Government Rural
+    '9700': { name: 'Government Rural', primary: true },
+    '9730': { name: 'Government Rural Other', primary: true },
+    '9740': { name: 'Government Rural Utility', primary: true },
+    '9780': { name: 'Government Rural Other', primary: true }
 };
 
 class WorkingCheckboxFilters {
