@@ -849,8 +849,8 @@
         .modal-content {
             background: white;
             border-radius: 8px;
-            width: 600px !important;
-            max-width: 90vw !important;
+            width: 800px !important;
+            max-width: 95vw !important;
             max-height: 90vh !important;
             overflow-y: auto !important;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
@@ -1070,7 +1070,7 @@
             background: #f8f9fa !important;
             font-weight: 600 !important;
             color: #2c3e50 !important;
-            font-size: 0.8em !important;
+            font-size: 0.85em !important;
         }
 
         /* EXTREME COLUMN CONSTRAINTS - NO SCROLL ALLOWED */
@@ -1082,9 +1082,9 @@
             width: auto !important;
             white-space: nowrap !important;
             overflow: hidden !important;
-            text-overflow: clip !important; /* Harsh clipping */
+            text-overflow: ellipsis !important; /* Show ... for truncated text */
             padding: 8px 6px !important;
-            font-size: 0.75em !important;
+            font-size: 0.8em !important;
         }
 
         .modal-table.sales-table th:nth-child(1),
@@ -1114,13 +1114,13 @@
         .modal-table.assessment-table th:nth-child(4),
         .modal-table.assessment-table td:nth-child(4) { width: 55px !important; }
 
-        /* FORCE NO HORIZONTAL SCROLL - CONTAIN TABLES */
+        /* ALLOW HORIZONTAL SCROLL FOR WIDER TABLES */
         .modal .table-container {
-            overflow-x: hidden !important;
+            overflow-x: auto !important;
             overflow-y: auto !important;
             max-width: 100% !important;
             width: 100% !important;
-            min-width: 0 !important;
+            min-width: 400px !important;
         }
 
 
