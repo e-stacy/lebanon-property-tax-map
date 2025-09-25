@@ -1111,7 +1111,11 @@
                     map.removeLayer(parcelsLayer);
                     
                     // Add parcels with proper coloring
-                    updateParcelLayer();
+                    // Small delay to ensure DOM and checkbox state are ready
+                    setTimeout(() => {
+                        updateParcelLayer();
+                        updateLegend();
+                    }, 500);
                     
                 } else {
                     throw new Error('No features found in GeoJSON data');
@@ -2086,7 +2090,7 @@
         document.getElementById('show-labels').addEventListener('change', toggleMapLabels);
         document.getElementById('show-values').addEventListener('change', toggleMapLabels);
         document.getElementById('transparent-colors').addEventListener('change', updateParcelLayer);
-        
+
         // Initialize map when page loads
         document.addEventListener('DOMContentLoaded', initMap);
     </script>
