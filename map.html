@@ -2344,7 +2344,7 @@
             const analysisDiv = document.getElementById('sales-analysis');
 
             tbody.innerHTML = '';
-            let salesData = [];
+            let localSalesData = [];
             let totalValue = 0;
             let saleCount = 0;
 
@@ -2368,21 +2368,21 @@
                     };
 
                     // Mark most recent sale as current
-                    if (salesData.length === 0) {
+                    if (localSalesData.length === 0) {
                         saleEntry.isCurrent = true;
                     }
 
-                    salesData.push(saleEntry);
+                    localSalesData.push(saleEntry);
                     totalValue += salePrice;
                     saleCount++;
                 }
             });
 
             // Fallback to NHDRA data if no comprehensive sales found
-            if (salesData.length === 0) {
+            if (localSalesData.length === 0) {
                 // Current sale
                 if (property.nhdra_saleprice && parseFloat(property.nhdra_saleprice) > 0) {
-                    salesData.push({
+                    localSalesData.push({
                         date: property.nhdra_saledate,
                         price: parseFloat(property.nhdra_saleprice),
                         qualified: property.nhdra_qualified || 'N/A',
@@ -2402,7 +2402,7 @@
 
                 priorSales.forEach((sale, index) => {
                     if (sale.price && sale.price > 0) {
-                        salesData.push({
+                        localSalesData.push({
                             date: sale.date,
                             price: sale.price,
                             qualified: 'Q', // Assume qualified for prior sales
@@ -2416,13 +2416,13 @@
             }
 
             // Sort by date (most recent first)
-            salesData.sort((a, b) => new Date(b.date || '1900-01-01') - new Date(a.date || '1900-01-01'));
+            localSalesData.sort((a, b) => new Date(b.date || '1900-01-01') - new Date(a.date || '1900-01-01'));
 
             // Populate table with enhanced information
-            salesData.forEach((sale, index) => {
+            localSalesData.forEach((sale, index) => {
                 const rowClass = sale.isCurrent ? 'current-sale' : '';
-                const timeGap = index < salesData.length - 1 ?
-                    calculateTimeGap(sale.date, salesData[index + 1].date) : '';
+                const timeGap = index < localSalesData.length - 1 ?
+                    calculateTimeGap(sale.date, localSalesData[index + 1].date) : '';
 
                 // Create detailed tooltip
                 const tooltipInfo = [
@@ -2446,14 +2446,14 @@
             });
 
             // Generate enhanced analysis
-            if (salesData.length > 0) {
+            if (localSalesData.length > 0) {
                 const avgPrice = totalValue / saleCount;
-                const highestSale = Math.max(...salesData.map(s => s.price));
-                const lowestSale = Math.min(...salesData.map(s => s.price));
+                const highestSale = Math.max(...localSalesData.map(s => s.price));
+                const lowestSale = Math.min(...localSalesData.map(s => s.price));
 
                 // Count sales by source
                 const sourceCounts = {};
-                salesData.forEach(sale => {
+                localSalesData.forEach(sale => {
                     sourceCounts[sale.source] = (sourceCounts[sale.source] || 0) + 1;
                 });
 
@@ -2469,7 +2469,7 @@
                         <li><strong>Highest Sale:</strong> $${formatNumber(highestSale)}</li>
                         <li><strong>Lowest Sale:</strong> $${formatNumber(lowestSale)}</li>
                         <li><strong>Average Sale Price:</strong> $${formatNumber(avgPrice)}</li>
-                        ${salesData.length > 1 ? `<li><strong>Total Appreciation:</strong> ${calculateAppreciation(salesData)}%</li>` : ''}
+                        ${localSalesData.length > 1 ? `<li><strong>Total Appreciation:</strong> ${calculateAppreciation(localSalesData)}%</li>` : ''}
                     </ul>
                     <p><small>💡 Hover over sales for detailed information</small></p>
                 `;
