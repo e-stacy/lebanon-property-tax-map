@@ -121,7 +121,7 @@ def create_final_sales_merge_manual():
     print(f'  Removed {duplicates_removed} duplicates')
 
     # Write to CSV manually
-    output_file = 'data/processed/final_property_sales_dataset.csv'
+    output_file = 'data/processed/sales.csv'
 
     if unique_records:
         # Collect all possible fieldnames

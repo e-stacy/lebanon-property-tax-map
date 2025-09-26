@@ -103,7 +103,7 @@ def create_nhdra_normalized():
 
     # 2. Process combined sales file
     print("\nProcessing 2019-2024 combined sales...")
-    sales_df = pd.read_csv('data/processed/final_property_sales_dataset.csv')
+    sales_df = pd.read_csv('data/processed/sales.csv')
     print(f"Loaded {len(sales_df)} sales from comprehensive dataset")
 
     # Filter to 2019-2024 and format

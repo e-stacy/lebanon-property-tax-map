@@ -17,7 +17,7 @@ def create_nhdra_comparison():
 
     # Read our comprehensive sales data
     print("Reading comprehensive sales data...")
-    sales_df = pd.read_csv('data/processed/final_property_sales_dataset.csv')
+    sales_df = pd.read_csv('data/processed/sales.csv')
     print(f"Loaded {len(sales_df)} sales records")
 
     # Group sales by parcel_id for quick lookup
