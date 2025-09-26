@@ -294,13 +294,15 @@ class WorkingCheckboxFilters {
             return;
         }
         console.log('FILTER DEBUG: Container found, creating filter for', containerId);
+        console.log('FILTER DEBUG: propertyData type:', Array.isArray(propertyData) ? 'Array' : 'Map');
+        console.log('FILTER DEBUG: propertyData size/length:', Array.isArray(propertyData) ? propertyData.length : propertyData.size);
 
         // Count occurrences of each property class
         const classCounts = {};
         if (Array.isArray(propertyData)) {
             // For array data (index page)
             propertyData.forEach(property => {
-                const classCode = property['Prop\nCode'] || property.class_code;
+                const classCode = property['Property Class Code'];
                 if (classCode) {
                     classCounts[classCode] = (classCounts[classCode] || 0) + 1;
                 }
@@ -308,7 +310,7 @@ class WorkingCheckboxFilters {
         } else {
             // For Map data (map page)
             propertyData.forEach(property => {
-                const classCode = property['Prop\nCode'] || property.class_code;
+                const classCode = property['Property Class Code'];
                 if (classCode) {
                     classCounts[classCode] = (classCounts[classCode] || 0) + 1;
                 }
@@ -415,7 +417,7 @@ class WorkingCheckboxFilters {
         if (Array.isArray(propertyData)) {
             propertyData.forEach(property => {
                 // Try multiple possible year fields
-                const yearValue = property['Year Built'] || property['nhdra_vns ayb'] || property['vns ayb'];
+                const yearValue = property['Year Built'];
                 if (yearValue && yearValue !== '0' && yearValue !== '' && yearValue !== 'NaN') {
                     const year = parseFloat(yearValue);
                     if (year >= 1800 && year <= 2029) {
@@ -427,7 +429,7 @@ class WorkingCheckboxFilters {
         } else {
             propertyData.forEach(property => {
                 // Try multiple possible year fields
-                const yearValue = property['Year Built'] || property['nhdra_vns ayb'] || property['vns ayb'];
+                const yearValue = property['Year Built'];
                 if (yearValue && yearValue !== '0' && yearValue !== '' && yearValue !== 'NaN') {
                     const year = parseFloat(yearValue);
                     if (year >= 1800 && year <= 2029) {
@@ -621,7 +623,7 @@ class WorkingCheckboxFilters {
         if (Array.isArray(propertyData)) {
             propertyData.forEach(property => {
                 // Try multiple possible zoning fields
-                const zoneValue = property['Town\nNotes'] || property['nhdra_lnd zone'] || property['lnd zone'];
+                const zoneValue = property['Zoning Code'];
                 if (zoneValue && zoneValue !== '0' && zoneValue !== '' && zoneValue !== 'NaN') {
                     zones.push(String(zoneValue).trim());
                 }
@@ -629,7 +631,7 @@ class WorkingCheckboxFilters {
         } else {
             propertyData.forEach(property => {
                 // Try multiple possible zoning fields
-                const zoneValue = property['Town\nNotes'] || property['nhdra_lnd zone'] || property['lnd zone'];
+                const zoneValue = property['Zoning Code'];
                 if (zoneValue && zoneValue !== '0' && zoneValue !== '' && zoneValue !== 'NaN') {
                     zones.push(String(zoneValue).trim());
                 }
@@ -877,8 +879,8 @@ class WorkingCheckboxFilters {
         if (Array.isArray(propertyData)) {
             propertyData.forEach(property => {
                 // Try multiple possible heating fields
-                const fuelValue = property['Heat Type'] || property['nhdra_vns heat fuel desc'];
-                const typeValue = property['Heat Type'] || property['nhdra_vns heat type desc'];
+                const fuelValue = property['Heating Fuel'];
+                const typeValue = property['Heating Type'];
                 if (fuelValue && fuelValue !== '0' && fuelValue !== '' && fuelValue !== 'NaN' &&
                     typeValue && typeValue !== '0' && typeValue !== '' && typeValue !== 'NaN') {
                     heatingSystems.push({
@@ -890,8 +892,8 @@ class WorkingCheckboxFilters {
         } else {
             propertyData.forEach(property => {
                 // Try multiple possible heating fields
-                const fuelValue = property['Heat Type'] || property['nhdra_vns heat fuel desc'];
-                const typeValue = property['Heat Type'] || property['nhdra_vns heat type desc'];
+                const fuelValue = property['Heating Fuel'];
+                const typeValue = property['Heating Type'];
                 if (fuelValue && fuelValue !== '0' && fuelValue !== '' && fuelValue !== 'NaN' &&
                     typeValue && typeValue !== '0' && typeValue !== '' && typeValue !== 'NaN') {
                     heatingSystems.push({
@@ -1581,6 +1583,7 @@ document.addEventListener('click', function(e) {
 
 // Initialize functions for each page
 function initializeWorkingFilters() {
+    console.log('=== initializeWorkingFilters called ===');
     // For index page
     if (typeof allParcels !== 'undefined' && allParcels.length > 0) {
         workingFilters.createPropertyClassFilter('class-filter', allParcels);
@@ -1589,12 +1592,26 @@ function initializeWorkingFilters() {
         workingFilters.createHeatingFilter('heating-filter', allParcels);
     }
     
-    // For map page  
-    if (typeof propertyData !== 'undefined' && propertyData.size > 0) {
+    // For map page - wait for both property and sales data
+    if (typeof propertyData !== 'undefined' && propertyData.size > 0 && typeof salesData !== 'undefined' && salesData.size > 0) {
+        console.log('🎯 Initializing filters for map page with', propertyData.size, 'properties and', salesData.size, 'sales records');
+
+        // Check if containers exist
+        const containers = ['class-filter', 'year-filter', 'zoning-filter', 'heating-filter'];
+        const missingContainers = containers.filter(id => !document.getElementById(id));
+        if (missingContainers.length > 0) {
+            console.error('❌ Missing filter containers:', missingContainers);
+            return;
+        }
+
+        console.log('✅ All filter containers found');
         workingFilters.createPropertyClassFilter('class-filter', propertyData);
         workingFilters.createYearBuiltFilter('year-filter', propertyData);
         workingFilters.createZoningFilter('zoning-filter', propertyData);
         workingFilters.createHeatingFilter('heating-filter', propertyData);
+        console.log('✅ Map page filters initialized successfully');
+    } else {
+        console.log('⏳ Map page data not ready yet - propertyData:', typeof propertyData, 'size:', propertyData?.size, 'salesData:', typeof salesData, 'size:', salesData?.size);
     }
 }
 

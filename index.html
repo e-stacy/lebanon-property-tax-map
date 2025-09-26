@@ -567,7 +567,7 @@
         }
 
         th {
-            height: 35px;
+            height: 45px;
             line-height: 1.1;
             white-space: normal;
             background: #f8f9fa;
@@ -608,24 +608,30 @@
             line-height: 1.2;
         }
 
-        /* Column widths to prevent wrapping */
-        th:nth-child(1), td:nth-child(1) { min-width: 65px; }  /* Parcel ID */
-        th:nth-child(2), td:nth-child(2) { min-width: 200px; } /* Owner */
-        th:nth-child(3), td:nth-child(3) { min-width: 60px; }  /* Class */
-        th:nth-child(4), td:nth-child(4) { min-width: 80px; }  /* Year Built */
-        th:nth-child(5), td:nth-child(5) { min-width: 100px; } /* Living Area */
-        th:nth-child(6), td:nth-child(6) { min-width: 80px; }  /* Bed/Bath */
-        th:nth-child(7), td:nth-child(7) { min-width: 140px; } /* Building Style */
-        th:nth-child(8), td:nth-child(8) { min-width: 120px; } /* Heating */
-        th:nth-child(9), td:nth-child(9) { min-width: 80px; }  /* Lot Size */
-        th:nth-child(10), td:nth-child(10) { min-width: 120px; } /* Land Value */
-        th:nth-child(11), td:nth-child(11) { min-width: 120px; } /* Building Value */
-        th:nth-child(12), td:nth-child(12) { min-width: 120px; } /* Total Value */
-        th:nth-child(13), td:nth-child(13) { min-width: 140px; } /* Last Sale */
+        /* Column widths are now handled dynamically by getOptimalColumnWidth() */
 
+
+        /* Click instruction styling */
+        .click-instruction {
+            background: #e7f3ff;
+            border: 1px solid #b8daff;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            font-size: 0.8em;
+        }
 
         tbody tr:hover {
-            background: #f8f9fa;
+            background: #e3f2fd;
+            transform: scale(1.002);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+
+        tbody tr {
+            transition: all 0.2s ease;
         }
 
         .currency {
@@ -1330,6 +1336,12 @@
             </div>
         </div>
 
+        <!-- Click instruction for users -->
+        <div class="click-instruction">
+            <i class="fas fa-info-circle" style="color: #007bff; margin-right: 8px;"></i>
+            <span style="font-size: 0.85em; color: #666;">Click any parcel row for detailed property information and sales history</span>
+        </div>
+
         <div class="table-container">
             <div class="table-wrapper">
                 <table>
@@ -1378,6 +1390,7 @@
         let allParcels = [];
         let filteredParcels = [];
         let salesData = new Map(); // parcel_id -> array of sales
+        let assessmentData = new Map(); // parcel_id -> array of assessments
         let parcelDataMap = new Map(); // Store parcel data by parcel_id
         let currentPage = 1;
         const rowsPerPage = 50;
@@ -1455,18 +1468,21 @@
                         parcel[header] = values[index] || '';
                     });
                     return parcel;
-                }).filter(p => p.parcel_id && p.parcel_id.trim());
+                }).filter(p => p['Parcel ID'] && p['Parcel ID'].trim());
 
                 console.log(`Loaded ${allParcels.length} parcels with ${headers.length} columns`);
                 filteredParcels = [...allParcels];
 
                 // Populate parcelDataMap for modal lookups
                 allParcels.forEach(parcel => {
-                    parcelDataMap.set(parcel.parcel_id, parcel);
+                    parcelDataMap.set(parcel['Parcel ID'], parcel);
                 });
 
                 // Load sales data
                 await loadSalesData();
+
+                // Load assessment data
+                await loadAssessmentData();
 
                 updateStats();
                 initializeFilter();
@@ -1490,7 +1506,7 @@
                     salesData = new Map();
                 }
 
-                const response = await fetch('data/processed/final_property_sales_dataset.csv');
+                const response = await fetch('data/processed/sales.csv');
 
                 if (!response.ok) {
                     console.warn('Sales data file not found - sales history will be limited');
@@ -1516,7 +1532,7 @@
                             sale[header] = values[index] || '';
                         });
 
-                        const parcelId = sale['parcel_id'];
+                        const parcelId = sale['Parcel ID'];
                         if (parcelId) {
                             if (!salesData.has(parcelId)) {
                                 salesData.set(parcelId, []);
@@ -1529,8 +1545,8 @@
                 // Sort sales by date for each parcel (most recent first)
                 for (const [parcelId, sales] of salesData) {
                     sales.sort((a, b) => {
-                        const dateA = new Date(a['sale_date'] || '1900-01-01');
-                        const dateB = new Date(b['sale_date'] || '1900-01-01');
+                        const dateA = new Date(a['Sale Date'] || '1900-01-01');
+                        const dateB = new Date(b['Sale Date'] || '1900-01-01');
                         return dateB - dateA; // Most recent first
                     });
                 }
@@ -1542,11 +1558,73 @@
             }
         }
 
+        // Load assessment data from CSV
+        async function loadAssessmentData() {
+            try {
+                console.log('Loading assessment data...');
+                // Ensure assessmentData is a Map
+                if (!assessmentData || typeof assessmentData.set !== 'function') {
+                    console.log('Initializing assessmentData as Map');
+                    assessmentData = new Map();
+                }
+
+                const response = await fetch('data/processed/assessments.csv');
+
+                if (!response.ok) {
+                    console.warn('Assessment data file not found - assessment history will be limited');
+                    return;
+                }
+
+                const text = await response.text();
+                const lines = text.trim().split('\n');
+
+                if (lines.length < 2) {
+                    console.warn('Assessment data file is empty');
+                    return;
+                }
+
+                const headers = parseCSVLine(lines[0]);
+
+                // Process assessment data
+                for (let i = 1; i < lines.length; i++) {
+                    const values = parseCSVLine(lines[i]);
+                    if (values.length >= headers.length) {
+                        const assessment = {};
+                        headers.forEach((header, index) => {
+                            assessment[header] = values[index] || '';
+                        });
+
+                        const parcelId = assessment['Parcel ID'];
+                        if (parcelId) {
+                            if (!assessmentData.has(parcelId)) {
+                                assessmentData.set(parcelId, []);
+                            }
+                            assessmentData.get(parcelId).push(assessment);
+                        }
+                    }
+                }
+
+                // Sort assessments by year for each parcel (most recent first)
+                for (const [parcelId, assessments] of assessmentData) {
+                    assessments.sort((a, b) => {
+                        const yearA = parseInt(a['Assessment Year']) || 0;
+                        const yearB = parseInt(b['Assessment Year']) || 0;
+                        return yearB - yearA; // Most recent first
+                    });
+                }
+
+                console.log(`Loaded assessment data for ${assessmentData.size} parcels`);
+
+            } catch (error) {
+                console.warn('Error loading assessment data:', error);
+            }
+        }
+
         // Generate table headers dynamically for filtered columns
         function generateTableHeaders(allHeaders) {
             // Remove unwanted columns
             const excludeColumns = [
-                'situs_address', 'mailing_address1', 'mailing_city', 'mailing_state', 'mailing_zip',
+                'Situs Address', 'mailing_address1', 'mailing_city', 'mailing_state', 'mailing_zip',
                 'nhdra_rem prcl locn street', 'nhdra_rem prcl locn', 'nhdra_address1', 'nhdra_city',
                 'nhdra_state', 'nhdra_zip', 'nhdra_grantor', 'nhdra_book pg',
                 'nhdra_ID1 Prior Sale Price', 'nhdra_ID1 Prior Sale Date', 'nhdra_ID1 Prior Book Page',
@@ -1587,42 +1665,35 @@
         // Translate column names with proper meanings for abbreviations
         function translateColumnName(header) {
             const translations = {
-                'parcel_id': 'Parcel<br>ID',
-                'owner_name': 'Owner',
+                'Parcel ID': '📍 Parcel<br>ID',
+                'Owner Name': 'Owner',
                 'co_own_name': 'Co-Owner',
-                'class_code': 'Property<br>Class',
-                'lot_size_acres': 'Lot Size<br>(acres)',
-                'land_value': 'Land<br>Value',
-                'building_value': 'Building<br>Value', 
-                'total_value': 'Total<br>Value',
-                'nhdra_saleprice': 'Sale<br>Price',
-                'nhdra_saledate': 'Sale<br>Date',
-                'nhdra_qualified': "Arm's<br>Length",
-                'nhdra_rem use code': 'Property<br>Class',
-                'nhdra_lnd zone': 'Zoning<br>District',
-                'nhdra_prc ttl lnd area acres': 'Land Area<br>(acres)',
-                'nhdra_prc ttl assess bldg': 'Building<br>Assessed',
-                'nhdra_prc ttl assess xf': 'Exempt<br>Assessed',
-                'nhdra_prc ttl assess lnd': 'Land<br>Assessed',
-                'nhdra_prc ttl assess ob': 'Outbuilding<br>Assessed',
-                'nhdra_prc ttl assess': 'Total<br>Assessment',
-                'nhdra_cns area living': 'Living<br>Area',
-                'nhdra_vns ayb': 'Year<br>Built',
-                'nhdra_vns style desc': 'Building<br>Style',
-                'nhdra_vns grade': 'Grade<br>(numeric)',
-                'nhdra_vns grade desc': 'Grade<br>Description',
-                'nhdra_vns roof cover desc': 'Roof<br>Cover',
-                'nhdra_cns area effective': 'Effective<br>Area',
-                'nhdra_vns tot rooms': 'Total<br>Rooms',
-                'nhdra_vns num bedrm': 'Bedrooms',
-                'nhdra_vns num baths': 'Bathrooms',
-                'nhdra_vns num hbaths': 'Half<br>Bathrooms',
-                'nhdra_vns heat type desc': 'Heating<br>Type',
-                'nhdra_vns heat fuel desc': 'Heating<br>Fuel',
-                'nhdra_cns pct good': 'Percent<br>Good',
-                'nhdra_cns eyb code': 'Eff Yr Built<br>Code',
-                'nhdra_lnd nbhd': 'Land<br>Neighborhood',
-                'nhdra_vns stories': 'Stories'
+                'Property Class Code': 'Property<br>Class',
+                'Lot Size (Acres)': 'Lot Size<br>(acres)',
+                'Land Value': 'Land<br>Value',
+                'Building Value': 'Building<br>Value',
+                'Total Value': 'Total<br>Value',
+                'NHDRA Qualified': "Arm's<br>Length",
+                'Use Code': 'Property<br>Class',
+                'Zoning Code': 'Zoning<br>District',
+                'Land Area (Acres)': 'Land Area<br>(acres)',
+                'Living Area (sq ft)': 'Living<br>Area',
+                'Year Built': 'Year<br>Built',
+                'Building Style': 'Building<br>Style',
+                'Grade Code': 'Grade<br>(numeric)',
+                'Grade Description': 'Grade<br>Description',
+                'Roof Cover Type': 'Roof<br>Cover',
+                'Effective Area (sq ft)': 'Effective<br>Area',
+                'Total Rooms': 'Total<br>Rooms',
+                'Number of Bedrooms': 'Bedrooms',
+                'Number of Bathrooms': 'Bathrooms',
+                'Number of Half Bathrooms': 'Half<br>Bathrooms',
+                'Heating Type': 'Heating<br>Type',
+                'Heating Fuel': 'Heating<br>Fuel',
+                'Condition Percentage': 'Percent<br>Good',
+                'Effective Year Built Code': 'Eff Yr Built<br>Code',
+                'Neighborhood Code': 'Land<br>Neighborhood',
+                'Number of Stories': 'Stories'
             };
 
             return translations[header] || header.replace('nhdra_', '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -1643,35 +1714,35 @@
         function updateStats() {
             // Calculate totals from all parcels (city-wide baseline)
             const totalParcels = allParcels.length;
-            const totalValue = allParcels.reduce((sum, p) => sum + parseNumber(p.total_value), 0);
-            const totalValues = allParcels.map(p => parseNumber(p.total_value)).filter(v => v > 0).sort((a, b) => a - b);
+            const totalValue = allParcels.reduce((sum, p) => sum + parseNumber(p['Total Value']), 0);
+            const totalValues = allParcels.map(p => parseNumber(p['Total Value'])).filter(v => v > 0).sort((a, b) => a - b);
             const totalMedianValue = totalValues.length > 0 ? totalValues[Math.floor(totalValues.length / 2)] : 0;
 
             // Calculate total median age
             const totalAges = allParcels.map(p => {
-                const year = parseNumber(p['nhdra_vns ayb']);
+                const year = parseNumber(p['Year Built']);
                 return year > 1800 && year <= 2025 ? 2025 - year : null;
             }).filter(age => age !== null).sort((a, b) => a - b);
             const totalMedianAge = totalAges.length > 0 ? totalAges[Math.floor(totalAges.length / 2)] : 0;
 
             // Calculate total land area
-            const totalLandArea = allParcels.reduce((sum, p) => sum + parseNumber(p.lot_size_acres), 0);
+            const totalLandArea = allParcels.reduce((sum, p) => sum + parseNumber(p['Lot Size (Acres)']), 0);
 
             // Calculate selected (filtered) values
             const selectedParcels = filteredParcels.length;
-            const selectedValue = filteredParcels.reduce((sum, p) => sum + parseNumber(p.total_value), 0);
-            const selectedValues = filteredParcels.map(p => parseNumber(p.total_value)).filter(v => v > 0).sort((a, b) => a - b);
+            const selectedValue = filteredParcels.reduce((sum, p) => sum + parseNumber(p['Total Value']), 0);
+            const selectedValues = filteredParcels.map(p => parseNumber(p['Total Value'])).filter(v => v > 0).sort((a, b) => a - b);
             const selectedMedianValue = selectedValues.length > 0 ? selectedValues[Math.floor(selectedValues.length / 2)] : 0;
 
             // Calculate selected median age
             const selectedAges = filteredParcels.map(p => {
-                const year = parseNumber(p['nhdra_vns ayb']);
+                const year = parseNumber(p['Year Built']);
                 return year > 1800 && year <= 2025 ? 2025 - year : null;
             }).filter(age => age !== null).sort((a, b) => a - b);
             const selectedMedianAge = selectedAges.length > 0 ? selectedAges[Math.floor(selectedAges.length / 2)] : 0;
 
             // Calculate selected land area
-            const selectedLandArea = filteredParcels.reduce((sum, p) => sum + parseNumber(p.lot_size_acres), 0);
+            const selectedLandArea = filteredParcels.reduce((sum, p) => sum + parseNumber(p['Lot Size (Acres)']), 0);
 
             // Calculate percentages and ratios
             const parcelPercent = totalParcels > 0 ? (selectedParcels / totalParcels * 100).toFixed(1) : 0;
@@ -1722,9 +1793,9 @@
             filteredParcels = allParcels.filter(parcel => {
                 // Search filter - back to standard parcels CSV fields
                 if (searchTerm && ![
-                    'parcel_id',
-                    'owner_name',
-                    'situs_address',
+                    'Parcel ID',
+                    'Owner Name',
+                    'Situs Address',
                     'mailing_address1',
                     'nhdra_rem prcl locn street',
                     'nhdra_rem prcl locn',
@@ -1734,13 +1805,13 @@
                 }
 
                 // Class filter
-                if (selectedClasses.length > 0 && !selectedClasses.includes(parcel.class_code)) {
+                if (selectedClasses.length > 0 && !selectedClasses.includes(parcel['Property Class Code'])) {
                     return false;
                 }
 
                 // Year Built filter
                 if (selectedYears.length > 0) {
-                    const yearValue = parcel['nhdra_vns ayb'];
+                    const yearValue = parcel['Year Built'];
                     if (!yearValue || yearValue === '0' || yearValue === '') {
                         // Include unknown year properties only if "unknown" is selected
                         return selectedYears.includes('unknown');
@@ -1758,7 +1829,7 @@
 
                 // Zoning District filter
                 if (selectedZones.length > 0) {
-                    const zoneValue = parcel['nhdra_lnd zone'];
+                    const zoneValue = parcel['Zoning Code'];
                     if (!zoneValue || zoneValue === '0' || zoneValue === '') {
                         // Include unknown zone properties only if "unknown" is selected
                         return selectedZones.includes('unknown');
@@ -1770,8 +1841,8 @@
 
                 // Heating System filter
                 if (selectedHeating.length > 0) {
-                    const heatFuel = parcel['nhdra_vns heat fuel desc'];
-                    const heatType = parcel['nhdra_vns heat type desc'];
+                    const heatFuel = parcel['Heating Fuel'];
+                    const heatType = parcel['Heating Type'];
 
                     if (!heatFuel || heatFuel === '0' || heatFuel === '' ||
                         !heatType || heatType === '0' || heatType === '') {
@@ -1786,7 +1857,7 @@
                 }
 
                 // Value filters
-                const value = parseNumber(parcel.total_value);
+                const value = parseNumber(parcel['Total Value']);
                 if (minValue > 0 && value < minValue) return false;
                 if (maxValue > 0 && value > maxValue) return false;
 
@@ -1854,7 +1925,7 @@
                     return `<td>${value}</td>`;
                 }).join('');
 
-                return `<tr data-parcel-id="${parcel.parcel_id}" style="cursor: pointer;">${cells}</tr>`;
+                return `<tr data-parcel-id="${parcel['Parcel ID']}" style="cursor: pointer;" title="Click to view property details and sales history for ${parcel['Parcel ID']} - ${parcel['Owner Name'] || 'Unknown Owner'}">${cells}</tr>`;
             }).join('');
 
             tbody.innerHTML = rows;
@@ -1949,10 +2020,10 @@
                 th.classList.remove('sort-asc', 'sort-desc');
             });
 
-            // Sort filtered data by parcel_id (original order)
+            // Sort filtered data by Parcel ID (original order)
             filteredParcels.sort((a, b) => {
-                const idA = a.parcel_id || '';
-                const idB = b.parcel_id || '';
+                const idA = a['Parcel ID'] || '';
+                const idB = b['Parcel ID'] || '';
                 return idA.localeCompare(idB, undefined, { numeric: true, sensitivity: 'base' });
             });
 
@@ -2081,43 +2152,48 @@
         function getOptimalColumnWidth(columnKey, displayName) {
             // Define optimal widths based on actual data content (data-dense approach)
             const widthMap = {
-                // Very short numeric columns
-                'stories': 60,
-                'grade': 50,
-                'year_built': 75,
-                'bedrooms': 70,
-                'full_baths': 75,
-                'half_baths': 75,
-                'fireplaces': 80,
+                // Very short numeric columns - accounting for headers
+                'Number of Stories': 76,     // Header "Stories" (7 chars) > data (4 chars)
+                'Number of Bedrooms': 84,    // Header "Bedrooms" (8 chars) > data (4 chars)
+                'Number of Bathrooms': 92,   // Header "Bathrooms" (9 chars) > data (3 chars)
+                'Number of Half Bathrooms': 52, // Max 4 chars (header similar)
+                'Year Built': 100,           // Header "Year Built" (10 chars) > data (6 chars)
+                'Condition Percentage': 60,  // Max 5 chars
 
-                // Currency columns - compact but readable
-                'total_value': 105,
-                'building_value': 105,
-                'land_value': 95,
-                'assessed_value': 105,
-                'price': 95,
+                // Area and size columns
+                'Living Area (sq ft)': 92,   // Max 9 chars
+                'Effective Area (sq ft)': 92, // Max 9 chars
+                'Lot Size (Acres)': 100,     // Max 10 chars
+                'Land Area (Acres)': 100,    // Max 10 chars
 
-                // Text columns - much tighter
-                'owner': 140,           // Names don't need huge space
-                'zoning_district': 90,  // Usually short codes
-                'property_class': 130,  // Reduced from 180
-                'neighborhood': 110,    // Reduced from 130
-                'construction': 100,    // Reduced from 120
-                'style': 85,           // Reduced from 100
-                'heating': 85,         // Reduced from 100
-                'fuel': 65,            // Reduced from 80
-                'condition': 80,       // Reduced from 90
+                // Currency columns - accounting for headers
+                'Total Value': 108,          // Max 11 chars (header same length)
+                'Building Value': 132,       // Header "Building Value" (14 chars) > data (11 chars)
+                'Land Value': 100,           // Max 10 chars (header same length)
 
-                // IDs and codes - very compact
-                'map_block_lot': 110,  // Reduced from 130
-                'parcel': 65,          // Reduced from 80
-                'account': 75,         // Reduced from 90
-                'lot_size_acres': 80,  // Decimal numbers don't need much space
+                // Text columns - accounting for headers
+                'Owner Name': 140,           // Names need space
+                'Situs Address': 180,        // Addresses need space
+                'Mailing Address': 160,      // Addresses need space
+                'Mailing City': 100,         // City names
+                'Mailing State': 60,         // Header "State" (5 chars) > data (2 chars)
+                'Mailing ZIP Code': 100,     // Max 10 chars (header "ZIP Code" 8 chars)
+                'Zoning Code': 68,           // Header "Zoning" (6 chars) > data (5 chars)
+                'Property Class Code': 80,   // Header "Property Class" with line break needs more space
+                'Neighborhood Code': 110,    // Neighborhood codes
+                'Building Style': 100,       // Building styles
+                'Heating Type': 116,         // Header "Heating Type" (12 chars) > data (10 chars)
+                'Heating Fuel': 116,         // Header "Heating Fuel" (12 chars) > data (10 chars)
+                'Grade Description': 100,    // Grade descriptions
+                'Roof Cover Type': 100,      // Roof types
+                'Use Code': 80,             // Use codes
+
+                // IDs and codes - optimized for actual lengths
+                'Parcel ID': 116,           // Max 12 chars (header "Parcel ID" 9 chars)
 
                 // Boolean/short text - minimal
-                'arms_length': 75,     // Just Y/N values
-                'multi_parcels': 85,   // Reduced from 100
-                'sale_date': 85        // Date format is consistent
+                'NHDRA Qualified': 85,      // Just Y/N values
+                'Sale Date': 85             // Date format is consistent
             };
 
             // Check if we have a specific width for this column
@@ -2167,7 +2243,7 @@
 
             // Update modal title
             document.getElementById('modal-title').textContent =
-                `📍 ${propertyData.parcel_id} (${propertyData.situs_address || 'No Address'})`;
+                `📍 ${propertyData['Parcel ID']} (${propertyData['Situs Address'] || 'No Address'})`;
 
             // Populate property summary
             populatePropertySummary(propertyData);
@@ -2209,12 +2285,12 @@
         function populatePropertySummary(property) {
             const summaryDiv = document.getElementById('property-summary');
             summaryDiv.innerHTML = `
-                <div class="summary-row"><strong>Owner:</strong> ${property.owner_name || 'Unknown'}</div>
-                <div class="summary-row"><strong>Class:</strong> ${property.class_code || 'Unknown'}</div>
-                <div class="summary-row"><strong>Zoning:</strong> ${property.nhdra_zoning_code || 'Unknown'}</div>
-                <div class="summary-row"><strong>Heating Fuel:</strong> ${property.nhdra_heating_fuel || 'Unknown'}</div>
-                <div class="summary-row"><strong>Lot Size:</strong> ${property.lot_size_acres || '0'} acres</div>
-                <div class="summary-row"><strong>Total Value:</strong> $${formatNumber(property.total_value || 0)}</div>
+                <div class="summary-row"><strong>Owner:</strong> ${property['Owner Name'] || 'Unknown'}</div>
+                <div class="summary-row"><strong>Class:</strong> ${property['Property Class Code'] || 'Unknown'}</div>
+                <div class="summary-row"><strong>Zoning:</strong> ${property['Zoning Code'] || 'Unknown'}</div>
+                <div class="summary-row"><strong>Heating Fuel:</strong> ${property['Heating Fuel'] || 'Unknown'}</div>
+                <div class="summary-row"><strong>Lot Size:</strong> ${property['Lot Size (Acres)'] || '0'} acres</div>
+                <div class="summary-row"><strong>Total Value:</strong> $${formatNumber(property['Total Value'] || 0)}</div>
             `;
         }
 
@@ -2223,24 +2299,24 @@
             let content = '';
 
             // Add building details if available
-            if (property['nhdra_vns ayb'] && parseInt(property['nhdra_vns ayb']) >= 1800) {
-                content += `<div class="summary-row"><strong>Year Built:</strong> ${property['nhdra_vns ayb']}</div>`;
+            if (property['Year Built'] && parseInt(property['Year Built']) >= 1800) {
+                content += `<div class="summary-row"><strong>Year Built:</strong> ${property['Year Built']}</div>`;
             }
 
-            if (property['nhdra_vns style desc']) {
-                content += `<div class="summary-row"><strong>Building Style:</strong> ${property['nhdra_vns style desc']}</div>`;
+            if (property['Building Style']) {
+                content += `<div class="summary-row"><strong>Building Style:</strong> ${property['Building Style']}</div>`;
             }
 
             if (property.building_gla) {
                 content += `<div class="summary-row"><strong>Building Area:</strong> ${formatNumber(property.building_gla)} sq ft</div>`;
             }
 
-            if (property['nhdra_lnd zone']) {
-                content += `<div class="summary-row"><strong>Zoning:</strong> ${property['nhdra_lnd zone']}</div>`;
+            if (property['Zoning Code']) {
+                content += `<div class="summary-row"><strong>Zoning:</strong> ${property['Zoning Code']}</div>`;
             }
 
-            if (property['nhdra_vns heat type desc']) {
-                content += `<div class="summary-row"><strong>Heating:</strong> ${property['nhdra_vns heat type desc']}</div>`;
+            if (property['Heating Type']) {
+                content += `<div class="summary-row"><strong>Heating:</strong> ${property['Heating Type']}</div>`;
             }
 
             if (!content) {
@@ -2266,22 +2342,22 @@
             }
 
             // Get comprehensive sales data from our merged dataset
-            const parcelSales = salesData.get(property.parcel_id) || [];
+            const parcelSales = salesData.get(property['Parcel ID']) || [];
 
             // Process sales from comprehensive dataset
             parcelSales.forEach(sale => {
-                const salePrice = parseFloat(sale.sale_price) || 0;
+                const salePrice = parseFloat(sale['Sale Price']) || 0;
                 if (salePrice > 0) {
                     const saleEntry = {
-                        date: sale.sale_date,
+                        date: sale['Sale Date'],
                         price: salePrice,
-                        qualified: sale.qualified || 'N/A',
-                        source: sale.data_source || 'unknown',
-                        strategy_tier: sale.strategy_tier || 'unknown',
-                        deed_type: sale.deed_type || '',
-                        grantor: sale.grantor || '',
-                        grantee: sale.grantee || '',
-                        property_address: sale.property_address || ''
+                        qualified: sale['Qualified Sale'] || 'N/A',
+                        source: 'sales.csv',
+                        strategy_tier: 'unknown',
+                        deed_type: sale['Deed Type'] || '',
+                        grantor: sale['Grantor (Seller)'] || '',
+                        grantee: sale['Grantee (Buyer)'] || '',
+                        property_address: ''
                     };
 
                     // Mark most recent sale as current
@@ -2412,55 +2488,54 @@
 
             tbody.innerHTML = '';
 
-            // Current assessments (2024)
-            const currentLand = parseFloat(property['nhdra_prc ttl assess lnd'] || 0);
-            const currentBuilding = parseFloat(property['nhdra_prc ttl assess bldg'] || 0);
-            const currentTotal = parseFloat(property['nhdra_prc ttl assess'] || 0);
+            // Get assessment history from the loaded assessment data
+            const parcelAssessments = assessmentData.get(property['Parcel ID']) || [];
 
-            // Previous assessments (adjusted/historical)
-            const previousLand = parseFloat(property['nhdra_ahd ttl assess lnd'] || 0);
-            const previousBuilding = parseFloat(property['nhdra_ahd ttl assess bldg'] || 0);
-            const previousTotal = parseFloat(property['nhdra_ahd ttl assess'] || 0);
+            // Sort assessments by year (most recent first) - should already be sorted from loading
+            parcelAssessments.forEach(assessment => {
+                const year = assessment['Assessment Year'];
+                const landValue = parseFloat(assessment['Land Assessed Value']) || 0;
+                const buildingValue = parseFloat(assessment['Building Assessed Value']) || 0;
+                const totalValue = parseFloat(assessment['Total Assessed Value']) || 0;
+                const dataSource = assessment['Data Source'];
 
-            // Current assessment row (most recent first)
-            if (currentTotal > 0) {
+                const isCurrent = year === '2022'; // Assuming 2022 is current
+
                 tbody.innerHTML += `
-                    <tr class="current-assessment">
-                        <td title="Current Assessment (2024)">Current (2024)</td>
-                        <td title="$${formatNumber(currentLand)}">$${formatNumber(currentLand)}</td>
-                        <td title="$${formatNumber(currentBuilding)}">$${formatNumber(currentBuilding)}</td>
-                        <td title="$${formatNumber(currentTotal)}"><strong>$${formatNumber(currentTotal)}</strong></td>
+                    <tr class="${isCurrent ? 'current-assessment' : ''}">
+                        <td title="${year} Assessment">${year} Assessment</td>
+                        <td title="$${formatNumber(landValue)}">$${formatNumber(landValue)}</td>
+                        <td title="$${formatNumber(buildingValue)}">$${formatNumber(buildingValue)}</td>
+                        <td title="$${formatNumber(totalValue)}"><strong>$${formatNumber(totalValue)}</strong></td>
                     </tr>
                 `;
-            }
-
-            // Previous assessment row (if available)
-            if (previousTotal > 0) {
-                tbody.innerHTML += `
-                    <tr>
-                        <td title="Previous Assessment">Previous</td>
-                        <td title="$${formatNumber(previousLand)}">$${formatNumber(previousLand)}</td>
-                        <td title="$${formatNumber(previousBuilding)}">$${formatNumber(previousBuilding)}</td>
-                        <td title="$${formatNumber(previousTotal)}"><strong>$${formatNumber(previousTotal)}</strong></td>
-                    </tr>
-                `;
-            }
+            });
 
             // Generate analysis
-            if (currentTotal > 0 && previousTotal > 0) {
-                const changePercent = ((currentTotal - previousTotal) / previousTotal * 100);
-                analysisDiv.innerHTML = `
-                    <h4>🏛️ Assessment Analysis</h4>
-                    <ul>
-                        <li><strong>Assessment Change:</strong> ${formatChange(currentTotal - previousTotal)} (${changePercent.toFixed(1)}%)</li>
-                        <li><strong>Current Assessment:</strong> $${formatNumber(currentTotal)}</li>
-                        <li><strong>Previous Assessment:</strong> $${formatNumber(previousTotal)}</li>
-                        ${property.nhdra_saleprice && property.nhdra_saleprice > 0 ?
-                            `<li><strong>Sale-to-Assessment Ratio:</strong> ${(currentTotal / property.nhdra_saleprice * 100).toFixed(1)}%</li>` : ''}
-                    </ul>
-                `;
+            if (parcelAssessments.length > 1) {
+                const mostRecent = parcelAssessments[0];
+                const previous = parcelAssessments[1];
+
+                const currentTotal = parseFloat(mostRecent['Total Assessed Value']) || 0;
+                const previousTotal = parseFloat(previous['Total Assessed Value']) || 0;
+
+                if (currentTotal > 0 && previousTotal > 0) {
+                    const changePercent = ((currentTotal - previousTotal) / previousTotal * 100);
+                    analysisDiv.innerHTML = `
+                        <h4>🏛️ Assessment Analysis</h4>
+                        <ul>
+                            <li><strong>Assessment Change:</strong> ${formatChange(currentTotal - previousTotal)} (${changePercent.toFixed(1)}%)</li>
+                            <li><strong>Current Assessment (${mostRecent['Assessment Year']}):</strong> $${formatNumber(currentTotal)}</li>
+                            <li><strong>Previous Assessment (${previous['Assessment Year']}):</strong> $${formatNumber(previousTotal)}</li>
+                        </ul>
+                    `;
+                } else {
+                    analysisDiv.innerHTML = `<p>Assessment data available for ${parcelAssessments.length} years.</p>`;
+                }
+            } else if (parcelAssessments.length === 1) {
+                analysisDiv.innerHTML = '<p>Single assessment record available.</p>';
             } else {
-                analysisDiv.innerHTML = '<p>Limited assessment history available.</p>';
+                analysisDiv.innerHTML = '<p>No assessment history available.</p>';
             }
         }
 
@@ -2502,7 +2577,7 @@
 
             const link = document.createElement('a');
             link.href = url;
-            link.download = `property_${currentPropertyData.parcel_id}.json`;
+            link.download = `property_${currentPropertyData['Parcel ID']}.json`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

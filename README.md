@@ -12,10 +12,11 @@ The Lebanon Property Tax Database is a **public transparency initiative** that p
 ### Project Structure Overview
 This project uses a clean, professional folder structure that separates web assets, data, scripts, and documentation:
 
-- **`public/`** - All web-deployable files (deploy this folder to web server)
+- **Root Directory** - Web-deployable files (index.html, map.html, assets) - deploy entire repository to web server
 - **`data/`** - Raw data, processed datasets, and schema documentation
 - **`scripts/`** - Python data processing and analysis scripts
-- **`docs/`** - Documentation, testing tools, and artifacts
+- **`docs/`** - Documentation and artifacts
+- **`archive/`** - Historical data backups
 
 ### Local Development Setup
 ```bash
@@ -24,7 +25,6 @@ git clone https://github.com/e-stacy/lebanon-property-tax-map.git
 cd lebanon-property-tax-map
 
 # Start local web server for testing
-cd public
 python -m http.server 8000
 # Visit http://localhost:8000 to test the application
 ```
@@ -52,10 +52,10 @@ python -m http.server 8001
 ```
 
 ### Deployment
-The `public/` directory contains all files needed for web deployment. Deploy this folder to:
-- **GitHub Pages**: Push `public/` contents to `gh-pages` branch or root
-- **Web Server**: Copy `public/` contents to web root
-- **CDN**: Upload `public/` contents to CDN provider
+The root directory contains all files needed for web deployment. Deploy the entire repository to:
+- **GitHub Pages**: Push repository contents to main branch (GitHub Pages enabled)
+- **Web Server**: Copy entire repository to web root
+- **CDN**: Upload repository contents to CDN provider
 
 ## Public Interest & Legal Foundation
 
@@ -72,17 +72,18 @@ This project directly serves **New Hampshire's Right-to-Know Law (RSA 91-A)**, w
 ## Current Data Integration Status
 
 ### Successfully Integrated Sources ✅
-- **Primary Assessment Data**: 5,622 properties with basic valuation information
+- **Primary Assessment Data**: 5,660 properties with comprehensive valuation information
 - **NHDRA Records**: New Hampshire Department of Revenue Administration data including:
   - Building characteristics (style, grade, construction year)
-  - Detailed specifications (living area, rooms, bathrooms) 
+  - Detailed specifications (living area, rooms, bathrooms)
   - Infrastructure details (heating systems, roofing, exterior materials)
   - Assessment history and condition ratings
 - **Zoning Information**: Current zoning classifications for land use analysis
-- **Sales History**: Transaction records for market value verification
+- **Sales History**: Comprehensive transaction records with up to 4 sales per property
+- **Assessment History**: Multi-year assessment data (2020, 2022) with temporal tracking
 
 ### Current Dataset Scope
-**25 data fields per property** including:
+**35+ data fields per property** across three normalized tables:
 - Parcel identification and ownership
 - Land and building valuations
 - Physical characteristics (5,000+ sqft of living area data)
@@ -139,10 +140,14 @@ The system implements a **two-stage normalization process** that transforms raw 
 ### Directory Structure & Data Organization
 ```
 lebanon-property-tax-map/
-├── 🌐 public/                        # 🆕 Web-deployable files
+├── 🌐 Web Files                     # Web-deployable files (root level)
 │   ├── 📄 index.html                # Main data explorer interface
 │   ├── 📄 map.html                  # Interactive mapping interface
 │   ├── 📄 disclaimer.html           # Legal disclaimer
+│   ├── 📄 README.md                 # Project documentation
+│   ├── 📄 LICENSE                   # License
+│   ├── 📄 CNAME                     # GitHub Pages config
+│   └── 📄 sitemap.xml               # Search engine data discovery
 │   └── 🎨 assets/                   # Static web assets
 │       ├── 🖼️ images/              # Images, favicon, screenshots
 │       ├── 🎨 css/                 # Stylesheets
@@ -150,8 +155,9 @@ lebanon-property-tax-map/
 │
 ├── 📊 data/                         # Data files and schemas
 │   ├── 🗃️ processed/                # Clean processed data
-│   │   ├── parcels.csv             # Main property data (5,622 properties)
-│   │   ├── parcels_backup_before_zoning_fix.csv
+│   │   ├── parcels.csv             # Main property data (5,660 properties)
+│   │   ├── sales.csv               # Sales history data
+│   │   ├── assessments.csv         # Assessment history data
 │   │   └── spatial/                # GeoJSON files
 │   │       ├── parcels_wgs84.geojson  # Web-optimized spatial data
 │   │       ├── parcels_real.geojson   # Original coordinate system
@@ -161,29 +167,27 @@ lebanon-property-tax-map/
 │   │   ├── column_mapping_*.md
 │   │   └── v2025-09-05_*.md        # Versioned schema docs
 │   └── 🗂️ raw/                     # Raw source data
-│       └── RecoveredRawData/       # Original municipal data
+│       ├── city/                   # Municipal data
+│       │   ├── nhdra.csv           # NHDRA simplified data
+│       │   ├── Parcel Master Export.csv
+│       │   └── column_header_mapping.csv
+│       └── nhdra/                  # State revenue data
+│           ├── NHDRA.xlsx
+│           └── SalesList-*.xlsx    # Annual sales files
 │
-├── 📚 docs/                        # Documentation & testing
+├── 📚 docs/                        # Documentation & artifacts
 │   ├── 📄 report.md                # Analysis reports
-│   ├── 🧪 test_data_loading.html   # CSV loading verification
-│   ├── 🧪 test_map.html           # Map functionality testing
-│   └── 📋 artifacts/              # Processing logs
-│       └── zoning_fix_log.txt
+│   └── 📋 map_debugging_notes.md  # Technical debugging guide
 │
 ├── 🔧 scripts/                     # Python processing scripts
 │   ├── 🧹 scrub_data.py            # Main data processor
-│   ├── 📊 analyze_*.py             # Analysis scripts
-│   ├── 🔍 check_zoning.py          # Validation scripts
-│   ├── 🏢 download_buildings_manual.py  # Building footprints tool
+│   ├── 📊 create_final_sales_merge_manual.py  # Production sales merge
+│   ├── 🔍 nhdra_csv_sales_extraction.py  # Core extraction logic
+│   ├── 🔧 fix_column_references.py # JavaScript debugging utility
 │   └── 📋 zoning_mapping.json      # Configuration
 │
-├── 🗂️ archive/                     # Old backups (compressed)
-│   └── RecoveredRawData_Backup_*/  # Historical data snapshots
-│
-├── 📄 README.md                    # Project documentation
-├── 📄 LICENSE                      # License
-├── 📄 CNAME                        # GitHub Pages config
-└── 📄 sitemap.xml                  # Search engine data discovery
+└── 🗂️ archive/                     # Historical data backups
+    └── RecoveredRawData_Backup_*/  # Timestamped snapshots
 ```
 
 ### Web Interface Architecture
@@ -202,14 +206,16 @@ The system demonstrates **transparent data access** while maintaining usable int
 - **Static Site**: GitHub Pages hosting for reliability and transparency
 
 **Data Loading Strategy**:
-- Asynchronous CSV fetch from `data/processed/parcels.csv` (911KB for 5,622 properties)
+- Asynchronous CSV fetch from `data/processed/parcels.csv` (main property data)
+- Sales history from `data/processed/sales.csv` (transaction records)
+- Assessment history from `data/processed/assessments.csv` (temporal valuations)
 - Spatial data loaded from `data/processed/spatial/parcels_wgs84.geojson`
 - Client-side parsing and filtering for responsive user experience
 - Efficient pagination and search without server dependencies
 
 **Deployment Structure**:
-- `public/` directory contains all web-deployable files
-- Static assets organized in `public/assets/` subdirectories
+- Root directory contains all web-deployable files
+- Static assets organized in `assets/` subdirectories
 - Data files accessible via relative paths from web interface
 
 ### Database Design & Integration Strategy
@@ -218,8 +224,8 @@ The system demonstrates **transparent data access** while maintaining usable int
 The system successfully integrates multiple municipal data sources using **Map-Block-Lot (MBL) identifiers** rather than simple parcel IDs, matching the city's actual property identification system.
 
 **Normalized Schema Design**:
-- **25 standardized columns** across integrated dataset
-- **Five logical tables**: parcels, buildings, land, sales, nhdra  
+- **35+ standardized columns** across three normalized tables
+- **Three core tables**: parcels (static property data), sales (transaction history), assessments (temporal valuations)
 - **Header normalization**: Client-side handling accommodates source data variations
 - **Type validation**: Automatic data type detection and conversion
 
@@ -338,23 +344,25 @@ For questions about data processing methods, technical specifications, or integr
 ## Current Features & Functionality
 
 ### **Advanced 4-Filter Hierarchical System**
-- **Property Class Filter**: 4-tier hierarchy covering residential, commercial, exempt, and agricultural properties
+- **Property Class Filter**: Complete property classification hierarchy with 116+ classes organized by type
 - **Year Built Filter**: Decade-based groupings (1800s-2020s) with comprehensive age analysis
-- **Zoning District Filter**: Complete Lebanon zoning coverage (R1-R3, RL1-RL3, CBD, GC, NC, PBD, MC, Industrial)
-- **Heating System Filter**: Environmental hierarchy prioritizing renewables (Solar → Wood → Gas → Electric → Oil → Coal)
-- **Touch-Friendly**: Mobile-optimized interface works without Ctrl+click requirement
+- **Zoning District Filter**: Complete Lebanon zoning coverage with proper district classifications
+- **Heating System Filter**: Dual hierarchy (Type & Fuel) with environmental prioritization
+- **Touch-Friendly**: Mobile-optimized interface with clear visual cues
 
 ### **Dual Interface System**
-- **Data Table Interface**: Ultra-compact layout with 9-row display and interactive column resizing
-- **Interactive Map**: Leaflet-based visualization with parcel boundaries and property overlays
-- **Statistics Dashboard**: 4-card percentage-based system with real-time filter updates
-- **Consistent Experience**: Identical filtering behavior across both interfaces
+- **Data Table Interface**: Compact layout with dynamic column widths and interactive filtering
+- **Interactive Map**: Leaflet-based visualization with property overlays and detailed popups
+- **Statistics Dashboard**: Real-time percentage calculations with filter-aware metrics
+- **Modal Details**: Comprehensive property, sales, and assessment history in modal dialogs
+- **Consistent Experience**: Synchronized filtering across table and map interfaces
 
 ### **Professional User Experience**
-- **Maximum Screen Efficiency**: Aggressive layout optimization for data density
-- **Interactive Elements**: Column resizing, filter statistics, map layer controls
-- **Data Export**: CSV, GeoJSON, and sitemap generation capabilities
-- **Mobile Responsive**: Optimized for desktop, tablet, and mobile viewing
+- **Data Density Optimization**: Intelligent column sizing based on actual content analysis
+- **Interactive Elements**: Column resizing, advanced filtering, map navigation
+- **Visual Cues**: Clear click instructions, hover effects, and contextual tooltips
+- **Data Export**: Direct access to underlying CSV and GeoJSON files
+- **Mobile Responsive**: Optimized layouts for all screen sizes
 
 ---
 

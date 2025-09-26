@@ -1,0 +1,125 @@
+Source File Name,Original Header,Plain Language Header,Original Position,Column Position
+Parcels Master Export,parcel_id,Parcel ID,1 (added),
+Parcels Master Export,REM_MBLU_MAP,Map Number,1,
+Parcels Master Export,REM_MBLU_BLOCK,Block Number,2,
+Parcels Master Export,REM_MBLU_LOT,Lot Number,3,
+Parcels Master Export,REM_MBLU_UNIT,Unit Number,4,
+Parcels Master Export,REM_PRCL_LOCN,Property Address,5,
+Parcels Master Export,REM_OWN_NAME,Owner Name,6,
+Parcels Master Export,MAD_MAIL_ADDR1,Mailing Address,7,
+Parcels Master Export,MAD_MAIL_CITY,Mailing City,8,
+Parcels Master Export,MAD_MAIL_STATE,Mailing State,9,
+Parcels Master Export,MAD_MAIL_ZIP,Mailing Zip Code,10,
+Parcels Master Export,REM_USE_CODE,Property Use Code,11,
+Parcels Master Export,PRC_TTL_LND_AREA_ACRES,Land Area (Acres),12,
+Parcels Master Export,PRC_TTL_ASSESS_LND,Land Assessed Value,13,
+Parcels Master Export,PRC_TTL_ASSESS_BLDG,Building Assessed Value,14,
+Parcels Master Export,PRC_TTL_ASSESS,Total Assessed Value,15,
+NHDRA,parcel_id,Parcel ID,1 (added),
+NHDRA,rem mblu map,Map Number,1,
+NHDRA,rem mblu map cut,Map Number Formatted,2,
+NHDRA,rem mblu block,Block Number,3,
+NHDRA,rem mblu block cut,Block Number Formatted,4,
+NHDRA,rem mblu lot,Lot Number,5,
+NHDRA,rem mblu lot cut,Lot Number Formatted,6,
+NHDRA,Unnamed: 6,Unit Separator,7,
+NHDRA,rem mblu unit,Unit Number,8,
+NHDRA,rem mblu unit cut,Unit Number Formatted,9,
+NHDRA,rem prcl locn street,Street Address,10,
+NHDRA,rem prcl locn,Full Property Address,11,
+NHDRA,own name,Primary Owner Name,12,
+NHDRA,co own name,Co-Owner Name,13,
+NHDRA,address1,Mailing Address Line 1,14,
+NHDRA,address2,Mailing Address Line 2,15,
+NHDRA,city,Mailing City,16,
+NHDRA,state,Mailing State,17,
+NHDRA,zip,Mailing Zip Code,18,
+NHDRA,book pg,Sale Book Page,19,
+NHDRA,saleprice,Sale Price,20,
+NHDRA,saledate,Sale Date,21,
+NHDRA,qualified,Sale Qualified Status,22,
+NHDRA,grantor,Grantor Name,23,
+NHDRA,rem use code,Property Use Code,24,
+NHDRA,lnd zone,Zoning Code,25,
+NHDRA,prc ttl lnd area acres,Land Area (Acres),26,
+NHDRA,prc ttl assess bldg,Current Building Assessment,27,
+NHDRA,prc ttl assess xf,Current Extra Features Assessment,28,
+NHDRA,prc ttl assess lnd,Current Land Assessment,29,
+NHDRA,prc ttl assess ob,Current Other Buildings Assessment,30,
+NHDRA,prc ttl assess,Current Total Assessment,31,
+NHDRA,cns area living,Living Area (Sq Ft),32,
+NHDRA,vns ayb,Year Built,33,
+NHDRA,vns style desc,Building Style Description,34,
+NHDRA,rem pid,Property ID,35,
+NHDRA,vns grade,Building Grade Code,36,
+NHDRA,vns grade desc,Building Grade Description,37,
+NHDRA,vns roof struct desc,Roof Structure Description,38,
+NHDRA,vns roof cover desc,Roof Covering Description,39,
+NHDRA,vns int flr1 desc,First Floor Description,40,
+NHDRA,vns int wall1 desc,Interior Wall Description,41,
+NHDRA,vns ext wall1 desc,Exterior Wall Description,42,
+NHDRA,cns area effective,Effective Area (Sq Ft),43,
+NHDRA,vns tot rooms,Total Rooms,44,
+NHDRA,vns num bedrm,Number of Bedrooms,45,
+NHDRA,vns num baths,Number of Bathrooms,46,
+NHDRA,vns num hbaths,Number of Half Bathrooms,47,
+NHDRA,vns bathrm style desc,Bathroom Style Description,48,
+NHDRA,vns kitchen style desc,Kitchen Style Description,49,
+NHDRA,vns heat type desc,Heating Type Description,50,
+NHDRA,vns heat fuel desc,Heating Fuel Description,51,
+NHDRA,vns ac type desc,Air Conditioning Type Description,52,
+NHDRA,cns pct good,Percentage Good Condition,53,
+NHDRA,cns eyb code,Effective Year Built Code,54,
+NHDRA,lnd nbhd,Land Neighborhood Code,55,
+NHDRA,vns stories,Number of Stories,56,
+NHDRA,ahd ttl assess bldg,Previous Building Assessment,57,
+NHDRA,ahd ttl assess xf,Previous Extra Features Assessment,58,
+NHDRA,ahd ttl assess lnd,Previous Land Assessment,59,
+NHDRA,ahd ttl assess ob,Previous Other Buildings Assessment,60,
+NHDRA,ahd ttl assess,Previous Total Assessment,61,
+NHDRA,ID1 Prior Sale Price,Prior Sale 1 Price,62,
+NHDRA,ID1 Prior Sale Date,Prior Sale 1 Date,63,
+NHDRA,ID1 Prior Book Page,Prior Sale 1 Book Page,64,
+NHDRA,ID2 Prior Sale Price,Prior Sale 2 Price,65,
+NHDRA,ID2 Prior Sale Date,Prior Sale 2 Date,66,
+NHDRA,ID2 Prior Book Page,Prior Sale 2 Book Page,67,
+NHDRA,ID3 Prior Sale Price,Prior Sale 3 Price,68,
+NHDRA,ID3 Prior Sale Date,Prior Sale 3 Date,69,
+NHDRA,ID3 Prior Book Page,Prior Sale 3 Book Page,70,
+Assessments,parcel_id,Parcel ID,1,
+Assessments,assessment_year,Assessment Year,2,
+Assessments,total_assessed_value,Total Assessed Value,3,
+Assessments,land_assessed_value,Land Assessed Value,4,
+Assessments,building_assessed_value,Building Assessed Value,5,
+Assessments,data_source,Data Source,6,
+Assessments,assessment_date,Assessment Date,7,
+Assessments,tax_year,Tax Year,8,
+sales.csv,Assessment Ratio,Assessment Ratio,1,1
+sales.csv,Book Page,Book Page,2,2
+sales.csv,Deed Type,Deed Type,3,3
+sales.csv,Grantee (Buyer),Grantee (Buyer),4,4
+sales.csv,Grantor (Seller),Grantor (Seller),5,5
+sales.csv,Parcel ID,Parcel ID,6,6
+sales.csv,Property Code,Property Code,7,7
+sales.csv,Qualified Sale,Qualified Sale,8,8
+sales.csv,Sale Date,Sale Date,9,9
+sales.csv,Sale Price,Sale Price,10,10
+parcels.csv,situs_address,Situs Address,,2.0
+parcels.csv,mailing_zip,Mailing ZIP Code,,7.0
+parcels.csv,class_code,Property Class Code,,8.0
+parcels.csv,lot_size_acres,Lot Size (Acres),,9.0
+parcels.csv,land_value,Land Value,,10.0
+parcels.csv,building_value,Building Value,,11.0
+parcels.csv,total_value,Total Value,,12.0
+parcels.csv,nhdra_qualified,NHDRA Qualified,,13.0
+parcels.csv,nhdra_vns style desc,Building Style,,15.0
+parcels.csv,nhdra_cns area living,Living Area (sq ft),,16.0
+parcels.csv,nhdra_vns heat type desc,Heating Type,,20.0
+parcels.csv,nhdra_vns heat fuel desc,Heating Fuel,,21.0
+parcels.csv,nhdra_rem use code,Use Code,,23.0
+parcels.csv,nhdra_cns pct good,Condition Percentage,,25.0
+parcels.csv,nhdra_vns grade desc,Grade Description,,26.0
+parcels.csv,nhdra_cns area effective,Effective Area (sq ft),,28.0
+parcels.csv,nhdra_vns roof cover desc,Roof Cover Type,,29.0
+parcels.csv,nhdra_vns grade,Grade Code,,30.0
+parcels.csv,nhdra_lnd nbhd,Neighborhood Code,,33.0

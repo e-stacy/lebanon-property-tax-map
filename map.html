@@ -597,6 +597,7 @@
         let parcelData = [];
         let propertyData = new Map();
         let salesData = new Map(); // parcel_id -> array of sales
+        let assessmentData = new Map(); // parcel_id -> array of assessments
         let currentFilters = {};
         
         // Color schemes for different visualization modes
@@ -1020,17 +1021,20 @@
                         console.warn(`Error parsing line ${index + 2}:`, err);
                         return null;
                     }
-                }).filter(p => p && p.parcel_id && p.parcel_id.trim());
+                }).filter(p => p && p['Parcel ID'] && p['Parcel ID'].trim());
 
                 // Index properties by parcel ID for quick lookup
                 properties.forEach(prop => {
-                    propertyData.set(prop.parcel_id, prop);
+                    propertyData.set(prop['Parcel ID'], prop);
                 });
 
                 console.log(`Successfully loaded ${properties.length} properties`);
 
                 // Load sales data
                 await loadSalesData();
+
+                // Load assessment data
+                await loadAssessmentData();
 
                 // Initialize working checkbox filters
                 if (typeof initializeWorkingFilters !== 'undefined') {
@@ -1039,6 +1043,14 @@
 
                 // Load spatial data
                 loadActualSpatialData(properties);
+
+                // Initialize filters again now that all data is loaded
+                if (typeof initializeWorkingFilters !== 'undefined') {
+                    setTimeout(() => {
+                        console.log('Re-initializing filters after all data loaded');
+                        initializeWorkingFilters();
+                    }, 500); // Small delay to ensure everything is ready
+                }
 
             } catch (error) {
                 console.error('Error loading property data:', error);
@@ -1050,7 +1062,7 @@
         async function loadSalesData() {
             try {
                 console.log('Loading sales data...');
-                const response = await fetch('../data/processed/final_property_sales_dataset.csv');
+                const response = await fetch('../data/processed/sales.csv');
 
                 if (!response.ok) {
                     console.warn('Sales data file not found - sales history will be limited');
@@ -1076,7 +1088,7 @@
                             sale[header] = values[index] || '';
                         });
 
-                        const parcelId = sale['parcel_id'];
+                        const parcelId = sale['Parcel ID'];
                         if (parcelId) {
                             if (!salesData.has(parcelId)) {
                                 salesData.set(parcelId, []);
@@ -1089,8 +1101,8 @@
                 // Sort sales by date for each parcel (most recent first)
                 for (const [parcelId, sales] of salesData) {
                     sales.sort((a, b) => {
-                        const dateA = new Date(a['sale_date'] || '1900-01-01');
-                        const dateB = new Date(b['sale_date'] || '1900-01-01');
+                        const dateA = new Date(a['Sale Date'] || '1900-01-01');
+                        const dateB = new Date(b['Sale Date'] || '1900-01-01');
                         return dateB - dateA; // Most recent first
                     });
                 }
@@ -1099,6 +1111,68 @@
 
             } catch (error) {
                 console.warn('Error loading sales data:', error);
+            }
+        }
+
+        // Load assessment data from CSV
+        async function loadAssessmentData() {
+            try {
+                console.log('Loading assessment data...');
+                // Ensure assessmentData is a Map
+                if (!assessmentData || typeof assessmentData.set !== 'function') {
+                    console.log('Initializing assessmentData as Map');
+                    assessmentData = new Map();
+                }
+
+                const response = await fetch('../data/processed/assessments.csv');
+
+                if (!response.ok) {
+                    console.warn('Assessment data file not found - assessment history will be limited');
+                    return;
+                }
+
+                const text = await response.text();
+                const lines = text.trim().split('\n');
+
+                if (lines.length < 2) {
+                    console.warn('Assessment data file is empty');
+                    return;
+                }
+
+                const headers = parseCSVLine(lines[0]);
+
+                // Process assessment data
+                for (let i = 1; i < lines.length; i++) {
+                    const values = parseCSVLine(lines[i]);
+                    if (values.length >= headers.length) {
+                        const assessment = {};
+                        headers.forEach((header, index) => {
+                            assessment[header] = values[index] || '';
+                        });
+
+                        const parcelId = assessment['Parcel ID'];
+                        if (parcelId) {
+                            if (!assessmentData.has(parcelId)) {
+                                assessmentData.set(parcelId, []);
+                            }
+                            assessmentData.get(parcelId).push(assessment);
+                        }
+                    }
+                }
+
+                // Sort assessments by year for each parcel (most recent first)
+                for (const [parcelId, assessments] of assessmentData) {
+                    assessments.sort((a, b) => {
+                        const yearA = parseInt(a['Assessment Year']) || 0;
+                        const yearB = parseInt(b['Assessment Year']) || 0;
+                        return yearB - yearA; // Most recent first
+                    });
+                }
+
+                console.log(`Loaded assessment data for ${assessmentData.size} parcels`);
+
+            } catch (error) {
+                console.warn('Error loading assessment data:', error);
             }
         }
 
@@ -1212,14 +1286,14 @@
                 const baseLng = centerLng - (gridSize * spacing / 2) + (col * spacing);
                 
                 // Size based on property value for testing
-                const value = parseFloat(prop.total_value) || 0;
+                const value = parseFloat(prop['Total Value']) || 0;
                 let size = 0.002;
                 if (value > 500000) size = 0.003;
                 if (value > 1000000) size = 0.004;
                 
                 const feature = {
                     type: 'Feature',
-                    properties: { parcel_id: prop.parcel_id },
+                    properties: { parcel_id: prop['Parcel ID'] },
                     geometry: {
                         type: 'Polygon',
                         coordinates: [[
@@ -1304,10 +1378,12 @@
                     // Try to link spatial data to property data
                     const mapLot = feature.properties.MAP_LOT;
                     let prop = null;
-                    
+
+                    if (!mapLot) return; // Skip if no MAP_LOT property
+
                     // Direct match with parcel_id
                     prop = propertyData.get(mapLot);
-                    
+
                     // Strategy 3: Try map-block match (e.g., "107-6" matches map 107, block 6)
                     if (!prop && mapLot.includes('-')) {
                         const parts = mapLot.split('-');
@@ -1379,10 +1455,10 @@
             
             switch (colorBy) {
                 case 'class':
-                    return colorSchemes.class[property?.class_code] || colorSchemes.class.default;
+                    return colorSchemes.class[property && property['Property Class Code']] || colorSchemes.class.default;
                     
                 case 'value':
-                    const value = parseFloat(property.total_value) || 0;
+                    const value = parseFloat(property['Total Value']) || 0;
                     for (const range of colorSchemes.value.ranges) {
                         if (value >= range.min && value < range.max) {
                             return range.color;
@@ -1391,7 +1467,7 @@
                     return '#bdc3c7';
                     
                 case 'year':
-                    const yearValue = property['nhdra_vns ayb'];
+                    const yearValue = property['Year Built'];
                     const year = parseInt(yearValue) || 0;
                     // Only consider realistic years (1800-2030), treat others as unknown
                     if (year < 1800 || year > 2030) {
@@ -1405,7 +1481,7 @@
                     return '#bdc3c7';
                     
                 case 'heating':
-                    const heatFuel = property['nhdra_vns heat fuel desc'];
+                    const heatFuel = property['Heating Fuel'];
                     if (!heatFuel || heatFuel === '0' || heatFuel === '') {
                         return colorSchemes.heating.unknown;
                     }
@@ -1423,7 +1499,7 @@
                     return colorSchemes.heating.default;
                     
                 case 'zoning':
-                    const zone = property['nhdra_lnd zone'];
+                    const zone = property['Zoning Code'];
                     if (!zone || zone === '0' || zone === '') {
                         return colorSchemes.zoning.unknown;
                     }
@@ -1437,6 +1513,11 @@
         
         // Check if property passes current filters
         function passesFilters(property) {
+            // If filter system not loaded yet, show all properties
+            if (typeof getSelectedValues === 'undefined') {
+                return true;
+            }
+
             const selectedClasses = getSelectedValues('class-filter');
             const selectedYears = getSelectedValues('year-filter');
             const selectedZones = getSelectedValues('zoning-filter');
@@ -1445,15 +1526,15 @@
             const maxValue = parseFloat(document.getElementById('max-value').value) || Infinity;
             
             // Checkbox class filtering
-            if (selectedClasses.length > 0 && property?.class_code) {
-                if (!selectedClasses.includes(property.class_code)) {
+            if (selectedClasses.length > 0 && property && property['Property Class Code']) {
+                if (!selectedClasses.includes(property['Property Class Code'])) {
                     return false;
                 }
             }
             
             // Year Built filter
             if (selectedYears.length > 0) {
-                const yearValue = property['nhdra_vns ayb'];
+                const yearValue = property['Year Built'];
                 if (!yearValue || yearValue === '0' || yearValue === '') {
                     // Include unknown year properties only if "unknown" is selected
                     if (!selectedYears.includes('unknown')) {
@@ -1476,7 +1557,7 @@
             
             // Zoning filter
             if (selectedZones.length > 0) {
-                const zoneValue = property['nhdra_lnd zone'];
+                const zoneValue = property['Zoning Code'];
                 if (!zoneValue || zoneValue === '0' || zoneValue === '') {
                     if (!selectedZones.includes('unknown')) {
                         return false;
@@ -1488,8 +1569,8 @@
             
             // Heating System filter
             if (selectedHeating.length > 0) {
-                const heatFuel = property['nhdra_vns heat fuel desc'];
-                const heatType = property['nhdra_vns heat type desc'];
+                const heatFuel = property['Heating Fuel'];
+                const heatType = property['Heating Type'];
                 
                 if (!heatFuel || heatFuel === '0' || heatFuel === '' ||
                     !heatType || heatType === '0' || heatType === '') {
@@ -1504,7 +1585,7 @@
                 }
             }
             
-            const value = parseFloat(property.total_value) || 0;
+            const value = parseFloat(property['Total Value']) || 0;
             if (value < minValue || value > maxValue) {
                 return false;
             }
@@ -1528,17 +1609,17 @@
         // Create popup content for parcel
         function createPopupContent(property) {
             return `
-                <div class="popup-title">${property.situs_address || 'No Address'}</div>
-                <div class="popup-row"><span class="popup-label">Parcel:</span> ${property.parcel_id}</div>
-                <div class="popup-row"><span class="popup-label">Owner:</span> ${property.owner_name || 'Unknown'}</div>
-                <div class="popup-row"><span class="popup-label">Class:</span> ${property?.class_code || 'Unknown'}</div>
-                <div class="popup-row"><span class="popup-label">Zoning:</span> ${property.nhdra_zoning_code || 'Unknown'}</div>
-                <div class="popup-row"><span class="popup-label">Heating:</span> ${property.nhdra_heating_fuel || 'Unknown'}</div>
-                <div class="popup-row"><span class="popup-label">Lot Size:</span> ${property.lot_size_acres || '0'} acres</div>
-                <div class="popup-row"><span class="popup-label">Total Value:</span> $${formatNumber(property.total_value || 0)}</div>
-                <div class="popup-row"><span class="popup-label">Land Value:</span> $${formatNumber(property.land_value || 0)}</div>
-                <div class="popup-row"><span class="popup-label">Building Value:</span> $${formatNumber(property.building_value || 0)}</div>
-                ${property['nhdra_vns ayb'] && parseInt(property['nhdra_vns ayb']) >= 1800 && parseInt(property['nhdra_vns ayb']) <= 2030 ? `<div class="popup-row"><span class="popup-label">Year Built:</span> ${property['nhdra_vns ayb']}</div>` : ''}
+                <div class="popup-title">${property['Situs Address'] || 'No Address'}</div>
+                <div class="popup-row"><span class="popup-label">Parcel:</span> ${property['Parcel ID']}</div>
+                <div class="popup-row"><span class="popup-label">Owner:</span> ${property['Owner Name'] || 'Unknown'}</div>
+                <div class="popup-row"><span class="popup-label">Class:</span> ${property && property['Property Class Code'] || 'Unknown'}</div>
+                <div class="popup-row"><span class="popup-label">Zoning:</span> ${property['Zoning Code'] || 'Unknown'}</div>
+                <div class="popup-row"><span class="popup-label">Heating:</span> ${property['Heating Fuel'] || 'Unknown'}</div>
+                <div class="popup-row"><span class="popup-label">Lot Size:</span> ${property['Lot Size (Acres)'] || '0'} acres</div>
+                <div class="popup-row"><span class="popup-label">Total Value:</span> $${formatNumber(property['Total Value'] || 0)}</div>
+                <div class="popup-row"><span class="popup-label">Land Value:</span> $${formatNumber(property['Land Value'] || 0)}</div>
+                <div class="popup-row"><span class="popup-label">Building Value:</span> $${formatNumber(property['Building Value'] || 0)}</div>
+                ${property['Year Built'] && parseInt(property['Year Built']) >= 1800 && parseInt(property['Year Built']) <= 2030 ? `<div class="popup-row"><span class="popup-label">Year Built:</span> ${property['Year Built']}</div>` : ''}
                 ${property.building_gla ? `<div class="popup-row"><span class="popup-label">Building Area:</span> ${formatNumber(property.building_gla)} sq ft</div>` : ''}
             `;
         }
@@ -1546,7 +1627,7 @@
         // Populate hierarchical class filter dropdown
         function populateClassFilter(properties) {
             const classFilter = document.getElementById('class-filter');
-            const usedClasses = new Set(properties.map(p => p?.class_code).filter(c => c && propertyClassHierarchy[c]));
+            const usedClasses = new Set(properties.map(p => p && p['Property Class Code']).filter(c => c && propertyClassHierarchy[c]));
             
             // Get primary classes that are actually used (either directly or have used subclasses)
             const primaryClassesToShow = getPrimaryClasses().filter(({code}) => {
@@ -1881,9 +1962,9 @@
             if (allPropertiesTotal > 0) return; // Already calculated
 
             for (const [id, prop] of propertyData) {
-                allPropertiesTotal += parseFloat(prop.total_value) || 0;
+                allPropertiesTotal += parseFloat(prop['Total Value']) || 0;
                 allPropertiesCount++;
-                allPropertiesLandArea += parseFloat(prop.lot_size_acres) || 0;
+                allPropertiesLandArea += parseFloat(prop['Lot Size (Acres)']) || 0;
             }
             
             // Update total value section
@@ -1891,7 +1972,7 @@
             document.getElementById('all-total-value').textContent = '$' + formatLargeNumber(allPropertiesTotal);
             // Calculate median value for all properties
             const allValues = [...propertyData.values()]
-                .map(p => parseFloat(p.total_value) || 0)
+                .map(p => parseFloat(p['Total Value']) || 0)
                 .filter(v => v > 0)
                 .sort((a, b) => a - b);
             const allMedianValue = allValues.length > 0 ? allValues[Math.floor(allValues.length / 2)] : 0;
@@ -1911,6 +1992,10 @@
             calculateTotalValue();
 
             // Check if any filters are applied
+            if (typeof getSelectedValues === 'undefined') {
+                return; // Skip if filter system not loaded yet
+            }
+
             const selectedClasses = getSelectedValues('class-filter');
             const selectedYears = getSelectedValues('year-filter');
             const selectedZones = getSelectedValues('zoning-filter');
@@ -1936,14 +2021,14 @@
                 for (const [id, prop] of propertyData) {
                     if (passesFilters(prop)) {
                         visibleCount++;
-                        totalValue += parseFloat(prop.total_value) || 0;
-                        landArea += parseFloat(prop.lot_size_acres) || 0;
+                        totalValue += parseFloat(prop['Total Value']) || 0;
+                        landArea += parseFloat(prop['Lot Size (Acres)']) || 0;
 
                         // Collect values and ages for median calculations
-                        const value = parseFloat(prop.total_value) || 0;
+                        const value = parseFloat(prop['Total Value']) || 0;
                         if (value > 0) values.push(value);
 
-                        const year = parseFloat(prop['nhdra_vns ayb']);
+                        const year = parseFloat(prop['Year Built']);
                         const age = year > 1800 && year <= 2025 ? 2025 - year : null;
                         if (age !== null) ages.push(age);
                     }
@@ -1955,7 +2040,7 @@
             if (!hasFilters) {
                 // No filters - use city-wide median
                 const allValues = [...propertyData.values()]
-                    .map(p => parseFloat(p.total_value) || 0)
+                    .map(p => parseFloat(p['Total Value']) || 0)
                     .filter(v => v > 0)
                     .sort((a, b) => a - b);
                 medianValue = allValues.length > 0 ? allValues[Math.floor(allValues.length / 2)] : 0;
@@ -1973,7 +2058,7 @@
                 // No filters - use city-wide median age
                 const allAges = [...propertyData.values()]
                     .map(p => {
-                        const year = parseFloat(p['nhdra_vns ayb']);
+                        const year = parseFloat(p['Year Built']);
                         return year > 1800 && year <= 2025 ? 2025 - year : null;
                     })
                     .filter(age => age !== null)
@@ -2018,7 +2103,7 @@
 
             // Calculate median percentages (cached for performance)
             const allPropValues = [...propertyData.values()]
-                .map(p => parseFloat(p.total_value) || 0)
+                .map(p => parseFloat(p['Total Value']) || 0)
                 .filter(v => v > 0)
                 .sort((a, b) => a - b);
             const allMedianValue = allPropValues.length > 0 ? allPropValues[Math.floor(allPropValues.length / 2)] : 0;
@@ -2027,7 +2112,7 @@
             // Calculate median age percentage/ratio (cached for performance)
             const allAges = [...propertyData.values()]
                 .map(p => {
-                    const year = parseFloat(p['nhdra_vns ayb']);
+                    const year = parseFloat(p['Year Built']);
                     return year > 1800 && year <= 2025 ? 2025 - year : null;
                 })
                 .filter(age => age !== null)
@@ -2147,8 +2232,8 @@
                 if (canShowMBL) {
                     // Get property data for complete identifier
                     let prop = propertyData.get(mapLot);
-                    if (prop && prop.parcel_id) {
-                        labelContent = prop.parcel_id;
+                    if (prop && prop['Parcel ID']) {
+                        labelContent = prop['Parcel ID'];
                         showThisLabel = true;
                     }
                 }
@@ -2158,11 +2243,11 @@
                     // Find property data
                     let prop = propertyData.get(mapLot);
                     
-                    if (prop && prop.total_value) {
-                        const value = formatLargeNumber(parseFloat(prop.total_value) || 0);
+                    if (prop && prop['Total Value']) {
+                        const value = formatLargeNumber(parseFloat(prop['Total Value']) || 0);
                         if (labelContent) {
                             // Both MBL and value - MBL on top, value on bottom
-                            labelContent = `${prop.parcel_id}<br/>$${value}`;
+                            labelContent = `${prop['Parcel ID']}<br/>$${value}`;
                         } else {
                             // Only value
                             labelContent = `$${value}`;
@@ -2274,7 +2359,7 @@
 
             // Update modal title
             document.getElementById('modal-title').textContent =
-                `📍 ${propertyData.parcel_id} (${propertyData.situs_address || 'No Address'})`;
+                `📍 ${propertyData['Parcel ID']} (${propertyData['Situs Address'] || 'No Address'})`;
 
             // Populate property summary
             populatePropertySummary(propertyData);
@@ -2298,12 +2383,12 @@
         function populatePropertySummary(property) {
             const summaryDiv = document.getElementById('property-summary');
             summaryDiv.innerHTML = `
-                <div class="summary-row"><strong>Parcel:</strong> ${property.parcel_id}</div>
-                <div class="summary-row"><strong>Owner:</strong> ${property.owner_name || 'Unknown'}</div>
-                <div class="summary-row"><strong>Class:</strong> ${property.class_code || 'Unknown'}</div>
-                <div class="summary-row"><strong>Zoning:</strong> ${property.nhdra_zoning_code || 'Unknown'}</div>
-                <div class="summary-row"><strong>Heating Fuel:</strong> ${property.nhdra_heating_fuel || 'Unknown'}</div>
-                <div class="summary-row"><strong>Total Value:</strong> $${formatNumber(property.total_value || 0)}</div>
+                <div class="summary-row"><strong>Parcel:</strong> ${property['Parcel ID']}</div>
+                <div class="summary-row"><strong>Owner:</strong> ${property['Owner Name'] || 'Unknown'}</div>
+                <div class="summary-row"><strong>Class:</strong> ${property['Property Class Code'] || 'Unknown'}</div>
+                <div class="summary-row"><strong>Zoning:</strong> ${property['Zoning Code'] || 'Unknown'}</div>
+                <div class="summary-row"><strong>Heating Fuel:</strong> ${property['Heating Fuel'] || 'Unknown'}</div>
+                <div class="summary-row"><strong>Total Value:</strong> $${formatNumber(property['Total Value'] || 0)}</div>
             `;
         }
 
@@ -2312,24 +2397,24 @@
             let content = '';
 
             // Add building details if available
-            if (property['nhdra_vns ayb'] && parseInt(property['nhdra_vns ayb']) >= 1800) {
-                content += `<div class="summary-row"><strong>Year Built:</strong> ${property['nhdra_vns ayb']}</div>`;
+            if (property['Year Built'] && parseInt(property['Year Built']) >= 1800) {
+                content += `<div class="summary-row"><strong>Year Built:</strong> ${property['Year Built']}</div>`;
             }
 
-            if (property['nhdra_vns style desc']) {
-                content += `<div class="summary-row"><strong>Building Style:</strong> ${property['nhdra_vns style desc']}</div>`;
+            if (property['Building Style']) {
+                content += `<div class="summary-row"><strong>Building Style:</strong> ${property['Building Style']}</div>`;
             }
 
             if (property.building_gla) {
                 content += `<div class="summary-row"><strong>Building Area:</strong> ${formatNumber(property.building_gla)} sq ft</div>`;
             }
 
-            if (property['nhdra_lnd zone']) {
-                content += `<div class="summary-row"><strong>Zoning:</strong> ${property['nhdra_lnd zone']}</div>`;
+            if (property['Zoning Code']) {
+                content += `<div class="summary-row"><strong>Zoning:</strong> ${property['Zoning Code']}</div>`;
             }
 
-            if (property['nhdra_vns heat type desc']) {
-                content += `<div class="summary-row"><strong>Heating:</strong> ${property['nhdra_vns heat type desc']}</div>`;
+            if (property['Heating Type']) {
+                content += `<div class="summary-row"><strong>Heating:</strong> ${property['Heating Type']}</div>`;
             }
 
             if (!content) {
@@ -2349,22 +2434,22 @@
             let saleCount = 0;
 
             // Get comprehensive sales data from our merged dataset
-            const parcelSales = salesData.get(property.parcel_id) || [];
+            const parcelSales = salesData.get(property['Parcel ID']) || [];
 
             // Process sales from comprehensive dataset
             parcelSales.forEach(sale => {
-                const salePrice = parseFloat(sale.sale_price) || 0;
+                const salePrice = parseFloat(sale['Sale Price']) || 0;
                 if (salePrice > 0) {
                     const saleEntry = {
-                        date: sale.sale_date,
+                        date: sale['Sale Date'],
                         price: salePrice,
-                        qualified: sale.qualified || 'N/A',
-                        source: sale.data_source || 'unknown',
-                        strategy_tier: sale.strategy_tier || 'unknown',
-                        deed_type: sale.deed_type || '',
-                        grantor: sale.grantor || '',
-                        grantee: sale.grantee || '',
-                        property_address: sale.property_address || ''
+                        qualified: sale['Qualified Sale'] || 'N/A',
+                        source: 'sales.csv',
+                        strategy_tier: 'unknown',
+                        deed_type: sale['Deed Type'] || '',
+                        grantor: sale['Grantor (Seller)'] || '',
+                        grantee: sale['Grantee (Buyer)'] || '',
+                        property_address: ''
                     };
 
                     // Mark most recent sale as current
@@ -2495,55 +2580,54 @@
 
             tbody.innerHTML = '';
 
-            // Current assessments (2024)
-            const currentLand = parseFloat(property['nhdra_prc ttl assess lnd'] || 0);
-            const currentBuilding = parseFloat(property['nhdra_prc ttl assess bldg'] || 0);
-            const currentTotal = parseFloat(property['nhdra_prc ttl assess'] || 0);
+            // Get assessment history from the loaded assessment data
+            const parcelAssessments = assessmentData.get(property['Parcel ID']) || [];
 
-            // Previous assessments (adjusted/historical)
-            const previousLand = parseFloat(property['nhdra_ahd ttl assess lnd'] || 0);
-            const previousBuilding = parseFloat(property['nhdra_ahd ttl assess bldg'] || 0);
-            const previousTotal = parseFloat(property['nhdra_ahd ttl assess'] || 0);
+            // Sort assessments by year (most recent first) - should already be sorted from loading
+            parcelAssessments.forEach(assessment => {
+                const year = assessment['Assessment Year'];
+                const landValue = parseFloat(assessment['Land Assessed Value']) || 0;
+                const buildingValue = parseFloat(assessment['Building Assessed Value']) || 0;
+                const totalValue = parseFloat(assessment['Total Assessed Value']) || 0;
+                const dataSource = assessment['Data Source'];
 
-            // Current assessment row (most recent first)
-            if (currentTotal > 0) {
+                const isCurrent = year === '2022'; // Assuming 2022 is current
+
                 tbody.innerHTML += `
-                    <tr class="current-assessment">
-                        <td>Current Assessment (2024)</td>
-                        <td>$${formatNumber(currentLand)}</td>
-                        <td>$${formatNumber(currentBuilding)}</td>
-                        <td><strong>$${formatNumber(currentTotal)}</strong></td>
+                    <tr class="${isCurrent ? 'current-assessment' : ''}">
+                        <td title="${year} Assessment">${year} Assessment</td>
+                        <td title="$${formatNumber(landValue)}">$${formatNumber(landValue)}</td>
+                        <td title="$${formatNumber(buildingValue)}">$${formatNumber(buildingValue)}</td>
+                        <td title="$${formatNumber(totalValue)}"><strong>$${formatNumber(totalValue)}</strong></td>
                     </tr>
                 `;
-            }
-
-            // Previous assessment row (if available)
-            if (previousTotal > 0) {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>Previous Assessment</td>
-                        <td>$${formatNumber(previousLand)}</td>
-                        <td>$${formatNumber(previousBuilding)}</td>
-                        <td><strong>$${formatNumber(previousTotal)}</strong></td>
-                    </tr>
-                `;
-            }
+            });
 
             // Generate analysis
-            if (currentTotal > 0 && previousTotal > 0) {
-                const changePercent = ((currentTotal - previousTotal) / previousTotal * 100);
-                analysisDiv.innerHTML = `
-                    <h4>🏛️ Assessment Analysis</h4>
-                    <ul>
-                        <li><strong>Assessment Change:</strong> ${formatChange(currentTotal - previousTotal)} (${changePercent.toFixed(1)}%)</li>
-                        <li><strong>Current Assessment:</strong> $${formatNumber(currentTotal)}</li>
-                        <li><strong>Previous Assessment:</strong> $${formatNumber(previousTotal)}</li>
-                        ${property.nhdra_saleprice && property.nhdra_saleprice > 0 ?
-                            `<li><strong>Sale-to-Assessment Ratio:</strong> ${(currentTotal / property.nhdra_saleprice * 100).toFixed(1)}%</li>` : ''}
-                    </ul>
-                `;
+            if (parcelAssessments.length > 1) {
+                const mostRecent = parcelAssessments[0];
+                const previous = parcelAssessments[1];
+
+                const currentTotal = parseFloat(mostRecent['Total Assessed Value']) || 0;
+                const previousTotal = parseFloat(previous['Total Assessed Value']) || 0;
+
+                if (currentTotal > 0 && previousTotal > 0) {
+                    const changePercent = ((currentTotal - previousTotal) / previousTotal * 100);
+                    analysisDiv.innerHTML = `
+                        <h4>🏛️ Assessment Analysis</h4>
+                        <ul>
+                            <li><strong>Assessment Change:</strong> ${formatChange(currentTotal - previousTotal)} (${changePercent.toFixed(1)}%)</li>
+                            <li><strong>Current Assessment (${mostRecent['Assessment Year']}):</strong> $${formatNumber(currentTotal)}</li>
+                            <li><strong>Previous Assessment (${previous['Assessment Year']}):</strong> $${formatNumber(previousTotal)}</li>
+                        </ul>
+                    `;
+                } else {
+                    analysisDiv.innerHTML = `<p>Assessment data available for ${parcelAssessments.length} years.</p>`;
+                }
+            } else if (parcelAssessments.length === 1) {
+                analysisDiv.innerHTML = '<p>Single assessment record available.</p>';
             } else {
-                analysisDiv.innerHTML = '<p>Limited assessment history available.</p>';
+                analysisDiv.innerHTML = '<p>No assessment history available.</p>';
             }
         }
 
@@ -2585,7 +2669,7 @@
 
             const link = document.createElement('a');
             link.href = url;
-            link.download = `property_${currentPropertyData.parcel_id}.json`;
+            link.download = `property_${currentPropertyData['Parcel ID']}.json`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
